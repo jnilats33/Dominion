@@ -1,0 +1,3117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dominion App</title>
+  <style>
+    :root {
+      --bg: #0d0b11;
+      --card: #181420;
+      --card-elevated: #201a2b;
+      --accent: #8b0032;
+      --accent-bright: #d62860;
+      --gold: #d4af37;
+      --gold-dim: rgba(212, 175, 55, 0.25);
+      --daisy: #a855f7;
+      --daisy-dim: rgba(168, 85, 247, 0.2);
+      --text: #ece6ea;
+      --muted: #8c8291;
+      --border: #2a2233;
+      --danger: #e11d48;
+      --success: #16a34a;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 84px;
+      line-height: 1.45;
+    }
+
+    /* Sticky Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--accent-bright);
+      line-height: 1.1;
+    }
+
+    header h1 span {
+      color: var(--gold);
+      font-weight: 400;
+      font-size: 11px;
+      letter-spacing: 1px;
+      margin-left: 4px;
+    }
+
+    .sync-status {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--warning);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sync-status.online {
+      color: #4ade80;
+    }
+
+    .role-badge {
+      background-color: var(--card-elevated);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .role-badge.daisy-active {
+      border-color: var(--daisy);
+      color: #e9d5ff;
+    }
+
+    /* Error Banner & Toast */
+    #errorBanner {
+      display: none;
+      background-color: #7f1d1d;
+      color: #fecaca;
+      padding: 10px 14px;
+      font-size: 12px;
+      border-bottom: 1px solid #ef4444;
+    }
+
+    .toast {
+      position: fixed;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      background-color: var(--card-elevated);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 9px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75);
+      display: none;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    /* Main Content */
+    main {
+      padding: 16px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Fixed Bottom Navigation */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background-color: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 4px 2px;
+      box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.45);
+    }
+
+    nav button {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 8px 2px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      min-height: 54px;
+      justify-content: center;
+    }
+
+    nav button .icon-wrap {
+      font-size: 17px;
+      line-height: 1;
+      position: relative;
+      display: inline-block;
+    }
+
+    nav button.active {
+      color: var(--accent-bright);
+      font-weight: 700;
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: -5px;
+      right: -11px;
+      background-color: var(--accent-bright);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--card);
+    }
+
+    .nav-badge.show {
+      display: flex;
+    }
+
+    /* Sub-Navigation */
+    .sub-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+
+    .sub-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .sub-nav button {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .sub-nav button.active {
+      background-color: var(--accent);
+      border-color: var(--accent-bright);
+      color: #ffffff;
+    }
+
+    .sub-nav button.perm-btn {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    .sub-nav button.perm-btn.active {
+      background-color: #4a3a08;
+      border-color: var(--gold);
+      color: #ffffff;
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .card-gold {
+      border-color: var(--gold-dim);
+    }
+
+    .card-crimson {
+      border-color: var(--accent);
+    }
+
+    .card-cloud {
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+
+    .card h3 {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 4px;
+      padding-right: 76px;
+    }
+
+    .card h3.full-width {
+      padding-right: 0;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+      margin: 16px 0 10px 0;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Item Actions */
+    .item-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 13px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .icon-btn.edit {
+      color: var(--gold);
+    }
+
+    .icon-btn.del {
+      color: #ff5c7c;
+    }
+
+    /* Forms & Inputs */
+    label.field-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select {
+      width: 100%;
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 8px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent-bright);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .input-row input {
+      margin-bottom: 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent), #640024);
+      border: 1px solid var(--accent-bright);
+      color: #ffffff;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-secondary {
+      background: var(--card-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #8a6d14, #594509);
+      border: 1px solid var(--gold);
+      color: #ffffff;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #15803d, #14532d);
+      border: 1px solid #22c55e;
+      color: #ffffff;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #be123c, #881337);
+      border: 1px solid #fb7185;
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      padding: 7px 10px;
+      font-size: 12px;
+      width: auto;
+    }
+
+    .daisy-notice {
+      background-color: var(--daisy-dim);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      color: #e9d5ff;
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    /* Media & Placeholder Boxes */
+    .media-box {
+      width: 100%;
+      height: 150px;
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .css-art-card {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: radial-gradient(circle at center, #291326 0%, #100c16 100%);
+      border: 1px inset rgba(212, 175, 55, 0.25);
+    }
+
+    .css-art-card.toys-theme {
+      background: radial-gradient(circle at center, #231233 0%, #100c16 100%);
+    }
+
+    .css-art-icon {
+      font-size: 44px;
+      line-height: 1;
+    }
+
+    .css-art-label {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .media-btn-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .media-btn {
+      flex: 1;
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .hidden-file {
+      display: none;
+    }
+
+    .preview-box {
+      display: none;
+      position: relative;
+      margin-bottom: 10px;
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .preview-box.active {
+      display: block;
+    }
+
+    .preview-box img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background-color: rgba(13, 11, 17, 0.9);
+      color: #ff5c7c;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tag-pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 12px;
+      background-color: rgba(139, 0, 50, 0.35);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      margin-top: 6px;
+    }
+
+    /* Dashboard Approval Styles */
+    .cat-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin: 14px 0 8px 0;
+      font-size: 13px;
+      font-weight: 700;
+      border-left: 4px solid var(--gold);
+      background-color: var(--card-elevated);
+    }
+
+    .pending-card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--daisy);
+      border-radius: 12px;
+      padding: 13px;
+      margin-bottom: 10px;
+    }
+
+    .rejected-card {
+      background-color: #1d1118;
+      border: 1px solid var(--accent-bright);
+      border-left: 4px solid var(--danger);
+      border-radius: 12px;
+      padding: 13px;
+      margin-bottom: 10px;
+    }
+
+    .req-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cat-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: #ffffff;
+    }
+
+    .req-time {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .req-actions {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .req-actions button {
+      padding: 8px 4px;
+      font-size: 11px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .reject-reason-box {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background-color: rgba(214, 40, 96, 0.14);
+      border: 1px solid rgba(214, 40, 96, 0.4);
+      border-radius: 8px;
+      font-size: 12px;
+      color: #fecdd3;
+    }
+
+    /* Chat */
+    .chat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chat-bubble {
+      max-width: 82%;
+      padding: 10px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      word-wrap: break-word;
+    }
+
+    .chat-bubble.master {
+      align-self: flex-end;
+      background-color: var(--accent);
+      color: #ffffff;
+      border-bottom-right-radius: 3px;
+    }
+
+    .chat-bubble.daisy {
+      align-self: flex-start;
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 3px;
+    }
+
+    /* Calendar */
+    .cal-filters {
+      display: flex;
+      gap: 6px;
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      padding: 5px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .cal-filter-btn {
+      flex: 1;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 7px 4px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .cal-filter-btn.active {
+      background-color: var(--bg);
+      border-color: var(--gold);
+      color: var(--text);
+    }
+
+    .dot-m {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent-bright);
+      display: inline-block;
+    }
+
+    .dot-d {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--daisy);
+      display: inline-block;
+    }
+
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .cal-nav {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cal-weekdays,
+    .cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+
+    .cal-weekdays {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .cal-cell {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-height: 44px;
+      padding: 4px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .cal-cell.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+
+    .cal-cell.selected {
+      border-color: var(--gold);
+      background-color: #241c30;
+    }
+
+    .cal-cell-num {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .cal-bars {
+      width: 85%;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .bar-m {
+      height: 4px;
+      border-radius: 2px;
+      background-color: var(--accent-bright);
+    }
+
+    .bar-d {
+      height: 4px;
+      border-radius: 2px;
+      background-color: var(--daisy);
+    }
+
+    .event-card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-left-width: 4px;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .event-card.master {
+      border-left-color: var(--accent-bright);
+    }
+
+    .event-card.daisy {
+      border-left-color: var(--daisy);
+    }
+
+    /* Shopping Checkboxes */
+    .shop-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 76px;
+    }
+
+    .shop-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-bright);
+      cursor: pointer;
+    }
+
+    .shop-row.done span {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    /* Permissions Matrix */
+    .perm-card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .perm-card.is-off {
+      opacity: 0.65;
+    }
+
+    .perm-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .master-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background-color: var(--bg);
+    }
+
+    .master-switch.on {
+      border-color: var(--accent-bright);
+      color: #ff85ac;
+      background-color: rgba(139, 0, 50, 0.25);
+    }
+
+    .master-switch.off {
+      color: var(--muted);
+    }
+
+    .perm-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .perm-box {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .perm-box input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-bright);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background-color: rgba(0, 0, 0, 0.85);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background-color: var(--card);
+      border: 1px solid var(--gold);
+      border-radius: 14px;
+      padding: 18px;
+      width: 100%;
+      max-width: 380px;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .modal-box h3 {
+      font-size: 16px;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .empty-box {
+      background-color: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="errorBanner"></div>
+
+  <header>
+    <div class="header-left">
+      <h1>DOMINION <span>v2</span></h1>
+      <div class="sync-status" id="syncStatusLabel">● Offline (Lokal)</div>
+    </div>
+    <div class="role-badge" id="roleBadge">Rolle: Master</div>
+  </header>
+
+  <div class="toast" id="toastMsg"></div>
+
+  <main>
+    <!-- 1. DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <div class="card card-gold" id="dashHeaderCard">
+        <h3 class="full-width" id="dashTitle" style="color: var(--gold);">📊 Master Freigabe-Dashboard</h3>
+        <p id="dashSubtitle">Offene Einreichungen von Daisy zur Prüfung, Bearbeitung oder Ablehnung.</p>
+      </div>
+      <div id="dashboardContainer"></div>
+    </section>
+
+    <!-- 2. CHAT -->
+    <section id="view-chat" class="view">
+      <div class="chat-list" id="chatList"></div>
+      <div class="input-row">
+        <input type="text" id="chatInput" placeholder="Nachricht schreiben...">
+        <button type="button" class="btn btn-sm" id="btnSendChat">Senden</button>
+      </div>
+    </section>
+
+    <!-- 3. KALENDER -->
+    <section id="view-calendar" class="view">
+      <div class="cal-filters" id="calFilters">
+        <button type="button" class="cal-filter-btn active" data-filter="Both">
+          <span class="dot-m"></span><span class="dot-d"></span> Beide (Übereinander)
+        </button>
+        <button type="button" class="cal-filter-btn" data-filter="Master">
+          <span class="dot-m"></span> Nur Master
+        </button>
+        <button type="button" class="cal-filter-btn" data-filter="Daisy">
+          <span class="dot-d"></span> Nur Daisy
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="cal-header">
+          <button type="button" class="cal-nav" id="btnPrevMonth">&lt;</button>
+          <strong id="calMonthLabel" style="color: var(--gold); font-size: 15px;">November 2026</strong>
+          <button type="button" class="cal-nav" id="btnNextMonth">&gt;</button>
+        </div>
+        <div class="cal-weekdays">
+          <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
+        </div>
+        <div class="cal-days" id="calDaysGrid"></div>
+      </div>
+
+      <div class="card card-crimson" id="form-kalender">
+        <h3 class="full-width" style="margin-bottom: 6px;">Neuer Kalendereintrag</h3>
+        <div class="daisy-notice" id="notice-kalender" style="display:none;">
+          ℹ️ Als Daisy wird dein Termin zunächst an das Master-Dashboard zur Freigabe gesendet.
+        </div>
+        <input type="text" id="calTitle" placeholder="Titel des Termins">
+        <div class="grid-2">
+          <input type="date" id="calDate">
+          <input type="time" id="calTime" value="19:30">
+        </div>
+        <textarea id="calNotes" rows="2" placeholder="Notiz / Details"></textarea>
+        <button type="button" class="btn" id="btnAddCal">Termin eintragen</button>
+      </div>
+
+      <div class="section-title">
+        <span id="calListHeading">Termine am ausgewählten Tag</span>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnToggleMonthAll">Alle im Monat</button>
+      </div>
+      <div id="calEventsList"></div>
+    </section>
+
+    <!-- 4. EINKAUF -->
+    <section id="view-shopping" class="view">
+      <div id="form-shopping">
+        <div class="daisy-notice" id="notice-shopping" style="display:none;">
+          ℹ️ Neue Artikel von Daisy gehen zuerst an das Dashboard zur Bestätigung.
+        </div>
+        <div class="input-row">
+          <input type="text" id="shopInput" placeholder="Neuer Einkaufsartikel...">
+          <button type="button" class="btn btn-sm" id="btnAddShop">+</button>
+        </div>
+      </div>
+      <div id="shopList"></div>
+    </section>
+
+    <!-- 5. STRAFBUCH -->
+    <section id="view-sanctions" class="view">
+      <div class="card card-crimson" id="form-strafbuch">
+        <h3 class="full-width" style="margin-bottom: 8px;">Eintrag im Strafbuch</h3>
+        <div class="daisy-notice" id="notice-strafbuch" style="display:none;">
+          ℹ️ Einträge von Daisy werden dem Master zuerst im Dashboard vorgelegt.
+        </div>
+        <input type="text" id="strafGrund" placeholder="Vergehen / Grund">
+        <select id="strafSelect">
+          <option value="">-- Strafe wählen --</option>
+        </select>
+        <textarea id="strafNotiz" rows="2" placeholder="Notizen / Reflexion"></textarea>
+        <button type="button" class="btn" id="btnAddStrafbuch">Im Strafbuch eintragen</button>
+      </div>
+      <div id="strafbuchList"></div>
+    </section>
+
+    <!-- 6. VERWALTUNG -->
+    <section id="view-admin" class="view">
+      <div class="sub-nav" id="adminSubNav">
+        <button type="button" class="active" data-sub="kleidung">Kleidung</button>
+        <button type="button" data-sub="toys">Toys</button>
+        <button type="button" data-sub="strafen">Strafen</button>
+        <button type="button" data-sub="belohnungen">Belohnungen</button>
+        <button type="button" data-sub="regeln">Regeln</button>
+        <button type="button" data-sub="aufgaben">Aufgaben</button>
+        <button type="button" class="perm-btn" data-sub="berechtigungen" id="subBtnPerm">🔐 Berechtigungen</button>
+        <button type="button" class="perm-btn" data-sub="sicherheit" id="subBtnSec">🛡️ Sicherheit</button>
+      </div>
+
+      <div class="empty-box" id="adminNoAccess" style="display:none;">
+        Für die Rolle <strong>Daisy</strong> sind aktuell keine Verwaltungsbereiche aktiviert.
+      </div>
+
+      <!-- Sub: Kleidung -->
+      <div id="sub-kleidung" class="sub-panel">
+        <div class="card" id="form-kleidung">
+          <div class="daisy-notice" id="notice-kleidung" style="display:none;">
+            ℹ️ Neue Kleidungsstücke werden an das Master-Dashboard zur Freigabe gesendet.
+          </div>
+          <input type="text" id="kName" placeholder="Bezeichnung">
+          <input type="text" id="kDesc" placeholder="Beschreibung / Größe">
+          <select id="kBesitzer">
+            <option value="Daisy">Daisy</option>
+            <option value="Master">Master</option>
+            <option value="Beide">Beide</option>
+          </select>
+          <div class="media-btn-row">
+            <button type="button" class="media-btn" id="btnKFile">📁 Datei wählen</button>
+            <button type="button" class="media-btn" id="btnKCam">📷 Kamera</button>
+          </div>
+          <input type="file" id="kFileInput" class="hidden-file" accept="image/*">
+          <input type="file" id="kCamInput" class="hidden-file" accept="image/*" capture="environment">
+          <div class="preview-box" id="kPreviewBox">
+            <img id="kPreviewImg" src="" alt="Vorschau">
+            <button type="button" class="preview-remove" id="btnKRemoveImg">✕ Entfernen</button>
+          </div>
+          <button type="button" class="btn" id="btnAddKleidung">Hinzufügen</button>
+        </div>
+        <div id="kleidungList"></div>
+      </div>
+
+      <!-- Sub: Toys -->
+      <div id="sub-toys" class="sub-panel" style="display:none;">
+        <div class="card" id="form-toys">
+          <div class="daisy-notice" id="notice-toys" style="display:none;">
+            ℹ️ Neue Toys werden an das Master-Dashboard zur Freigabe gesendet.
+          </div>
+          <input type="text" id="tName" placeholder="Bezeichnung">
+          <input type="text" id="tPflege" placeholder="Pflege / Details">
+          <select id="tStatus">
+            <option value="Einsatzbereit">Einsatzbereit</option>
+            <option value="Reinigung nötig">Reinigung nötig</option>
+          </select>
+          <div class="media-btn-row">
+            <button type="button" class="media-btn" id="btnTFile">📁 Datei wählen</button>
+            <button type="button" class="media-btn" id="btnTCam">📷 Kamera</button>
+          </div>
+          <input type="file" id="tFileInput" class="hidden-file" accept="image/*">
+          <input type="file" id="tCamInput" class="hidden-file" accept="image/*" capture="environment">
+          <div class="preview-box" id="tPreviewBox">
+            <img id="tPreviewImg" src="" alt="Vorschau">
+            <button type="button" class="preview-remove" id="btnTRemoveImg">✕ Entfernen</button>
+          </div>
+          <button type="button" class="btn" id="btnAddToy">Hinzufügen</button>
+        </div>
+        <div id="toysList"></div>
+      </div>
+
+      <!-- Sub: Strafen -->
+      <div id="sub-strafen" class="sub-panel" style="display:none;">
+        <div class="card" id="form-strafen">
+          <div class="daisy-notice" id="notice-strafen" style="display:none;">
+            ℹ️ Vorschläge gehen zuerst an das Master-Dashboard.
+          </div>
+          <input type="text" id="sTitel" placeholder="Titel der Strafe">
+          <textarea id="sDesc" rows="2" placeholder="Beschreibung / Schweregrad"></textarea>
+          <button type="button" class="btn" id="btnAddStrafe">Katalog-Strafe hinzufügen</button>
+        </div>
+        <div id="strafenList"></div>
+      </div>
+
+      <!-- Sub: Belohnungen -->
+      <div id="sub-belohnungen" class="sub-panel" style="display:none;">
+        <div class="card" id="form-belohnungen">
+          <div class="daisy-notice" id="notice-belohnungen" style="display:none;">
+            ℹ️ Vorschläge gehen zuerst an das Master-Dashboard.
+          </div>
+          <input type="text" id="bTitel" placeholder="Belohnung">
+          <textarea id="bDesc" rows="2" placeholder="Bedingung"></textarea>
+          <button type="button" class="btn" id="btnAddBelohnung">Belohnung hinzufügen</button>
+        </div>
+        <div id="belohnungenList"></div>
+      </div>
+
+      <!-- Sub: Regeln -->
+      <div id="sub-regeln" class="sub-panel" style="display:none;">
+        <div class="card" id="form-regeln">
+          <div class="daisy-notice" id="notice-regeln" style="display:none;">
+            ℹ️ Vorschläge gehen zuerst an das Master-Dashboard.
+          </div>
+          <input type="text" id="rTitel" placeholder="Regel formulieren">
+          <button type="button" class="btn" id="btnAddRegel">Regel speichern</button>
+        </div>
+        <div id="regelnList"></div>
+      </div>
+
+      <!-- Sub: Aufgaben -->
+      <div id="sub-aufgaben" class="sub-panel" style="display:none;">
+        <div class="card" id="form-aufgaben">
+          <div class="daisy-notice" id="notice-aufgaben" style="display:none;">
+            ℹ️ Neue Aufgaben gehen zuerst an das Master-Dashboard.
+          </div>
+          <input type="text" id="aTitel" placeholder="Aufgabe">
+          <select id="aZustand">
+            <option value="Daisy">Daisy</option>
+            <option value="Master">Master</option>
+          </select>
+          <button type="button" class="btn" id="btnAddAufgabe">Aufgabe erstellen</button>
+        </div>
+        <div id="aufgabenList"></div>
+      </div>
+
+      <!-- Sub: Berechtigungen (Master only) -->
+      <div id="sub-berechtigungen" class="sub-panel" style="display:none;">
+        <div class="card card-gold">
+          <h3 class="full-width" style="color: var(--gold);">🔐 Bereiche &amp; Rechte für Daisy</h3>
+          <p>Schalte Kategorien komplett EIN/AUS oder steuere die vier Einzelrechte.</p>
+        </div>
+        <div id="permMatrixContainer"></div>
+      </div>
+
+      <!-- Sub: Sicherheit, Live-Sync & Backup (Master only) -->
+      <div id="sub-sicherheit" class="sub-panel" style="display:none;">
+        <!-- Live-Sync Cloud -->
+        <div class="card card-cloud">
+          <h3 class="full-width" style="color: #4ade80;">☁️ Live-Sync (Zwei Telefone verbinden)</h3>
+          <p style="margin-bottom: 10px;">
+            Verbindet Master &amp; Daisy in Echtzeit über eure kostenlose Firebase Realtime Database. Auf beiden Handys identische Daten eintragen:
+          </p>
+          <label class="field-label">Firebase Realtime Database URL</label>
+          <input type="text" id="cloudDbUrl" placeholder="https://dein-projekt-default-rtdb.europe-west1.firebasedatabase.app">
+
+          <label class="field-label">Gemeinsamer Sync-Raum-Code (Geheimwort)</label>
+          <input type="text" id="cloudRoomCode" placeholder="z.B. dominion-privat-2026">
+
+          <div class="grid-2" style="margin-top: 4px;">
+            <button type="button" class="btn btn-success" id="btnConnectCloud">🔗 Verbinden &amp; Sync</button>
+            <button type="button" class="btn btn-secondary" id="btnDisconnectCloud">🔌 Trennen (Lokal)</button>
+          </div>
+          <p id="cloudDiagMsg" style="margin-top: 8px; font-size: 12px; color: var(--gold);">
+            Status: Nicht verbunden (Daten werden nur lokal auf diesem Gerät gespeichert).
+          </p>
+        </div>
+
+        <!-- Master PIN -->
+        <div class="card card-crimson">
+          <h3 class="full-width" style="color: var(--gold);">🔑 Master-PIN ändern</h3>
+          <p style="margin-bottom: 10px;">Standard-PIN ist 1234. Änderungen werden dauerhaft gespeichert und synchronisiert.</p>
+          <div class="grid-2">
+            <input type="password" id="pinNew" inputmode="numeric" placeholder="Neue PIN">
+            <input type="password" id="pinConfirm" inputmode="numeric" placeholder="Wiederholen">
+          </div>
+          <button type="button" class="btn btn-gold" id="btnSavePin">Neue PIN speichern</button>
+        </div>
+
+        <!-- JSON Backup -->
+        <div class="card card-gold">
+          <h3 class="full-width" style="color: var(--gold);">💾 Datenbank Backup (Export &amp; Import)</h3>
+          <p style="margin-bottom: 12px;">
+            Sichere alle eingepflegten Inhalte als JSON-Datei, bevor du die App-Datei aktualisierst.
+          </p>
+          <div class="grid-2" style="margin-bottom: 8px;">
+            <button type="button" class="btn btn-success" id="btnExportJson">⬇️ JSON Exportieren</button>
+            <button type="button" class="btn btn-gold" id="btnImportFile">⬆️ JSON Importieren</button>
+          </div>
+          <input type="file" id="importJsonInput" class="hidden-file" accept=".json,application/json">
+
+          <details style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
+            <summary style="font-size: 12px; color: var(--gold); cursor: pointer; font-weight: 600;">
+              📋 WebView-Fallback: JSON-Text kopieren oder einfügen
+            </summary>
+            <div style="margin-top: 8px;">
+              <textarea id="jsonBackupArea" rows="4" placeholder="Hier erscheint das exportierte JSON oder du fügst dein Backup zum Wiederherstellen hier ein..."></textarea>
+              <div class="grid-2">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnCopyJson" style="width:100%;">📋 In Zwischenablage</button>
+                <button type="button" class="btn btn-sm" id="btnRestoreTextJson" style="width:100%;">🔄 Text-JSON einspielen</button>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Reset -->
+        <div class="card">
+          <h3 class="full-width" style="color: #ff809b;">⚠️ Werksreset</h3>
+          <p style="margin-bottom: 10px;">Setzt alle Listen, Berechtigungen und die Master-PIN auf die Standardwerte zurück.</p>
+          <button type="button" class="btn btn-secondary" id="btnResetDefaults" style="color: #ff809b;">
+            ↺ Alle Daten &amp; Rechte zurücksetzen
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav id="bottomNav">
+    <button type="button" class="active" data-view="dashboard" id="tab-dashboard">
+      <span class="icon-wrap">📊<span class="nav-badge" id="dashBadge">0</span></span>
+      <span>Dashboard</span>
+    </button>
+    <button type="button" data-view="chat" id="tab-chat">
+      <span class="icon-wrap">💬</span>
+      <span>Chat</span>
+    </button>
+    <button type="button" data-view="calendar" id="tab-calendar">
+      <span class="icon-wrap">📅</span>
+      <span>Kalender</span>
+    </button>
+    <button type="button" data-view="shopping" id="tab-shopping">
+      <span class="icon-wrap">🛒</span>
+      <span>Einkauf</span>
+    </button>
+    <button type="button" data-view="sanctions" id="tab-sanctions">
+      <span class="icon-wrap">📖</span>
+      <span>Strafbuch</span>
+    </button>
+    <button type="button" data-view="admin" id="tab-admin">
+      <span class="icon-wrap">⚙️</span>
+      <span>Verwaltung</span>
+    </button>
+  </nav>
+
+  <!-- MODAL: PIN -->
+  <div class="modal-overlay" id="modalPin">
+    <div class="modal-box">
+      <h3>Master-PIN eingeben</h3>
+      <input type="password" id="pinLoginInput" inputmode="numeric" placeholder="PIN (Standard: 1234)">
+      <div class="modal-btns">
+        <button type="button" class="btn" id="btnPinOk">Bestätigen</button>
+        <button type="button" class="btn btn-secondary" id="btnPinCancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT ITEM / APPROVE WITH EDITS -->
+  <div class="modal-overlay" id="modalEdit">
+    <div class="modal-box">
+      <h3 id="editModalHeading">Eintrag bearbeiten</h3>
+      <div id="editModalBody"></div>
+      <div class="modal-btns">
+        <button type="button" class="btn btn-success" id="btnEditSave">Speichern</button>
+        <button type="button" class="btn btn-secondary" id="btnEditCancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REJECT WITH REASON -->
+  <div class="modal-overlay" id="modalReject">
+    <div class="modal-box">
+      <h3>Vorschlag ablehnen</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">
+        Optional kannst du eine Begründung für Daisy eingeben:
+      </p>
+      <textarea id="rejectReasonInput" rows="3" placeholder="Begründung (optional)..."></textarea>
+      <div class="modal-btns">
+        <button type="button" class="btn btn-danger" id="btnRejectConfirm">❌ Ablehnen</button>
+        <button type="button" class="btn btn-secondary" id="btnRejectCancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DELETE CONFIRM -->
+  <div class="modal-overlay" id="modalDelete">
+    <div class="modal-box">
+      <h3>Eintrag löschen?</h3>
+      <p style="font-size: 13px; color: var(--muted);">Dieser Vorgang kann nicht rückgängig gemacht werden.</p>
+      <div class="modal-btns">
+        <button type="button" class="btn btn-danger" id="btnDelConfirm">Löschen</button>
+        <button type="button" class="btn btn-secondary" id="btnDelCancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onerror = function (message, source, lineno) {
+      var banner = document.getElementById("errorBanner");
+      if (banner) {
+        banner.style.display = "block";
+        banner.textContent = "Skript-Hinweis (Zeile " + lineno + "): " + message;
+      }
+      return false;
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var STORAGE_KEY = "dominion_app_data_v1";
+      var CLOUD_CFG_KEY = "dominion_cloud_cfg_v1";
+      var currentRole = "Master";
+      var pendingDeleteFn = null;
+      var activeEditState = null;
+      var activeRejectIndex = null;
+
+      // Cloud Sync Variablen (REST + Echtzeit SSE Stream ohne externe SDK-Abstürze)
+      var cloudConfig = { dbUrl: "", roomCode: "" };
+      var cloudEventSource = null;
+      var cloudPollTimer = null;
+      var isCloudConnected = false;
+      var lastSyncedHash = "";
+
+      var calYear = 2026;
+      var calMonth = 10;
+      var calSelectedDay = "2026-11-12";
+      var calFilter = "Both";
+      var calShowAllMonth = false;
+
+      var MONTHS_DE = [
+        "Januar", "Februar", "März", "April", "Mai", "Juni",
+        "Juli", "August", "September", "Oktober", "November", "Dezember"
+      ];
+
+      var CAT_META = {
+        kalender:    { label: "📅 Kalender", color: "#a855f7" },
+        shopping:    { label: "🛒 Einkauf", color: "#0284c7" },
+        strafbuch:   { label: "📖 Strafbuch", color: "#dc2626" },
+        kleidung:    { label: "👗 Kleidung", color: "#d62860" },
+        toys:        { label: "⛓️ Toys", color: "#9333ea" },
+        strafen:     { label: "⚖️ Strafen-Katalog", color: "#b91c1c" },
+        belohnungen: { label: "🎁 Belohnungen", color: "#b45309" },
+        regeln:      { label: "📜 Regeln", color: "#4f46e5" },
+        aufgaben:    { label: "✅ Aufgaben", color: "#0d9488" }
+      };
+
+      var draftImgs = {
+        kleidung: null,
+        toys: null,
+        edit: null
+      };
+
+      function buildMediaPreview(imgUrl, artType, altText) {
+        if (imgUrl) {
+          return '<div class="media-box"><img src="' + imgUrl + '" alt="' + esc(altText) + '"></div>';
+        }
+        if (artType === "kleidung") {
+          return '<div class="media-box">' +
+                   '<div class="css-art-card">' +
+                     '<span class="css-art-icon">👗</span>' +
+                     '<span class="css-art-label">Garderobe &amp; Latex</span>' +
+                   '</div>' +
+                 '</div>';
+        }
+        return '<div class="media-box">' +
+                 '<div class="css-art-card toys-theme">' +
+                   '<span class="css-art-icon">⛓️</span>' +
+                   '<span class="css-art-label">Equipment &amp; Toys</span>' +
+                 '</div>' +
+               '</div>';
+      }
+
+      function createDefaultStore() {
+        return {
+          updatedAt: Date.now(),
+          masterPin: "1234",
+          pending: [
+            {
+              category: "kleidung",
+              timestamp: "12.11.2026, 09:45",
+              item: {
+                name: "Overknee-Lackstiefel",
+                desc: "Schwarz, glänzend, Größe 38",
+                besitzer: "Daisy",
+                imgUrl: null,
+                artType: "kleidung"
+              }
+            }
+          ],
+          rejected: [],
+          chat: [
+            { sender: "Master", text: "Willkommen in Dominion. Melde dich, sobald du bereit bist." },
+            { sender: "Daisy", text: "Ja, Master. Ich habe einen Vorschlag im Dashboard hinterlegt." }
+          ],
+          kalender: [
+            { title: "Abend-Inspektion", date: "2026-11-12", time: "20:00", role: "Master", notes: "Pünktlich erscheinen." },
+            { title: "Stiefelpflege & Vorbereitung", date: "2026-11-12", time: "18:30", role: "Daisy", notes: "Lederpflege anwenden." },
+            { title: "Wochenend-Session", date: "2026-11-15", time: "21:00", role: "Master", notes: "Korsett & Flogger." },
+            { title: "Termin außer Haus", date: "2026-11-20", time: "10:00", role: "Daisy", notes: "Vormittags." }
+          ],
+          shopping: [
+            { text: "Milch", done: false },
+            { text: "Lederbalsam", done: true }
+          ],
+          strafbuch: [
+            { grund: "Verspätete Antwort", strafe: "10 Min. Knien", notiz: "Reflektiert und entschuldigt.", date: "12.11.2026" }
+          ],
+          kleidung: [
+            { name: "Latex-Korsett", desc: "Schwarz, Größe S", besitzer: "Daisy", imgUrl: null, artType: "kleidung" }
+          ],
+          toys: [
+            { name: "Flogger", pflege: "Lederpflege anwenden", status: "Einsatzbereit", imgUrl: null, artType: "toys" }
+          ],
+          strafen: [
+            { titel: "10 Min. Knien", desc: "Leichtes Vergehen" },
+            { titel: "Schreibaufgabe (50 Zeilen)", desc: "Mittleres Vergehen" }
+          ],
+          belohnungen: [
+            { titel: "Auszeit", desc: "1 Stunde ohne Aufgaben" }
+          ],
+          regeln: [
+            { titel: "Auf Befehl sofort und höflich antworten" }
+          ],
+          aufgaben: [
+            { titel: "Stiefel putzen", zustand: "Daisy" }
+          ],
+          permissions: {
+            kalender:    { visible: true, add: true,  edit: true,  del: false },
+            shopping:    { visible: true, add: true,  edit: true,  del: false },
+            strafbuch:   { visible: true, add: true,  edit: false, del: false },
+            kleidung:    { visible: true, add: true,  edit: false, del: false },
+            toys:        { visible: true, add: true,  edit: false, del: false },
+            strafen:     { visible: true, add: false, edit: false, del: false },
+            belohnungen: { visible: true, add: false, edit: false, del: false },
+            regeln:      { visible: true, add: false, edit: false, del: false },
+            aufgaben:    { visible: true, add: true,  edit: true,  del: false }
+          }
+        };
+      }
+
+      var memoryFallback = null;
+
+      function normalizeStoreObject(parsed) {
+        var def = createDefaultStore();
+        if (!parsed || typeof parsed !== "object") return def;
+        for (var key in def) {
+          if (parsed[key] === undefined || parsed[key] === null) {
+            if (Array.isArray(def[key])) {
+              parsed[key] = [];
+            } else {
+              parsed[key] = def[key];
+            }
+          }
+        }
+        for (var pKey in def.permissions) {
+          if (!parsed.permissions[pKey]) {
+            parsed.permissions[pKey] = def.permissions[pKey];
+          }
+        }
+        return parsed;
+      }
+
+      function loadSafeStore() {
+        var def = createDefaultStore();
+        try {
+          var raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return def;
+          return normalizeStoreObject(JSON.parse(raw));
+        } catch (e) {
+          return memoryFallback || def;
+        }
+      }
+
+      function loadCloudConfig() {
+        try {
+          var raw = window.localStorage.getItem(CLOUD_CFG_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === "object") {
+              cloudConfig.dbUrl = parsed.dbUrl || "";
+              cloudConfig.roomCode = parsed.roomCode || "";
+            }
+          }
+        } catch (e) {}
+      }
+
+      function saveCloudConfig() {
+        try {
+          window.localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudConfig));
+        } catch (e) {}
+      }
+
+      var store = loadSafeStore();
+      loadCloudConfig();
+
+      function saveSafeStore(skipCloudPush) {
+        store.updatedAt = Date.now();
+        memoryFallback = store;
+        var serialized = JSON.stringify(store);
+        try {
+          window.localStorage.setItem(STORAGE_KEY, serialized);
+        } catch (e) {}
+
+        if (!skipCloudPush && cloudConfig.dbUrl && cloudConfig.roomCode) {
+          pushStoreToCloud(serialized);
+        }
+      }
+
+      // ==========================================
+      // ECHTZEIT CLOUD SYNC (FIREBASE REST + SSE)
+      // ==========================================
+      function buildCloudEndpoint() {
+        var base = cloudConfig.dbUrl.trim().replace(/\/+$/, "");
+        var room = cloudConfig.roomCode.trim().replace(/[^a-zA-Z0-9_-]/g, "_");
+        if (!base || !room) return null;
+        if (base.indexOf("http") !== 0) base = "https://" + base;
+        return base + "/dominion_rooms/" + room + ".json";
+      }
+
+      function updateSyncStatusUI(online, msg) {
+        isCloudConnected = online;
+        var label = document.getElementById("syncStatusLabel");
+        var diag = document.getElementById("cloudDiagMsg");
+        if (label) {
+          if (online) {
+            label.textContent = "● Live-Sync aktiv";
+            label.classList.add("online");
+          } else {
+            label.textContent = "● Offline (Lokal)";
+            label.classList.remove("online");
+          }
+        }
+        if (diag && msg) {
+          diag.textContent = "Status: " + msg;
+        }
+      }
+
+      function pushStoreToCloud(serializedJson) {
+        var endpoint = buildCloudEndpoint();
+        if (!endpoint) return;
+        lastSyncedHash = serializedJson;
+        fetch(endpoint, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: serializedJson
+        })
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          updateSyncStatusUI(true, "Verbunden & synchronisiert (" + getNowStamp() + ")");
+        })
+        .catch(function (err) {
+          updateSyncStatusUI(false, "Sync-Fehler: " + err.message);
+        });
+      }
+
+      function applyIncomingCloudData(remoteObj) {
+        if (!remoteObj || typeof remoteObj !== "object") return;
+        var normalized = normalizeStoreObject(remoteObj);
+        var incomingStr = JSON.stringify(normalized);
+        if (incomingStr === lastSyncedHash) return;
+
+        lastSyncedHash = incomingStr;
+        store = normalized;
+        memoryFallback = store;
+        try {
+          window.localStorage.setItem(STORAGE_KEY, incomingStr);
+        } catch (e) {}
+
+        syncPermissionsUI();
+        updateSyncStatusUI(true, "Live-Update empfangen (" + getNowStamp() + ")");
+      }
+
+      function pullFromCloudOnce(pushIfEmpty) {
+        var endpoint = buildCloudEndpoint();
+        if (!endpoint) return;
+        fetch(endpoint)
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            if (data && typeof data === "object") {
+              applyIncomingCloudData(data);
+            } else if (pushIfEmpty) {
+              pushStoreToCloud(JSON.stringify(store));
+            }
+            updateSyncStatusUI(true, "Live-Sync aktiv (Raum: " + cloudConfig.roomCode + ")");
+          })
+          .catch(function (err) {
+            updateSyncStatusUI(false, "Verbindungsfehler: " + err.message);
+          });
+      }
+
+      function startCloudRealtimeSync(pushInitial) {
+        stopCloudRealtimeSync(true);
+        var endpoint = buildCloudEndpoint();
+        if (!endpoint) {
+          updateSyncStatusUI(false, "Nicht verbunden (URL oder Raum-Code fehlt).");
+          return;
+        }
+
+        updateSyncStatusUI(false, "Verbinde mit Cloud...");
+        pullFromCloudOnce(pushInitial);
+
+        // Echtzeit-Stream über Server-Sent Events (SSE) von Firebase
+        if (typeof window.EventSource !== "undefined") {
+          try {
+            cloudEventSource = new EventSource(endpoint);
+            cloudEventSource.addEventListener("put", function (e) {
+              try {
+                var packet = JSON.parse(e.data);
+                if (packet && packet.path === "/" && packet.data) {
+                  applyIncomingCloudData(packet.data);
+                } else if (packet && packet.path && packet.path !== "/") {
+                  pullFromCloudOnce(false);
+                }
+              } catch (parseErr) {}
+            });
+            cloudEventSource.onerror = function () {
+              // Fallback auf kurzes Polling, falls WebView SSE drosselt
+            };
+          } catch (sseErr) {}
+        }
+
+        // Zusätzlicher 4-Sekunden-Heartbeat für mobile WebViews
+        cloudPollTimer = setInterval(function () {
+          pullFromCloudOnce(false);
+        }, 4000);
+      }
+
+      function stopCloudRealtimeSync(keepConfig) {
+        if (cloudEventSource) {
+          cloudEventSource.close();
+          cloudEventSource = null;
+        }
+        if (cloudPollTimer) {
+          clearInterval(cloudPollTimer);
+          cloudPollTimer = null;
+        }
+        if (!keepConfig) {
+          cloudConfig.dbUrl = "";
+          cloudConfig.roomCode = "";
+          saveCloudConfig();
+          var uIn = document.getElementById("cloudDbUrl");
+          var rIn = document.getElementById("cloudRoomCode");
+          if (uIn) uIn.value = "";
+          if (rIn) rIn.value = "";
+        }
+        updateSyncStatusUI(false, "Nicht verbunden (Lokal-Modus aktiv).");
+      }
+
+      // ==========================================
+      // HILFSFUNKTIONEN
+      // ==========================================
+      function esc(str) {
+        if (str === null || str === undefined) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function pad2(n) {
+        return n < 10 ? "0" + n : String(n);
+      }
+
+      function formatDateDE(iso) {
+        if (!iso || iso.indexOf("-") === -1) return iso || "";
+        var p = iso.split("-");
+        return p[2] + "." + p[1] + "." + p[0];
+      }
+
+      function getNowStamp() {
+        var d = new Date();
+        return pad2(d.getDate()) + "." + pad2(d.getMonth() + 1) + "." + d.getFullYear() +
+               ", " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+      }
+
+      function showToast(msg) {
+        var el = document.getElementById("toastMsg");
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = "block";
+        clearTimeout(el._t);
+        el._t = setTimeout(function () {
+          el.style.display = "none";
+        }, 2300);
+      }
+
+      function canDo(cat, action) {
+        if (currentRole === "Master") return true;
+        var p = store.permissions[cat];
+        if (!p || !p.visible) return false;
+        return Boolean(p[action]);
+      }
+
+      function openModal(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add("active");
+      }
+
+      function closeModal(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove("active");
+      }
+
+      // Rollenwechsel
+      function handleRoleToggle() {
+        if (currentRole === "Master") {
+          currentRole = "Daisy";
+          var b = document.getElementById("roleBadge");
+          b.textContent = "Rolle: Daisy";
+          b.classList.add("daisy-active");
+          syncPermissionsUI();
+          showToast("Ansicht: Rolle Daisy");
+        } else {
+          document.getElementById("pinLoginInput").value = "";
+          openModal("modalPin");
+        }
+      }
+
+      function verifyLoginPin() {
+        var val = document.getElementById("pinLoginInput").value;
+        if (val === (store.masterPin || "1234")) {
+          currentRole = "Master";
+          var b = document.getElementById("roleBadge");
+          b.textContent = "Rolle: Master";
+          b.classList.remove("daisy-active");
+          closeModal("modalPin");
+          syncPermissionsUI();
+          showToast("Master-Ansicht aktiv");
+        } else {
+          showToast("Falsche PIN!");
+        }
+      }
+
+      function saveNewPin() {
+        var p1 = document.getElementById("pinNew").value.trim();
+        var p2 = document.getElementById("pinConfirm").value.trim();
+        if (p1.length < 4) {
+          showToast("PIN muss mindestens 4 Zeichen haben");
+          return;
+        }
+        if (p1 !== p2) {
+          showToast("PINs stimmen nicht überein");
+          return;
+        }
+        store.masterPin = p1;
+        saveSafeStore();
+        document.getElementById("pinNew").value = "";
+        document.getElementById("pinConfirm").value = "";
+        showToast("Master-PIN gespeichert");
+      }
+
+      // Navigation
+      function switchMainTab(viewName, btnEl) {
+        var views = document.querySelectorAll(".view");
+        for (var i = 0; i < views.length; i++) {
+          views[i].classList.remove("active");
+        }
+        var tabs = document.querySelectorAll("#bottomNav button");
+        for (var j = 0; j < tabs.length; j++) {
+          tabs[j].classList.remove("active");
+        }
+        var target = document.getElementById("view-" + viewName);
+        if (target) target.classList.add("active");
+        if (btnEl) btnEl.classList.add("active");
+        window.scrollTo(0, 0);
+      }
+
+      function switchAdminSub(subName, btnEl) {
+        if ((subName === "berechtigungen" || subName === "sicherheit") && currentRole !== "Master") return;
+        var panels = document.querySelectorAll(".sub-panel");
+        for (var i = 0; i < panels.length; i++) {
+          panels[i].style.display = "none";
+        }
+        var btns = document.querySelectorAll("#adminSubNav button");
+        for (var j = 0; j < btns.length; j++) {
+          btns[j].classList.remove("active");
+        }
+        var target = document.getElementById("sub-" + subName);
+        if (target) target.style.display = "block";
+        if (btnEl) btnEl.classList.add("active");
+      }
+
+      // Berechtigungen anwenden
+      function syncPermissionsUI() {
+        var isMaster = currentRole === "Master";
+        var cats = ["kalender", "shopping", "strafbuch", "kleidung", "toys", "strafen", "belohnungen", "regeln", "aufgaben"];
+
+        for (var i = 0; i < cats.length; i++) {
+          var c = cats[i];
+          var notice = document.getElementById("notice-" + c);
+          if (notice) notice.style.display = isMaster ? "none" : "block";
+          var form = document.getElementById("form-" + c);
+          if (form) form.style.display = canDo(c, "add") ? "block" : "none";
+        }
+
+        var tabCal = document.getElementById("tab-calendar");
+        var tabShop = document.getElementById("tab-shopping");
+        var tabSanc = document.getElementById("tab-sanctions");
+        var tabAdmin = document.getElementById("tab-admin");
+
+        var visCal = isMaster || store.permissions.kalender.visible;
+        var visShop = isMaster || store.permissions.shopping.visible;
+        var visSanc = isMaster || store.permissions.strafbuch.visible;
+
+        if (tabCal) tabCal.style.display = visCal ? "flex" : "none";
+        if (tabShop) tabShop.style.display = visShop ? "flex" : "none";
+        if (tabSanc) tabSanc.style.display = visSanc ? "flex" : "none";
+
+        var adminSubs = ["kleidung", "toys", "strafen", "belohnungen", "regeln", "aufgaben"];
+        var visibleCount = 0;
+        var firstVis = null;
+        for (var s = 0; s < adminSubs.length; s++) {
+          var key = adminSubs[s];
+          var btn = document.querySelector('#adminSubNav button[data-sub="' + key + '"]');
+          var vis = isMaster || store.permissions[key].visible;
+          if (btn) btn.style.display = vis ? "inline-block" : "none";
+          if (vis) {
+            visibleCount++;
+            if (!firstVis) firstVis = key;
+          }
+        }
+
+        var permBtn = document.getElementById("subBtnPerm");
+        if (permBtn) permBtn.style.display = isMaster ? "inline-block" : "none";
+
+        var secBtn = document.getElementById("subBtnSec");
+        if (secBtn) secBtn.style.display = isMaster ? "inline-block" : "none";
+
+        if (tabAdmin) {
+          tabAdmin.style.display = (isMaster || visibleCount > 0) ? "flex" : "none";
+        }
+
+        var noAccessBox = document.getElementById("adminNoAccess");
+        if (noAccessBox) {
+          noAccessBox.style.display = (!isMaster && visibleCount === 0) ? "block" : "none";
+        }
+
+        var activeView = document.querySelector(".view.active");
+        if (activeView) {
+          var id = activeView.id.replace("view-", "");
+          if ((id === "calendar" && !visCal) ||
+              (id === "shopping" && !visShop) ||
+              (id === "sanctions" && !visSanc) ||
+              (id === "admin" && !isMaster && visibleCount === 0)) {
+            switchMainTab("dashboard", document.getElementById("tab-dashboard"));
+          }
+        }
+
+        var activeSubBtn = document.querySelector("#adminSubNav button.active");
+        if (activeSubBtn) {
+          var subKey = activeSubBtn.getAttribute("data-sub");
+          if ((subKey === "berechtigungen" || subKey === "sicherheit") && !isMaster && firstVis) {
+            switchAdminSub(firstVis, document.querySelector('#adminSubNav button[data-sub="' + firstVis + '"]'));
+          } else if (subKey !== "berechtigungen" && subKey !== "sicherheit" && !isMaster && !store.permissions[subKey].visible && firstVis) {
+            switchAdminSub(firstVis, document.querySelector('#adminSubNav button[data-sub="' + firstVis + '"]'));
+          }
+        }
+
+        renderEverything();
+      }
+
+      // Einreichung (Master -> direkt, Daisy -> Dashboard)
+      function submitItem(category, itemObj, onDirectSuccess) {
+        if (currentRole === "Master") {
+          store[category].push(itemObj);
+          saveSafeStore();
+          if (onDirectSuccess) onDirectSuccess();
+          renderEverything();
+          showToast("Eintrag gespeichert");
+        } else {
+          store.pending.push({
+            category: category,
+            timestamp: getNowStamp(),
+            item: itemObj
+          });
+          saveSafeStore();
+          renderDashboard();
+          showToast("Vorschlag an Master gesendet");
+        }
+      }
+
+      // 1. DASHBOARD
+      function renderItemSummary(category, item) {
+        var html = "";
+        if (category === "kleidung" || category === "toys") {
+          html += buildMediaPreview(item.imgUrl, item.artType || category, item.name);
+          html += '<strong style="font-size:15px;">' + esc(item.name) + '</strong>';
+          if (category === "kleidung") {
+            html += '<p>' + esc(item.desc) + ' • Besitzer: ' + esc(item.besitzer) + '</p>';
+          } else {
+            html += '<p>' + esc(item.pflege) + ' • Status: ' + esc(item.status) + '</p>';
+          }
+        } else if (category === "kalender") {
+          html += '<strong style="font-size:15px;">' + esc(item.title) + '</strong>';
+          html += '<p>📅 ' + esc(formatDateDE(item.date)) + ' • 🕒 ' + esc(item.time) + ' Uhr</p>';
+          if (item.notes) html += '<p>' + esc(item.notes) + '</p>';
+        } else if (category === "shopping") {
+          html += '<strong style="font-size:15px;">' + esc(item.text) + '</strong>';
+        } else if (category === "strafbuch") {
+          html += '<strong style="font-size:15px;">' + esc(item.grund) + '</strong>';
+          html += '<p>Strafe: ' + esc(item.strafe || "Keine") + '</p>';
+          if (item.notiz) html += '<p>' + esc(item.notiz) + '</p>';
+        } else if (category === "strafen" || category === "belohnungen") {
+          html += '<strong style="font-size:15px;">' + esc(item.titel) + '</strong>';
+          if (item.desc) html += '<p>' + esc(item.desc) + '</p>';
+        } else if (category === "regeln") {
+          html += '<strong style="font-size:15px;">' + esc(item.titel) + '</strong>';
+        } else if (category === "aufgaben") {
+          html += '<strong style="font-size:15px;">' + esc(item.titel) + '</strong>';
+          html += '<p>Zuständig: ' + esc(item.zustand) + '</p>';
+        }
+        return html;
+      }
+
+      function renderDashboard() {
+        var container = document.getElementById("dashboardContainer");
+        var badge = document.getElementById("dashBadge");
+        var titleEl = document.getElementById("dashTitle");
+        var subEl = document.getElementById("dashSubtitle");
+        if (!container) return;
+
+        var isMaster = currentRole === "Master";
+        var count = isMaster ? store.pending.length : store.rejected.length;
+
+        if (badge) {
+          badge.textContent = String(count);
+          if (count > 0) badge.classList.add("show");
+          else badge.classList.remove("show");
+        }
+
+        if (isMaster) {
+          titleEl.textContent = "📊 Master Freigabe-Dashboard";
+          subEl.textContent = "Alle offenen Einreichungen von Daisy, gruppiert nach Kategorie.";
+
+          if (store.pending.length === 0) {
+            container.innerHTML = '<div class="empty-box">Keine offenen Vorschläge von Daisy vorhanden.</div>';
+            return;
+          }
+
+          var order = ["kalender", "kleidung", "toys", "aufgaben", "shopping", "strafbuch", "strafen", "belohnungen", "regeln"];
+          var grouped = {};
+          for (var i = 0; i < store.pending.length; i++) {
+            var pEntry = store.pending[i];
+            if (!grouped[pEntry.category]) grouped[pEntry.category] = [];
+            grouped[pEntry.category].push({ entry: pEntry, idx: i });
+          }
+
+          var html = "";
+          for (var o = 0; o < order.length; o++) {
+            var catKey = order[o];
+            var list = grouped[catKey];
+            if (!list || list.length === 0) continue;
+
+            var meta = CAT_META[catKey] || { label: catKey, color: "#d4af37" };
+            html += '<div class="cat-group-header" style="border-left-color:' + meta.color + ';">' +
+                      '<span>' + meta.label + '</span>' +
+                      '<span class="cat-badge" style="background-color:' + meta.color + ';">' + list.length + '</span>' +
+                    '</div>';
+
+            for (var k = 0; k < list.length; k++) {
+              var obj = list[k];
+              html += '<div class="pending-card" style="border-left-color:' + meta.color + ';">' +
+                        '<div class="req-meta">' +
+                          '<span class="cat-badge" style="background-color:' + meta.color + ';">' + meta.label + '</span>' +
+                          '<span class="req-time">Eingereicht: ' + esc(obj.entry.timestamp) + '</span>' +
+                        '</div>' +
+                        renderItemSummary(catKey, obj.entry.item) +
+                        '<div class="req-actions">' +
+                          '<button type="button" class="btn-success" data-approve-idx="' + obj.idx + '">✅ Bestätigen</button>' +
+                          '<button type="button" class="btn-gold" data-edit-pending-idx="' + obj.idx + '">✏️ Bearb. &amp; OK</button>' +
+                          '<button type="button" class="btn-danger" data-reject-idx="' + obj.idx + '">❌ Ablehnen</button>' +
+                        '</div>' +
+                      '</div>';
+            }
+          }
+          container.innerHTML = html;
+        } else {
+          titleEl.textContent = "📊 Meine Vorschläge & Rückmeldungen";
+          subEl.textContent = "Hier siehst du deine offenen Einreichungen sowie abgelehnte Einträge mit Begründung des Masters.";
+
+          var dHtml = '<div class="section-title"><span>⏳ Offene Vorschläge (Wartet auf Master)</span><span>' + store.pending.length + '</span></div>';
+          if (store.pending.length === 0) {
+            dHtml += '<div class="empty-box">Aktuell keine offenen Vorschläge.</div>';
+          } else {
+            for (var p = 0; p < store.pending.length; p++) {
+              var pend = store.pending[p];
+              var pMeta = CAT_META[pend.category] || { label: pend.category, color: "#a855f7" };
+              dHtml += '<div class="pending-card">' +
+                         '<div class="req-meta">' +
+                           '<span class="cat-badge" style="background-color:' + pMeta.color + ';">' + pMeta.label + '</span>' +
+                           '<span class="req-time">' + esc(pend.timestamp) + '</span>' +
+                         '</div>' +
+                         renderItemSummary(pend.category, pend.item) +
+                       '</div>';
+            }
+          }
+
+          dHtml += '<div class="section-title" style="color:#ff809b;"><span>❌ Abgelehnte Einträge</span><span>' + store.rejected.length + '</span></div>';
+          if (store.rejected.length === 0) {
+            dHtml += '<div class="empty-box">Keine abgelehnten Einträge vorhanden.</div>';
+          } else {
+            for (var r = 0; r < store.rejected.length; r++) {
+              var rej = store.rejected[r];
+              var rMeta = CAT_META[rej.category] || { label: rej.category, color: "#e11d48" };
+              dHtml += '<div class="rejected-card">' +
+                         '<div class="req-meta">' +
+                           '<span class="cat-badge" style="background-color:' + rMeta.color + ';">' + rMeta.label + '</span>' +
+                           '<span class="req-time">Abgelehnt: ' + esc(rej.rejectedAt) + '</span>' +
+                         '</div>' +
+                         renderItemSummary(rej.category, rej.item) +
+                         '<div class="reject-reason-box"><strong>Begründung des Masters:</strong> ' +
+                           esc(rej.reason ? rej.reason : "Keine besondere Begründung angegeben.") +
+                         '</div>' +
+                         '<div style="margin-top:10px; text-align:right;">' +
+                           '<button type="button" class="btn btn-secondary btn-sm" data-dismiss-rej="' + r + '">🗑 Quittieren / Entfernen</button>' +
+                         '</div>' +
+                       '</div>';
+            }
+          }
+          container.innerHTML = dHtml;
+        }
+      }
+
+      function approvePending(idx) {
+        if (currentRole !== "Master") return;
+        var entry = store.pending[idx];
+        if (!entry) return;
+        store[entry.category].push(entry.item);
+        store.pending.splice(idx, 1);
+        saveSafeStore();
+        renderEverything();
+        showToast("Eintrag bestätigt & übernommen");
+      }
+
+      function openRejectModal(idx) {
+        if (currentRole !== "Master") return;
+        activeRejectIndex = idx;
+        document.getElementById("rejectReasonInput").value = "";
+        openModal("modalReject");
+      }
+
+      function confirmReject() {
+        if (activeRejectIndex === null || currentRole !== "Master") return;
+        var entry = store.pending[activeRejectIndex];
+        if (entry) {
+          var reason = document.getElementById("rejectReasonInput").value.trim();
+          store.rejected.unshift({
+            category: entry.category,
+            item: entry.item,
+            reason: reason,
+            rejectedAt: getNowStamp()
+          });
+          store.pending.splice(activeRejectIndex, 1);
+          saveSafeStore();
+          renderEverything();
+          showToast("Vorschlag abgelehnt");
+        }
+        activeRejectIndex = null;
+        closeModal("modalReject");
+      }
+
+      // 2. CHAT
+      function renderChat() {
+        var el = document.getElementById("chatList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.chat.length; i++) {
+          var m = store.chat[i];
+          var cls = m.sender === "Master" ? "master" : "daisy";
+          html += '<div class="chat-bubble ' + cls + '"><strong>' + esc(m.sender) + ':</strong> ' + esc(m.text) + '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function sendChatMsg() {
+        var inp = document.getElementById("chatInput");
+        var txt = inp.value.trim();
+        if (!txt) return;
+        store.chat.push({ sender: currentRole, text: txt });
+        inp.value = "";
+        saveSafeStore();
+        renderChat();
+      }
+
+      // 3. KALENDER
+      function renderCalendar() {
+        var label = document.getElementById("calMonthLabel");
+        var grid = document.getElementById("calDaysGrid");
+        if (!label || !grid) return;
+
+        label.textContent = MONTHS_DE[calMonth] + " " + calYear;
+
+        var fBtns = document.querySelectorAll("#calFilters .cal-filter-btn");
+        for (var f = 0; f < fBtns.length; f++) {
+          if (fBtns[f].getAttribute("data-filter") === calFilter) fBtns[f].classList.add("active");
+          else fBtns[f].classList.remove("active");
+        }
+
+        var firstDay = new Date(calYear, calMonth, 1);
+        var startOffset = (firstDay.getDay() + 6) % 7;
+        var totalDays = new Date(calYear, calMonth + 1, 0).getDate();
+        var prefix = calYear + "-" + pad2(calMonth + 1) + "-";
+
+        var markers = {};
+        for (var i = 0; i < store.kalender.length; i++) {
+          var ev = store.kalender[i];
+          if (calFilter !== "Both" && ev.role !== calFilter) continue;
+          if (ev.date && ev.date.indexOf(prefix) === 0) {
+            if (!markers[ev.date]) markers[ev.date] = { m: false, d: false };
+            if (ev.role === "Master") markers[ev.date].m = true;
+            if (ev.role === "Daisy") markers[ev.date].d = true;
+          }
+        }
+
+        var html = "";
+        for (var e = 0; e < startOffset; e++) {
+          html += '<div class="cal-cell empty"></div>';
+        }
+        for (var d = 1; d <= totalDays; d++) {
+          var iso = prefix + pad2(d);
+          var selClass = (!calShowAllMonth && iso === calSelectedDay) ? " selected" : "";
+          var bars = '<div class="cal-bars">';
+          if (markers[iso]) {
+            if (markers[iso].m) bars += '<div class="bar-m"></div>';
+            if (markers[iso].d) bars += '<div class="bar-d"></div>';
+          }
+          bars += '</div>';
+          html += '<div class="cal-cell' + selClass + '" data-day="' + iso + '">' +
+                    '<span class="cal-cell-num">' + d + '</span>' + bars +
+                  '</div>';
+        }
+        grid.innerHTML = html;
+
+        renderCalendarList();
+      }
+
+      function renderCalendarList() {
+        var heading = document.getElementById("calListHeading");
+        var listEl = document.getElementById("calEventsList");
+        var toggleBtn = document.getElementById("btnToggleMonthAll");
+        if (!heading || !listEl) return;
+
+        var prefix = calYear + "-" + pad2(calMonth + 1) + "-";
+        if (calShowAllMonth) {
+          heading.textContent = "Alle Termine im " + MONTHS_DE[calMonth];
+          if (toggleBtn) toggleBtn.textContent = "Nur gewählter Tag";
+        } else {
+          heading.textContent = "Termine am " + formatDateDE(calSelectedDay);
+          if (toggleBtn) toggleBtn.textContent = "Alle im Monat";
+        }
+
+        var items = [];
+        for (var i = 0; i < store.kalender.length; i++) {
+          var ev = store.kalender[i];
+          if (calFilter !== "Both" && ev.role !== calFilter) continue;
+          if (calShowAllMonth) {
+            if (ev.date && ev.date.indexOf(prefix) === 0) items.push({ ev: ev, idx: i });
+          } else {
+            if (ev.date === calSelectedDay) items.push({ ev: ev, idx: i });
+          }
+        }
+
+        if (items.length === 0) {
+          listEl.innerHTML = '<div class="empty-box">Keine Termine für diese Auswahl.</div>';
+          return;
+        }
+
+        var html = "";
+        for (var j = 0; j < items.length; j++) {
+          var evObj = items[j].ev;
+          var idx = items[j].idx;
+          var cls = evObj.role === "Master" ? "master" : "daisy";
+          var allowEdit = currentRole === "Master" || (evObj.role === "Daisy" && canDo("kalender", "edit"));
+          var allowDel = currentRole === "Master" || (evObj.role === "Daisy" && canDo("kalender", "del"));
+
+          html += '<div class="event-card ' + cls + '">' +
+                    '<h3 style="font-size:15px; padding-right:76px;">' + esc(evObj.title) + '</h3>' +
+                    '<p style="font-size:12px; color:var(--gold); margin-bottom:4px;">' +
+                      esc(evObj.role) + ' • 📅 ' + esc(formatDateDE(evObj.date)) + ' • 🕒 ' + esc(evObj.time) + ' Uhr' +
+                    '</p>' +
+                    (evObj.notes ? '<p style="font-size:13px; color:var(--muted);">' + esc(evObj.notes) + '</p>' : '') +
+                    buildActionBtns("kalender", idx, allowEdit, allowDel) +
+                  '</div>';
+        }
+        listEl.innerHTML = html;
+      }
+
+      function addCalendarEntry() {
+        if (!canDo("kalender", "add")) return;
+        var title = document.getElementById("calTitle").value.trim();
+        var date = document.getElementById("calDate").value;
+        var time = document.getElementById("calTime").value || "19:30";
+        var notes = document.getElementById("calNotes").value.trim();
+        if (!title || !date) {
+          showToast("Bitte Titel und Datum eingeben");
+          return;
+        }
+        var evObj = { title: title, date: date, time: time, role: currentRole, notes: notes };
+        document.getElementById("calTitle").value = "";
+        document.getElementById("calNotes").value = "";
+
+        submitItem("kalender", evObj, function () {
+          calSelectedDay = date;
+          calShowAllMonth = false;
+          var parts = date.split("-");
+          calYear = parseInt(parts[0], 10);
+          calMonth = parseInt(parts[1], 10) - 1;
+        });
+      }
+
+      // 4. EINKAUF
+      function renderShopping() {
+        var el = document.getElementById("shopList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.shopping.length; i++) {
+          var it = store.shopping[i];
+          html += '<div class="card">' +
+                    '<div class="shop-row' + (it.done ? ' done' : '') + '">' +
+                      '<input type="checkbox" data-shop-check="' + i + '"' + (it.done ? ' checked' : '') + '>' +
+                      '<span>' + esc(it.text) + '</span>' +
+                    '</div>' +
+                    buildActionBtns("shopping", i, canDo("shopping", "edit"), canDo("shopping", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addShopping() {
+        if (!canDo("shopping", "add")) return;
+        var inp = document.getElementById("shopInput");
+        var val = inp.value.trim();
+        if (!val) return;
+        inp.value = "";
+        submitItem("shopping", { text: val, done: false });
+      }
+
+      // 5. STRAFBUCH
+      function renderStrafbuch() {
+        var sel = document.getElementById("strafSelect");
+        if (sel) {
+          var prev = sel.value;
+          var opts = '<option value="">-- Strafe wählen --</option>';
+          for (var i = 0; i < store.strafen.length; i++) {
+            opts += '<option value="' + esc(store.strafen[i].titel) + '">' + esc(store.strafen[i].titel) + '</option>';
+          }
+          sel.innerHTML = opts;
+          sel.value = prev;
+        }
+
+        var el = document.getElementById("strafbuchList");
+        if (!el) return;
+        var html = "";
+        for (var j = 0; j < store.strafbuch.length; j++) {
+          var s = store.strafbuch[j];
+          html += '<div class="card">' +
+                    '<h3>' + esc(s.grund) + '</h3>' +
+                    '<p><strong>Strafe:</strong> ' + esc(s.strafe || "Keine") + '</p>' +
+                    (s.notiz ? '<p><strong>Notiz:</strong> ' + esc(s.notiz) + '</p>' : '') +
+                    '<p style="font-size:11px; margin-top:4px;">Datum: ' + esc(s.date) + '</p>' +
+                    buildActionBtns("strafbuch", j, canDo("strafbuch", "edit"), canDo("strafbuch", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addStrafbuch() {
+        if (!canDo("strafbuch", "add")) return;
+        var grund = document.getElementById("strafGrund").value.trim();
+        var strafe = document.getElementById("strafSelect").value;
+        var notiz = document.getElementById("strafNotiz").value.trim();
+        if (!grund) return;
+        document.getElementById("strafGrund").value = "";
+        document.getElementById("strafNotiz").value = "";
+        var d = new Date();
+        var dateStr = pad2(d.getDate()) + "." + pad2(d.getMonth() + 1) + "." + d.getFullYear();
+        submitItem("strafbuch", { grund: grund, strafe: strafe, notiz: notiz, date: dateStr });
+      }
+
+      // 6. VERWALTUNG LISTEN
+      function renderKleidung() {
+        var el = document.getElementById("kleidungList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.kleidung.length; i++) {
+          var k = store.kleidung[i];
+          html += '<div class="card">' +
+                    buildMediaPreview(k.imgUrl, "kleidung", k.name) +
+                    '<h3>' + esc(k.name) + '</h3>' +
+                    '<p>' + esc(k.desc) + '</p>' +
+                    '<span class="tag-pill">Besitzer: ' + esc(k.besitzer) + '</span>' +
+                    buildActionBtns("kleidung", i, canDo("kleidung", "edit"), canDo("kleidung", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addKleidung() {
+        if (!canDo("kleidung", "add")) return;
+        var name = document.getElementById("kName").value.trim();
+        var desc = document.getElementById("kDesc").value.trim();
+        var besitzer = document.getElementById("kBesitzer").value;
+        if (!name) return;
+        var obj = {
+          name: name,
+          desc: desc,
+          besitzer: besitzer,
+          imgUrl: draftImgs.kleidung,
+          artType: "kleidung"
+        };
+        document.getElementById("kName").value = "";
+        document.getElementById("kDesc").value = "";
+        clearDraftImage("kleidung");
+        submitItem("kleidung", obj);
+      }
+
+      function renderToys() {
+        var el = document.getElementById("toysList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.toys.length; i++) {
+          var t = store.toys[i];
+          html += '<div class="card">' +
+                    buildMediaPreview(t.imgUrl, "toys", t.name) +
+                    '<h3>' + esc(t.name) + '</h3>' +
+                    '<p>' + esc(t.pflege) + '</p>' +
+                    '<span class="tag-pill">Status: ' + esc(t.status) + '</span>' +
+                    buildActionBtns("toys", i, canDo("toys", "edit"), canDo("toys", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addToy() {
+        if (!canDo("toys", "add")) return;
+        var name = document.getElementById("tName").value.trim();
+        var pflege = document.getElementById("tPflege").value.trim();
+        var status = document.getElementById("tStatus").value;
+        if (!name) return;
+        var obj = {
+          name: name,
+          pflege: pflege,
+          status: status,
+          imgUrl: draftImgs.toys,
+          artType: "toys"
+        };
+        document.getElementById("tName").value = "";
+        document.getElementById("tPflege").value = "";
+        clearDraftImage("toys");
+        submitItem("toys", obj);
+      }
+
+      function renderStrafen() {
+        var el = document.getElementById("strafenList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.strafen.length; i++) {
+          var s = store.strafen[i];
+          html += '<div class="card">' +
+                    '<h3>' + esc(s.titel) + '</h3>' +
+                    '<p>' + esc(s.desc) + '</p>' +
+                    buildActionBtns("strafen", i, canDo("strafen", "edit"), canDo("strafen", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addStrafe() {
+        if (!canDo("strafen", "add")) return;
+        var titel = document.getElementById("sTitel").value.trim();
+        var desc = document.getElementById("sDesc").value.trim();
+        if (!titel) return;
+        document.getElementById("sTitel").value = "";
+        document.getElementById("sDesc").value = "";
+        submitItem("strafen", { titel: titel, desc: desc });
+      }
+
+      function renderBelohnungen() {
+        var el = document.getElementById("belohnungenList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.belohnungen.length; i++) {
+          var b = store.belohnungen[i];
+          html += '<div class="card">' +
+                    '<h3>' + esc(b.titel) + '</h3>' +
+                    '<p>' + esc(b.desc) + '</p>' +
+                    buildActionBtns("belohnungen", i, canDo("belohnungen", "edit"), canDo("belohnungen", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addBelohnung() {
+        if (!canDo("belohnungen", "add")) return;
+        var titel = document.getElementById("bTitel").value.trim();
+        var desc = document.getElementById("bDesc").value.trim();
+        if (!titel) return;
+        document.getElementById("bTitel").value = "";
+        document.getElementById("bDesc").value = "";
+        submitItem("belohnungen", { titel: titel, desc: desc });
+      }
+
+      function renderRegeln() {
+        var el = document.getElementById("regelnList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.regeln.length; i++) {
+          var r = store.regeln[i];
+          html += '<div class="card">' +
+                    '<h3>' + esc(r.titel) + '</h3>' +
+                    buildActionBtns("regeln", i, canDo("regeln", "edit"), canDo("regeln", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addRegel() {
+        if (!canDo("regeln", "add")) return;
+        var titel = document.getElementById("rTitel").value.trim();
+        if (!titel) return;
+        document.getElementById("rTitel").value = "";
+        submitItem("regeln", { titel: titel });
+      }
+
+      function renderAufgaben() {
+        var el = document.getElementById("aufgabenList");
+        if (!el) return;
+        var html = "";
+        for (var i = 0; i < store.aufgaben.length; i++) {
+          var a = store.aufgaben[i];
+          html += '<div class="card">' +
+                    '<h3>' + esc(a.titel) + '</h3>' +
+                    '<span class="tag-pill">Zuständig: ' + esc(a.zustand) + '</span>' +
+                    buildActionBtns("aufgaben", i, canDo("aufgaben", "edit"), canDo("aufgaben", "del")) +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function addAufgabe() {
+        if (!canDo("aufgaben", "add")) return;
+        var titel = document.getElementById("aTitel").value.trim();
+        var zustand = document.getElementById("aZustand").value;
+        if (!titel) return;
+        document.getElementById("aTitel").value = "";
+        submitItem("aufgaben", { titel: titel, zustand: zustand });
+      }
+
+      // Berechtigungsmatrix
+      function renderPermMatrix() {
+        var el = document.getElementById("permMatrixContainer");
+        if (!el) return;
+        var keys = ["kalender", "shopping", "strafbuch", "kleidung", "toys", "strafen", "belohnungen", "regeln", "aufgaben"];
+        var html = "";
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          var p = store.permissions[k];
+          var isOn = Boolean(p.visible);
+          html += '<div class="perm-card' + (isOn ? '' : ' is-off') + '">' +
+                    '<div class="perm-top">' +
+                      '<strong style="color:var(--gold); font-size:14px;">' + CAT_META[k].label + '</strong>' +
+                      '<label class="master-switch ' + (isOn ? 'on' : 'off') + '">' +
+                        '<input type="checkbox" data-pcat="' + k + '" data-pact="visible"' + (isOn ? ' checked' : '') + '>' +
+                        '<span>' + (isOn ? 'EIN (Sichtbar)' : 'AUS (Versteckt)') + '</span>' +
+                      '</label>' +
+                    '</div>' +
+                    '<div class="perm-grid">' +
+                      '<label class="perm-box"><span>👁 Sichtbar</span><input type="checkbox" data-pcat="' + k + '" data-pact="visible"' + (p.visible ? ' checked' : '') + '></label>' +
+                      '<label class="perm-box"><span>➕ Hinzuf.</span><input type="checkbox" data-pcat="' + k + '" data-pact="add"' + (p.add ? ' checked' : '') + '></label>' +
+                      '<label class="perm-box"><span>✏️ Bearb.</span><input type="checkbox" data-pcat="' + k + '" data-pact="edit"' + (p.edit ? ' checked' : '') + '></label>' +
+                      '<label class="perm-box"><span>🗑 Löschen</span><input type="checkbox" data-pcat="' + k + '" data-pact="del"' + (p.del ? ' checked' : '') + '></label>' +
+                    '</div>' +
+                  '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function buildActionBtns(cat, idx, allowEdit, allowDel) {
+        if (!allowEdit && !allowDel) return "";
+        var h = '<div class="item-actions">';
+        if (allowEdit) {
+          h += '<button type="button" class="icon-btn edit" data-edit-cat="' + cat + '" data-edit-idx="' + idx + '">✏️</button>';
+        }
+        if (allowDel) {
+          h += '<button type="button" class="icon-btn del" data-del-cat="' + cat + '" data-del-idx="' + idx + '">🗑</button>';
+        }
+        h += '</div>';
+        return h;
+      }
+
+      // Bild-Upload & Kamera
+      function readFileAsDataUrl(evt, targetKey) {
+        var files = evt.target.files;
+        if (!files || !files[0]) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          draftImgs[targetKey] = e.target.result;
+          if (targetKey === "edit") {
+            var ei = document.getElementById("editPrevImg");
+            var eb = document.getElementById("editPrevBox");
+            if (ei && eb) {
+              ei.src = e.target.result;
+              eb.classList.add("active");
+            }
+          } else {
+            var pfx = targetKey === "kleidung" ? "k" : "t";
+            var img = document.getElementById(pfx + "PreviewImg");
+            var box = document.getElementById(pfx + "PreviewBox");
+            if (img && box) {
+              img.src = e.target.result;
+              box.classList.add("active");
+            }
+          }
+        };
+        reader.readAsDataURL(files[0]);
+      }
+
+      function clearDraftImage(targetKey) {
+        draftImgs[targetKey] = null;
+        if (targetKey === "edit") {
+          var ei = document.getElementById("editPrevImg");
+          var eb = document.getElementById("editPrevBox");
+          if (ei) ei.src = "";
+          if (eb) eb.classList.remove("active");
+          return;
+        }
+        var pfx = targetKey === "kleidung" ? "k" : "t";
+        var img = document.getElementById(pfx + "PreviewImg");
+        var box = document.getElementById(pfx + "PreviewBox");
+        var fIn = document.getElementById(pfx + "FileInput");
+        var cIn = document.getElementById(pfx + "CamInput");
+        if (img) img.src = "";
+        if (box) box.classList.remove("active");
+        if (fIn) fIn.value = "";
+        if (cIn) cIn.value = "";
+      }
+
+      // Edit Modal
+      function openEditDialog(isPending, category, idx) {
+        var obj = isPending ? (store.pending[idx] && store.pending[idx].item) : (store[category] && store[category][idx]);
+        if (!obj) return;
+
+        activeEditState = { isPending: isPending, category: category, index: idx };
+        draftImgs.edit = obj.imgUrl || null;
+
+        document.getElementById("editModalHeading").textContent = isPending ? "Bearbeiten & Bestätigen" : "Eintrag bearbeiten";
+        document.getElementById("btnEditSave").textContent = isPending ? "✅ Speichern & Übernehmen" : "Speichern";
+
+        var body = document.getElementById("editModalBody");
+        var html = "";
+
+        if (category === "kalender") {
+          html = '<input type="text" id="ef1" value="' + esc(obj.title) + '" placeholder="Titel">' +
+                 '<div class="grid-2">' +
+                   '<input type="date" id="ef2" value="' + esc(obj.date) + '">' +
+                   '<input type="time" id="ef3" value="' + esc(obj.time) + '">' +
+                 '</div>' +
+                 '<textarea id="ef4" rows="2" placeholder="Notiz">' + esc(obj.notes) + '</textarea>';
+        } else if (category === "shopping") {
+          html = '<input type="text" id="ef1" value="' + esc(obj.text) + '" placeholder="Artikel">';
+        } else if (category === "strafbuch") {
+          var opts = '<option value="">-- Strafe wählen --</option>';
+          for (var i = 0; i < store.strafen.length; i++) {
+            var st = store.strafen[i].titel;
+            opts += '<option value="' + esc(st) + '"' + (obj.strafe === st ? ' selected' : '') + '>' + esc(st) + '</option>';
+          }
+          html = '<input type="text" id="ef1" value="' + esc(obj.grund) + '" placeholder="Grund">' +
+                 '<select id="ef2">' + opts + '</select>' +
+                 '<textarea id="ef3" rows="2" placeholder="Notiz">' + esc(obj.notiz) + '</textarea>';
+        } else if (category === "kleidung") {
+          html = '<input type="text" id="ef1" value="' + esc(obj.name) + '" placeholder="Bezeichnung">' +
+                 '<input type="text" id="ef2" value="' + esc(obj.desc) + '" placeholder="Beschreibung">' +
+                 '<select id="ef3">' +
+                   '<option value="Daisy"' + (obj.besitzer === "Daisy" ? ' selected' : '') + '>Daisy</option>' +
+                   '<option value="Master"' + (obj.besitzer === "Master" ? ' selected' : '') + '>Master</option>' +
+                   '<option value="Beide"' + (obj.besitzer === "Beide" ? ' selected' : '') + '>Beide</option>' +
+                 '</select>' +
+                 '<div class="media-btn-row">' +
+                   '<button type="button" class="media-btn" id="btnEditFile">📁 Datei</button>' +
+                   '<button type="button" class="media-btn" id="btnEditCam">📷 Kamera</button>' +
+                 '</div>' +
+                 '<input type="file" id="editFileIn" class="hidden-file" accept="image/*">' +
+                 '<input type="file" id="editCamIn" class="hidden-file" accept="image/*" capture="environment">' +
+                 '<div class="preview-box' + (obj.imgUrl ? ' active' : '') + '" id="editPrevBox">' +
+                   '<img id="editPrevImg" src="' + (obj.imgUrl || '') + '" alt="Vorschau">' +
+                   '<button type="button" class="preview-remove" id="btnEditRemImg">✕</button>' +
+                 '</div>';
+        } else if (category === "toys") {
+          html = '<input type="text" id="ef1" value="' + esc(obj.name) + '" placeholder="Bezeichnung">' +
+                 '<input type="text" id="ef2" value="' + esc(obj.pflege) + '" placeholder="Pflege">' +
+                 '<select id="ef3">' +
+                   '<option value="Einsatzbereit"' + (obj.status === "Einsatzbereit" ? ' selected' : '') + '>Einsatzbereit</option>' +
+                   '<option value="Reinigung nötig"' + (obj.status === "Reinigung nötig" ? ' selected' : '') + '>Reinigung nötig</option>' +
+                 '</select>' +
+                 '<div class="media-btn-row">' +
+                   '<button type="button" class="media-btn" id="btnEditFile">📁 Datei</button>' +
+                   '<button type="button" class="media-btn" id="btnEditCam">📷 Kamera</button>' +
+                 '</div>' +
+                 '<input type="file" id="editFileIn" class="hidden-file" accept="image/*">' +
+                 '<input type="file" id="editCamIn" class="hidden-file" accept="image/*" capture="environment">' +
+                 '<div class="preview-box' + (obj.imgUrl ? ' active' : '') + '" id="editPrevBox">' +
+                   '<img id="editPrevImg" src="' + (obj.imgUrl || '') + '" alt="Vorschau">' +
+                   '<button type="button" class="preview-remove" id="btnEditRemImg">✕</button>' +
+                 '</div>';
+        } else if (category === "strafen" || category === "belohnungen") {
+          html = '<input type="text" id="ef1" value="' + esc(obj.titel) + '" placeholder="Titel">' +
+                 '<textarea id="ef2" rows="2" placeholder="Beschreibung">' + esc(obj.desc) + '</textarea>';
+        } else if (category === "regeln") {
+          html = '<input type="text" id="ef1" value="' + esc(obj.titel) + '" placeholder="Regel">';
+        } else if (category === "aufgaben") {
+          html = '<input type="text" id="ef1" value="' + esc(obj.titel) + '" placeholder="Aufgabe">' +
+                 '<select id="ef2">' +
+                   '<option value="Daisy"' + (obj.zustand === "Daisy" ? ' selected' : '') + '>Daisy</option>' +
+                   '<option value="Master"' + (obj.zustand === "Master" ? ' selected' : '') + '>Master</option>' +
+                 '</select>';
+        }
+
+        body.innerHTML = html;
+
+        if (category === "kleidung" || category === "toys") {
+          document.getElementById("btnEditFile").addEventListener("click", function () {
+            document.getElementById("editFileIn").click();
+          });
+          document.getElementById("btnEditCam").addEventListener("click", function () {
+            document.getElementById("editCamIn").click();
+          });
+          document.getElementById("editFileIn").addEventListener("change", function (e) {
+            readFileAsDataUrl(e, "edit");
+          });
+          document.getElementById("editCamIn").addEventListener("change", function (e) {
+            readFileAsDataUrl(e, "edit");
+          });
+          document.getElementById("btnEditRemImg").addEventListener("click", function () {
+            clearDraftImage("edit");
+          });
+        }
+
+        openModal("modalEdit");
+      }
+
+      function saveEditDialog() {
+        if (!activeEditState) return;
+        var cat = activeEditState.category;
+        var idx = activeEditState.index;
+        var isPend = activeEditState.isPending;
+        var obj = isPend ? (store.pending[idx] && store.pending[idx].item) : (store[cat] && store[cat][idx]);
+        if (!obj) return;
+
+        var f1 = document.getElementById("ef1");
+        var f2 = document.getElementById("ef2");
+        var f3 = document.getElementById("ef3");
+        var f4 = document.getElementById("ef4");
+
+        if (cat === "kalender" && f1.value.trim() && f2.value) {
+          obj.title = f1.value.trim();
+          obj.date = f2.value;
+          obj.time = f3.value || "19:30";
+          obj.notes = f4.value.trim();
+        } else if (cat === "shopping" && f1.value.trim()) {
+          obj.text = f1.value.trim();
+        } else if (cat === "strafbuch" && f1.value.trim()) {
+          obj.grund = f1.value.trim();
+          obj.strafe = f2.value;
+          obj.notiz = f3.value.trim();
+        } else if (cat === "kleidung" && f1.value.trim()) {
+          obj.name = f1.value.trim();
+          obj.desc = f2.value.trim();
+          obj.besitzer = f3.value;
+          obj.imgUrl = draftImgs.edit;
+        } else if (cat === "toys" && f1.value.trim()) {
+          obj.name = f1.value.trim();
+          obj.pflege = f2.value.trim();
+          obj.status = f3.value;
+          obj.imgUrl = draftImgs.edit;
+        } else if ((cat === "strafen" || cat === "belohnungen") && f1.value.trim()) {
+          obj.titel = f1.value.trim();
+          obj.desc = f2.value.trim();
+        } else if (cat === "regeln" && f1.value.trim()) {
+          obj.titel = f1.value.trim();
+        } else if (cat === "aufgaben" && f1.value.trim()) {
+          obj.titel = f1.value.trim();
+          obj.zustand = f2.value;
+        }
+
+        if (isPend) {
+          store[cat].push(obj);
+          store.pending.splice(idx, 1);
+          showToast("Bearbeitet & übernommen");
+        } else {
+          showToast("Änderung gespeichert");
+        }
+
+        activeEditState = null;
+        draftImgs.edit = null;
+        saveSafeStore();
+        closeModal("modalEdit");
+        renderEverything();
+      }
+
+      function renderEverything() {
+        renderDashboard();
+        renderChat();
+        renderCalendar();
+        renderShopping();
+        renderStrafbuch();
+        renderKleidung();
+        renderToys();
+        renderStrafen();
+        renderBelohnungen();
+        renderRegeln();
+        renderAufgaben();
+        renderPermMatrix();
+      }
+
+      // JSON Export & Import
+      function exportBackupJson() {
+        if (currentRole !== "Master") return;
+        var jsonStr = JSON.stringify(store, null, 2);
+        var area = document.getElementById("jsonBackupArea");
+        if (area) area.value = jsonStr;
+
+        var d = new Date();
+        var fileName = "dominion-backup-" + d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) + ".json";
+
+        try {
+          var blob = new Blob([jsonStr], { type: "application/json" });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 1500);
+          showToast("Backup heruntergeladen (" + fileName + ")");
+        } catch (e) {
+          showToast("JSON im Textfeld bereitgestellt");
+        }
+      }
+
+      function applyImportedJsonString(rawStr) {
+        if (currentRole !== "Master") return;
+        if (!rawStr || !rawStr.trim()) {
+          showToast("Keine JSON-Daten vorhanden");
+          return;
+        }
+        try {
+          var parsed = JSON.parse(rawStr);
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+            showToast("Ungültiges Backup-Format");
+            return;
+          }
+          store = normalizeStoreObject(parsed);
+          saveSafeStore();
+          syncPermissionsUI();
+          showToast("✅ Backup erfolgreich wiederhergestellt!");
+        } catch (err) {
+          showToast("Fehler beim Lesen der JSON-Daten");
+        }
+      }
+
+      function attachAllListeners() {
+        document.getElementById("roleBadge").addEventListener("click", handleRoleToggle);
+        document.getElementById("btnPinOk").addEventListener("click", verifyLoginPin);
+        document.getElementById("btnPinCancel").addEventListener("click", function () {
+          closeModal("modalPin");
+        });
+        document.getElementById("btnSavePin").addEventListener("click", saveNewPin);
+
+        // Cloud Sync Buttons
+        var urlField = document.getElementById("cloudDbUrl");
+        var roomField = document.getElementById("cloudRoomCode");
+        if (urlField) urlField.value = cloudConfig.dbUrl;
+        if (roomField) roomField.value = cloudConfig.roomCode;
+
+        document.getElementById("btnConnectCloud").addEventListener("click", function () {
+          var u = document.getElementById("cloudDbUrl").value.trim();
+          var r = document.getElementById("cloudRoomCode").value.trim();
+          if (!u || !r) {
+            showToast("Bitte Firebase-URL und Raum-Code eingeben");
+            return;
+          }
+          cloudConfig.dbUrl = u;
+          cloudConfig.roomCode = r;
+          saveCloudConfig();
+          startCloudRealtimeSync(true);
+          showToast("Cloud-Verbindung gestartet");
+        });
+
+        document.getElementById("btnDisconnectCloud").addEventListener("click", function () {
+          stopCloudRealtimeSync(false);
+          showToast("Cloud getrennt (Lokal-Modus)");
+        });
+
+        // Backup Export / Import
+        document.getElementById("btnExportJson").addEventListener("click", exportBackupJson);
+        document.getElementById("btnImportFile").addEventListener("click", function () {
+          document.getElementById("importJsonInput").click();
+        });
+        document.getElementById("importJsonInput").addEventListener("change", function (e) {
+          var files = e.target.files;
+          if (!files || !files[0]) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var content = ev.target.result;
+            var area = document.getElementById("jsonBackupArea");
+            if (area) area.value = content;
+            applyImportedJsonString(content);
+            e.target.value = "";
+          };
+          reader.readAsText(files[0]);
+        });
+        document.getElementById("btnCopyJson").addEventListener("click", function () {
+          var area = document.getElementById("jsonBackupArea");
+          if (!area) return;
+          if (!area.value.trim()) {
+            area.value = JSON.stringify(store, null, 2);
+          }
+          area.select();
+          try {
+            document.execCommand("copy");
+            showToast("JSON in Zwischenablage kopiert");
+          } catch (err) {
+            showToast("Bitte Text manuell kopieren");
+          }
+        });
+        document.getElementById("btnRestoreTextJson").addEventListener("click", function () {
+          var area = document.getElementById("jsonBackupArea");
+          if (area) applyImportedJsonString(area.value);
+        });
+
+        var navBtns = document.querySelectorAll("#bottomNav button");
+        for (var i = 0; i < navBtns.length; i++) {
+          navBtns[i].addEventListener("click", function () {
+            switchMainTab(this.getAttribute("data-view"), this);
+          });
+        }
+
+        var subBtns = document.querySelectorAll("#adminSubNav button");
+        for (var j = 0; j < subBtns.length; j++) {
+          subBtns[j].addEventListener("click", function () {
+            switchAdminSub(this.getAttribute("data-sub"), this);
+          });
+        }
+
+        document.getElementById("btnSendChat").addEventListener("click", sendChatMsg);
+
+        document.getElementById("calDate").value = calSelectedDay;
+        document.getElementById("btnAddCal").addEventListener("click", addCalendarEntry);
+        document.getElementById("btnPrevMonth").addEventListener("click", function () {
+          calMonth--;
+          if (calMonth < 0) {
+            calMonth = 11;
+            calYear--;
+          }
+          renderCalendar();
+        });
+        document.getElementById("btnNextMonth").addEventListener("click", function () {
+          calMonth++;
+          if (calMonth > 11) {
+            calMonth = 0;
+            calYear++;
+          }
+          renderCalendar();
+        });
+        document.getElementById("btnToggleMonthAll").addEventListener("click", function () {
+          calShowAllMonth = !calShowAllMonth;
+          renderCalendar();
+        });
+
+        var fBtns = document.querySelectorAll("#calFilters .cal-filter-btn");
+        for (var f = 0; f < fBtns.length; f++) {
+          fBtns[f].addEventListener("click", function () {
+            calFilter = this.getAttribute("data-filter");
+            renderCalendar();
+          });
+        }
+
+        document.getElementById("calDaysGrid").addEventListener("click", function (e) {
+          var cell = e.target.closest(".cal-cell");
+          if (cell && !cell.classList.contains("empty")) {
+            var d = cell.getAttribute("data-day");
+            if (d) {
+              calSelectedDay = d;
+              calShowAllMonth = false;
+              document.getElementById("calDate").value = d;
+              renderCalendar();
+            }
+          }
+        });
+
+        document.getElementById("btnAddShop").addEventListener("click", addShopping);
+        document.getElementById("btnAddStrafbuch").addEventListener("click", addStrafbuch);
+
+        document.getElementById("btnKFile").addEventListener("click", function () {
+          document.getElementById("kFileInput").click();
+        });
+        document.getElementById("btnKCam").addEventListener("click", function () {
+          document.getElementById("kCamInput").click();
+        });
+        document.getElementById("kFileInput").addEventListener("change", function (e) {
+          readFileAsDataUrl(e, "kleidung");
+        });
+        document.getElementById("kCamInput").addEventListener("change", function (e) {
+          readFileAsDataUrl(e, "kleidung");
+        });
+        document.getElementById("btnKRemoveImg").addEventListener("click", function () {
+          clearDraftImage("kleidung");
+        });
+        document.getElementById("btnAddKleidung").addEventListener("click", addKleidung);
+
+        document.getElementById("btnTFile").addEventListener("click", function () {
+          document.getElementById("tFileInput").click();
+        });
+        document.getElementById("btnTCam").addEventListener("click", function () {
+          document.getElementById("tCamInput").click();
+        });
+        document.getElementById("tFileInput").addEventListener("change", function (e) {
+          readFileAsDataUrl(e, "toys");
+        });
+        document.getElementById("tCamInput").addEventListener("change", function (e) {
+          readFileAsDataUrl(e, "toys");
+        });
+        document.getElementById("btnTRemoveImg").addEventListener("click", function () {
+          clearDraftImage("toys");
+        });
+        document.getElementById("btnAddToy").addEventListener("click", addToy);
+
+        document.getElementById("btnAddStrafe").addEventListener("click", addStrafe);
+        document.getElementById("btnAddBelohnung").addEventListener("click", addBelohnung);
+        document.getElementById("btnAddRegel").addEventListener("click", addRegel);
+        document.getElementById("btnAddAufgabe").addEventListener("click", addAufgabe);
+
+        document.getElementById("btnEditSave").addEventListener("click", saveEditDialog);
+        document.getElementById("btnEditCancel").addEventListener("click", function () {
+          activeEditState = null;
+          closeModal("modalEdit");
+        });
+
+        document.getElementById("btnRejectConfirm").addEventListener("click", confirmReject);
+        document.getElementById("btnRejectCancel").addEventListener("click", function () {
+          activeRejectIndex = null;
+          closeModal("modalReject");
+        });
+
+        document.getElementById("btnDelConfirm").addEventListener("click", function () {
+          if (pendingDeleteFn) pendingDeleteFn();
+          pendingDeleteFn = null;
+          closeModal("modalDelete");
+        });
+        document.getElementById("btnDelCancel").addEventListener("click", function () {
+          pendingDeleteFn = null;
+          closeModal("modalDelete");
+        });
+
+        document.getElementById("btnResetDefaults").addEventListener("click", function () {
+          store = createDefaultStore();
+          saveSafeStore();
+          syncPermissionsUI();
+          showToast("Standardwerte wiederhergestellt");
+        });
+
+        document.querySelector("main").addEventListener("click", function (e) {
+          var appBtn = e.target.closest("[data-approve-idx]");
+          if (appBtn) {
+            approvePending(parseInt(appBtn.getAttribute("data-approve-idx"), 10));
+            return;
+          }
+
+          var editPendBtn = e.target.closest("[data-edit-pending-idx]");
+          if (editPendBtn) {
+            var pIdx = parseInt(editPendBtn.getAttribute("data-edit-pending-idx"), 10);
+            if (store.pending[pIdx]) {
+              openEditDialog(true, store.pending[pIdx].category, pIdx);
+            }
+            return;
+          }
+
+          var rejBtn = e.target.closest("[data-reject-idx]");
+          if (rejBtn) {
+            openRejectModal(parseInt(rejBtn.getAttribute("data-reject-idx"), 10));
+            return;
+          }
+
+          var dismBtn = e.target.closest("[data-dismiss-rej]");
+          if (dismBtn) {
+            var rIdx = parseInt(dismBtn.getAttribute("data-dismiss-rej"), 10);
+            store.rejected.splice(rIdx, 1);
+            saveSafeStore();
+            renderDashboard();
+            return;
+          }
+
+          var editBtn = e.target.closest("[data-edit-cat]");
+          if (editBtn) {
+            openEditDialog(
+              false,
+              editBtn.getAttribute("data-edit-cat"),
+              parseInt(editBtn.getAttribute("data-edit-idx"), 10)
+            );
+            return;
+          }
+
+          var delBtn = e.target.closest("[data-del-cat]");
+          if (delBtn) {
+            var dCat = delBtn.getAttribute("data-del-cat");
+            var dIdx = parseInt(delBtn.getAttribute("data-del-idx"), 10);
+            pendingDeleteFn = function () {
+              if (store[dCat]) {
+                store[dCat].splice(dIdx, 1);
+                saveSafeStore();
+                renderEverything();
+                showToast("Gelöscht");
+              }
+            };
+            openModal("modalDelete");
+          }
+        });
+
+        document.querySelector("main").addEventListener("change", function (e) {
+          var shopAttr = e.target.getAttribute("data-shop-check");
+          if (shopAttr !== null) {
+            var sIdx = parseInt(shopAttr, 10);
+            if (store.shopping[sIdx]) {
+              store.shopping[sIdx].done = e.target.checked;
+              saveSafeStore();
+              renderShopping();
+            }
+            return;
+          }
+
+          var pCat = e.target.getAttribute("data-pcat");
+          var pAct = e.target.getAttribute("data-pact");
+          if (pCat && pAct && store.permissions[pCat]) {
+            store.permissions[pCat][pAct] = e.target.checked;
+            saveSafeStore();
+            syncPermissionsUI();
+            showToast("Berechtigung aktualisiert");
+          }
+        });
+      }
+
+      attachAllListeners();
+      syncPermissionsUI();
+
+      // Automatisch mit Cloud verbinden, falls bereits konfiguriert
+      if (cloudConfig.dbUrl && cloudConfig.roomCode) {
+        startCloudRealtimeSync(false);
+      }
+    });
+  </script>
+</body>
+</html>
