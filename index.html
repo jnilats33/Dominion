@@ -1171,7 +1171,7 @@
   <header>
     <div class="header-left">
       <h1>DOMINION <span>v2.1</span></h1>
-      <div class="sync-status" id="syncStatusLabel">● Offline (Lokal)</div>
+      <div class="sync-status" id="syncStatusLabel">● Verbinde Cloud...</div>
     </div>
     <div class="role-badge daisy-active" id="roleBadge">Rolle: Daisy</div>
   </header>
@@ -1206,10 +1206,10 @@
           </summary>
           <ul class="changelog-list">
             <li><strong>1. Standard-Startrolle „Daisy“:</strong> Beim Öffnen der App startet die Oberfläche automatisch sicher in der Daisy-Ansicht (Master-Zugang weiterhin über PIN).</li>
-            <li><strong>2. 3-teiliges Dashboard:</strong> Klare Unterteilung in Freigaben/Rückmeldungen, die 5 dringendsten Termine &amp; Aufgaben (überfällige Einträge rot mit <code>!</code> hervorgehoben) sowie diese Update-Übersicht.</li>
-            <li><strong>3. Chat-Signalton:</strong> Dezenter Doppel-Ping bei eingehenden Nachrichten der anderen Rolle inklusive Stummschalt-Button (<code>🔊</code>/<code>🔇</code>).</li>
-            <li><strong>4. Emoji-Picker im Chat:</strong> Schnelle Auswahl passender Smileys &amp; Symbole über den <code>😊</code>-Button neben dem Textfeld.</li>
-            <li><strong>5. Bildversand im Chat:</strong> Fotos direkt über die Kamera oder Galerie (<code>📷</code>) senden – mit automatischer Komprimierung und Vollbild-Ansicht beim Antippen.</li>
+            <li><strong>2. Automatischer Live-Sync:</strong> Die Firebase-Verbindung und der Raum <code>D+W Connection</code> sind auf beiden Geräten direkt voreingestellt und verbinden sich beim Start automatisch.</li>
+            <li><strong>3. 3-teiliges Dashboard:</strong> Klare Unterteilung in Freigaben/Rückmeldungen, die 5 dringendsten Termine &amp; Aufgaben (überfällige Einträge rot mit <code>!</code> hervorgehoben) sowie diese Update-Übersicht.</li>
+            <li><strong>4. Chat-Signalton:</strong> Dezenter Doppel-Ping bei eingehenden Nachrichten der anderen Rolle inklusive Stummschalt-Button (<code>🔊</code>/<code>🔇</code>).</li>
+            <li><strong>5. Emoji-Picker &amp; Bildversand im Chat:</strong> Schnelle Auswahl passender Smileys (<code>😊</code>) sowie Foto-Versand über Kamera oder Galerie (<code>📷</code>) mit automatischer Komprimierung und Vollbild-Ansicht.</li>
           </ul>
         </details>
       </div>
@@ -1451,20 +1451,20 @@
         <div class="card card-cloud">
           <h3 class="full-width" style="color: #4ade80;">☁️ Live-Sync (Zwei Telefone verbinden)</h3>
           <p style="margin-bottom: 10px;">
-            Verbindet Master &amp; Daisy in Echtzeit über eure kostenlose Firebase Realtime Database. Auf beiden Handys identische Daten eintragen:
+            Verbindet Master &amp; Daisy in Echtzeit über eure Firebase Realtime Database. Standardwerte sind bereits voreingestellt und können bei Bedarf jederzeit geändert werden:
           </p>
           <label class="field-label">Firebase Realtime Database URL</label>
-          <input type="text" id="cloudDbUrl" placeholder="https://dein-projekt-default-rtdb.europe-west1.firebasedatabase.app">
+          <input type="text" id="cloudDbUrl" value="https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app" placeholder="https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app">
 
           <label class="field-label">Gemeinsamer Sync-Raum-Code (Geheimwort)</label>
-          <input type="text" id="cloudRoomCode" placeholder="z.B. dominion-privat-2026">
+          <input type="text" id="cloudRoomCode" value="D+W Connection" placeholder="D+W Connection">
 
           <div class="grid-2" style="margin-top: 4px;">
             <button type="button" class="btn btn-success" id="btnConnectCloud">🔗 Verbinden &amp; Sync</button>
             <button type="button" class="btn btn-secondary" id="btnDisconnectCloud">🔌 Trennen (Lokal)</button>
           </div>
           <p id="cloudDiagMsg" style="margin-top: 8px; font-size: 12px; color: var(--gold);">
-            Status: Nicht verbunden (Daten werden nur lokal auf diesem Gerät gespeichert).
+            Status: Verbinde automatisch mit Raum „D+W Connection“...
           </p>
         </div>
 
@@ -1622,6 +1622,9 @@
       var CLOUD_CFG_KEY = "dominion_cloud_cfg_v1";
       var MUTE_CFG_KEY = "dominion_chat_muted_v1";
 
+      var DEFAULT_DB_URL = "https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app";
+      var DEFAULT_ROOM_CODE = "D+W Connection";
+
       // Standard-Startrolle immer "Daisy"
       var currentRole = "Daisy";
       var activeMainView = "dashboard";
@@ -1636,8 +1639,12 @@
       var activeEditState = null;
       var activeRejectIndex = null;
 
-      // Cloud Sync Variablen (REST + Echtzeit SSE Stream ohne externe SDK-Abstürze)
-      var cloudConfig = { dbUrl: "", roomCode: "" };
+      // Cloud Sync Variablen (Standardwerte voreingestellt, jederzeit änderbar)
+      var cloudConfig = {
+        dbUrl: DEFAULT_DB_URL,
+        roomCode: DEFAULT_ROOM_CODE,
+        disconnected: false
+      };
       var cloudEventSource = null;
       var cloudPollTimer = null;
       var isCloudConnected = false;
@@ -1850,11 +1857,16 @@
           if (raw) {
             var parsed = JSON.parse(raw);
             if (parsed && typeof parsed === "object") {
-              cloudConfig.dbUrl = parsed.dbUrl || "";
-              cloudConfig.roomCode = parsed.roomCode || "";
+              cloudConfig.dbUrl = (parsed.dbUrl && parsed.dbUrl.trim()) ? parsed.dbUrl.trim() : DEFAULT_DB_URL;
+              cloudConfig.roomCode = (parsed.roomCode && parsed.roomCode.trim()) ? parsed.roomCode.trim() : DEFAULT_ROOM_CODE;
+              cloudConfig.disconnected = Boolean(parsed.disconnected);
+              return;
             }
           }
         } catch (e) {}
+        cloudConfig.dbUrl = DEFAULT_DB_URL;
+        cloudConfig.roomCode = DEFAULT_ROOM_CODE;
+        cloudConfig.disconnected = false;
       }
 
       function saveCloudConfig() {
@@ -1874,7 +1886,7 @@
           window.localStorage.setItem(STORAGE_KEY, serialized);
         } catch (e) {}
 
-        if (!skipCloudPush && cloudConfig.dbUrl && cloudConfig.roomCode) {
+        if (!skipCloudPush && !cloudConfig.disconnected && cloudConfig.dbUrl && cloudConfig.roomCode) {
           pushStoreToCloud(serialized);
         }
       }
@@ -1883,8 +1895,8 @@
       // ECHTZEIT CLOUD SYNC (FIREBASE REST + SSE)
       // ==========================================
       function buildCloudEndpoint() {
-        var base = cloudConfig.dbUrl.trim().replace(/\/+$/, "");
-        var room = cloudConfig.roomCode.trim().replace(/[^a-zA-Z0-9_-]/g, "_");
+        var base = (cloudConfig.dbUrl || DEFAULT_DB_URL).trim().replace(/\/+$/, "");
+        var room = (cloudConfig.roomCode || DEFAULT_ROOM_CODE).trim().replace(/[^a-zA-Z0-9_-]/g, "_");
         if (!base || !room) return null;
         if (base.indexOf("http") !== 0) base = "https://" + base;
         return base + "/dominion_rooms/" + room + ".json";
@@ -1993,6 +2005,9 @@
           return;
         }
 
+        cloudConfig.disconnected = false;
+        saveCloudConfig();
+
         updateSyncStatusUI(false, "Verbinde mit Cloud...");
         pullFromCloudOnce(pushInitial);
 
@@ -2028,13 +2043,8 @@
           cloudPollTimer = null;
         }
         if (!keepConfig) {
-          cloudConfig.dbUrl = "";
-          cloudConfig.roomCode = "";
+          cloudConfig.disconnected = true;
           saveCloudConfig();
-          var uIn = document.getElementById("cloudDbUrl");
-          var rIn = document.getElementById("cloudRoomCode");
-          if (uIn) uIn.value = "";
-          if (rIn) rIn.value = "";
         }
         updateSyncStatusUI(false, "Nicht verbunden (Lokal-Modus aktiv).");
       }
@@ -2339,7 +2349,6 @@
         var nowTime = getNowTimeOnly();
         var entries = [];
 
-        // Kalendereinträge einbeziehen
         if (Array.isArray(store.kalender)) {
           for (var i = 0; i < store.kalender.length; i++) {
             var ev = store.kalender[i];
@@ -2358,7 +2367,6 @@
           }
         }
 
-        // Aufgaben einbeziehen (falls mit Frist oder offen)
         if (Array.isArray(store.aufgaben)) {
           for (var j = 0; j < store.aufgaben.length; j++) {
             var aufg = store.aufgaben[j];
@@ -3345,21 +3353,20 @@
         });
         document.getElementById("btnSavePin").addEventListener("click", saveNewPin);
 
-        // Cloud Sync Buttons
+        // Cloud Sync Buttons & voreingestellte Felder
         var urlField = document.getElementById("cloudDbUrl");
         var roomField = document.getElementById("cloudRoomCode");
-        if (urlField) urlField.value = cloudConfig.dbUrl;
-        if (roomField) roomField.value = cloudConfig.roomCode;
+        if (urlField) urlField.value = cloudConfig.dbUrl || DEFAULT_DB_URL;
+        if (roomField) roomField.value = cloudConfig.roomCode || DEFAULT_ROOM_CODE;
 
         document.getElementById("btnConnectCloud").addEventListener("click", function () {
-          var u = document.getElementById("cloudDbUrl").value.trim();
-          var r = document.getElementById("cloudRoomCode").value.trim();
-          if (!u || !r) {
-            showToast("Bitte Firebase-URL und Raum-Code eingeben");
-            return;
-          }
+          var u = document.getElementById("cloudDbUrl").value.trim() || DEFAULT_DB_URL;
+          var r = document.getElementById("cloudRoomCode").value.trim() || DEFAULT_ROOM_CODE;
+          document.getElementById("cloudDbUrl").value = u;
+          document.getElementById("cloudRoomCode").value = r;
           cloudConfig.dbUrl = u;
           cloudConfig.roomCode = r;
+          cloudConfig.disconnected = false;
           saveCloudConfig();
           startCloudRealtimeSync(true);
           showToast("Cloud-Verbindung gestartet");
@@ -3683,9 +3690,11 @@
       attachAllListeners();
       syncPermissionsUI();
 
-      // Automatisch mit Cloud verbinden, falls bereits konfiguriert
-      if (cloudConfig.dbUrl && cloudConfig.roomCode) {
+      // Automatisch beim Start mit der Cloud verbinden (sofern nicht manuell getrennt)
+      if (!cloudConfig.disconnected && cloudConfig.dbUrl && cloudConfig.roomCode) {
         startCloudRealtimeSync(false);
+      } else {
+        updateSyncStatusUI(false, "Nicht verbunden (Lokal-Modus aktiv).");
       }
     });
   </script>
