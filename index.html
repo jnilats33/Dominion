@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.3</title>
+  <title>Dominion TEST – v2.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -800,11 +800,11 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
-    const STORAGE_KEY = 'dominion_app_state_v2';
-    const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
-    const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
+    const STORAGE_KEY = 'dominion_test_state_20261114';
+    const LEGACY_KEYS = [];
+    const DEVICE_PREFS_KEY = 'dominion_test_device_prefs_20261114';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
-    const DEFAULT_ROOM_CODE = 'D+W Connection';
+    const DEFAULT_ROOM_CODE = 'dominion-test-20261114-isolated';
     const FCM_VAPID_KEY = 'BIjo1CgqJnE-B12MQNhsc-PBNigNW1JhuPz241wPvVnveqnlrPOxBblc0bVt5ZNBGuzODM1fj83ibkb_hgnGVaU';
     const MGMT_CATEGORIES = [
       { id: 'kleidung', label: '👗 Kleidung', singular: 'Kleidung' },
@@ -935,10 +935,7 @@
         ...incoming,
         version: '2.3',
         pin: incoming.pin || def.pin,
-        firebase: {
-          url: (incoming.firebase && incoming.firebase.url) ? incoming.firebase.url : DEFAULT_FB_URL,
-          room: (incoming.firebase && incoming.firebase.room) ? incoming.firebase.room : DEFAULT_ROOM_CODE
-        },
+        firebase: { url: DEFAULT_FB_URL, room: DEFAULT_ROOM_CODE },
         basics: { ...def.basics, ...(incoming.basics || {}) },
         permissions: { ...def.permissions, ...(incoming.permissions || {}) },
         chat: Array.isArray(incoming.chat) ? incoming.chat : def.chat,
@@ -1010,8 +1007,8 @@
      * Firebase Realtime Database & FCM Push Setup
      */
     function initFirebaseSync() {
-      const fbUrl = (appState.firebase.url || DEFAULT_FB_URL).trim();
-      const roomRaw = (appState.firebase.room || DEFAULT_ROOM_CODE).trim();
+      const fbUrl = DEFAULT_FB_URL; // Test build: fixed database
+      const roomRaw = DEFAULT_ROOM_CODE; // Test build: never connect to production room
       const safeRoomPath = roomRaw.replace(/[.#$\[\]\/]/g, '_');
 
       try {
@@ -1109,8 +1106,10 @@
         updateSyncIndicator(true);
         const remoteData = snapshot.val();
         if (!remoteData) {
-          console.warn('Leerer Firebase-Raum: kein automatisches Überschreiben aus lokalem Gerätestand.');
-          updateSyncIndicator(false);
+          // This is a fixed, isolated test room. Initialize it only once atomically.
+          firebaseDbRef.transaction(existing => existing === null ? sanitizeForFirebase(createDefaultState()) : undefined, (error, committed) => {
+            if (error) { console.warn('Test-Raum Initialisierung:', error); updateSyncIndicator(false); }
+          }, false);
           return;
         }
 
@@ -2447,11 +2446,11 @@
       if (currentRole !== 'Master') return;
       const url = document.getElementById('sec-fb-url').value.trim() || DEFAULT_FB_URL;
       const room = document.getElementById('sec-fb-room').value.trim() || DEFAULT_ROOM_CODE;
-      appState.firebase.url = url;
-      appState.firebase.room = room;
+      appState.firebase.url = DEFAULT_FB_URL;
+      appState.firebase.room = DEFAULT_ROOM_CODE;
       saveStateLocalOnly();
       initFirebaseSync();
-      showToast('Firebase-Verbindung aktualisiert.');
+      showToast('TEST: Firebase-Raum bleibt fest isoliert.');
     }
 
     function changeMasterPin() {
