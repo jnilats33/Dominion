@@ -1106,16 +1106,25 @@
           return;
         }
 
+        let mergedChat = [];
+        let chatNeedsSync = false;
         isApplyingRemoteUpdate = true;
-        const localChatBackup = Array.isArray(appState.chat) ? [...appState.chat] : [];
-        appState = mergeWithDefaults(remoteData);
-        const remoteChat = Array.isArray(appState.chat) ? appState.chat : [];
-        const mergedChat = mergeChatMessages(localChatBackup, remoteChat);
-        const chatNeedsSync = JSON.stringify(mergedChat) !== JSON.stringify(remoteChat);
-        appState.chat = mergedChat;
-        saveStateLocalOnly();
-        refreshAllUI();
-        isApplyingRemoteUpdate = false;
+        try {
+          const localChatBackup = Array.isArray(appState.chat) ? [...appState.chat] : [];
+          appState = mergeWithDefaults(remoteData);
+          const remoteChat = Array.isArray(appState.chat) ? appState.chat : [];
+          mergedChat = mergeChatMessages(localChatBackup, remoteChat);
+          chatNeedsSync = JSON.stringify(mergedChat) !== JSON.stringify(remoteChat);
+          appState.chat = mergedChat;
+          saveStateLocalOnly();
+          refreshAllUI();
+        } catch (err) {
+          console.error('Fehler beim Anwenden des Firebase-Status:', err);
+          updateSyncIndicator(false);
+          return;
+        } finally {
+          isApplyingRemoteUpdate = false;
+        }
         if (chatNeedsSync) {
           firebaseDbRef.child('chat').set(sanitizeForFirebase(mergedChat)).catch(err => {
             console.warn('Chat-Abgleich Fehler:', err);
