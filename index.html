@@ -3,28 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0b0b0f" />
+  <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.2</title>
+  <title>Dominion App v2.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #09090d;
-      --bg-secondary: #12121a;
-      --bg-card: rgba(22, 22, 32, 0.88);
-      --bg-elevated: #1c1c28;
-      --border-subtle: rgba(212, 175, 55, 0.16);
-      --border-strong: rgba(212, 175, 55, 0.38);
-      --accent-gold: #d4af37;
-      --accent-gold-light: #f3d576;
-      --accent-crimson: #9f1239;
-      --accent-crimson-bright: #e11d48;
-      --text-main: #f4f4f6;
-      --text-muted: #9ca3af;
+      --bg-primary: #0f1117;
+      --bg-secondary: #171a24;
+      --bg-card: #1e2230;
+      --border-color: #2d3348;
+      --accent-gold: #c9973e;
+      --accent-gold-light: #e5b55c;
+      --text-primary: #f1f5f9;
+      --text-muted: #94a3b8;
+      --status-success: #22c55e;
+      --status-danger: #ef4444;
     }
 
     * {
@@ -37,9 +35,9 @@
       padding: 0;
       background-color: var(--bg-primary);
       background-image:
-        radial-gradient(circle at 15% 10%, rgba(159, 18, 57, 0.14), transparent 40%),
-        radial-gradient(circle at 85% 90%, rgba(212, 175, 55, 0.10), transparent 45%);
-      color: var(--text-main);
+        radial-gradient(circle at 15% 10%, rgba(159, 18, 57, 0.12), transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(201, 151, 62, 0.08), transparent 45%);
+      color: var(--text-primary);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
@@ -50,16 +48,16 @@
     }
 
     .glass-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     }
 
     .gold-gradient {
-      background: linear-gradient(135deg, #d4af37 0%, #f3d576 50%, #b8891e 100%);
-      color: #0b0b0f;
+      background: linear-gradient(135deg, #c9973e 0%, #e5b55c 50%, #a87d2b 100%);
+      color: #0f1117;
     }
 
     .crimson-gradient {
@@ -84,14 +82,14 @@
       border-radius: 999px;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(212, 175, 55, 0.28);
+      background: rgba(201, 151, 62, 0.28);
       border-radius: 999px;
     }
 
     @keyframes pulseHighlight {
-      0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.75); border-color: #f3d576; }
-      50% { box-shadow: 0 0 24px 6px rgba(212, 175, 55, 0.35); border-color: #d4af37; }
-      100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); border-color: var(--border-subtle); }
+      0% { box-shadow: 0 0 0 0 rgba(201, 151, 62, 0.75); border-color: #e5b55c; }
+      50% { box-shadow: 0 0 24px 6px rgba(201, 151, 62, 0.35); border-color: #c9973e; }
+      100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); border-color: var(--border-color); }
     }
 
     .highlight-target {
@@ -108,9 +106,9 @@
     }
 
     input, select, textarea {
-      background-color: rgba(14, 14, 21, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #f4f4f6;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
       border-radius: 0.75rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -118,7 +116,7 @@
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--accent-gold);
-      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+      box-shadow: 0 0 0 2px rgba(201, 151, 62, 0.2);
     }
 
     input:disabled, select:disabled, textarea:disabled {
@@ -134,14 +132,14 @@
 
   <!-- Custom Confirm / Modal Dialog -->
   <div id="modal-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div id="modal-box" class="glass-card rounded-2xl p-6 w-full max-w-md border border-[#d4af37]/30 animate-fade">
-      <h3 id="modal-title" class="font-display text-lg font-bold text-[#f3d576] mb-2">Bestätigung</h3>
-      <p id="modal-message" class="text-sm text-gray-300 mb-5 leading-relaxed"></p>
+    <div id="modal-box" class="glass-card rounded-2xl p-6 w-full max-w-md border border-[#c9973e]/30 animate-fade">
+      <h3 id="modal-title" class="font-display text-lg font-bold text-[#e5b55c] mb-2">Bestätigung</h3>
+      <p id="modal-message" class="text-sm text-slate-300 mb-5 leading-relaxed"></p>
       <div id="modal-input-wrap" class="hidden mb-4">
         <input id="modal-input" type="password" inputmode="numeric" maxlength="8" placeholder="PIN eingeben..." class="w-full px-4 py-3 text-center tracking-widest text-lg" />
       </div>
       <div class="flex justify-end gap-3">
-        <button id="modal-cancel" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-sm font-medium transition">Abbrechen</button>
+        <button id="modal-cancel" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-medium transition">Abbrechen</button>
         <button id="modal-confirm" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-sm shadow-lg transition">Bestätigen</button>
       </div>
     </div>
@@ -149,23 +147,23 @@
 
   <!-- Role Login / Lock Screen -->
   <div id="role-screen" class="min-h-screen flex flex-col items-center justify-center p-5">
-    <div class="glass-card rounded-3xl p-7 sm:p-9 w-full max-w-md border border-[#d4af37]/30 text-center animate-fade">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl gold-gradient flex items-center justify-center shadow-lg shadow-[#d4af37]/20">
+    <div class="glass-card rounded-3xl p-7 sm:p-9 w-full max-w-md border border-[#c9973e]/30 text-center animate-fade">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl gold-gradient flex items-center justify-center shadow-lg shadow-[#c9973e]/20">
         <span class="text-3xl">👑</span>
       </div>
-      <h1 id="login-app-title" class="font-display text-2xl sm:text-3xl font-bold tracking-wider text-[#f3d576]">DOMINION</h1>
-      <p id="login-app-subtitle" class="text-xs uppercase tracking-[0.22em] text-gray-400 mt-1 mb-7">Exklusive Verbindung • v2.2</p>
+      <h1 id="login-app-title" class="font-display text-2xl sm:text-3xl font-bold tracking-wider text-[#e5b55c]">DOMINION</h1>
+      <p id="login-app-subtitle" class="text-xs uppercase tracking-[0.22em] text-slate-400 mt-1 mb-7">Exklusive Verbindung • v2.3</p>
 
       <div id="role-select-buttons" class="space-y-3.5">
-        <button onclick="selectRole('Master')" class="w-full p-4 rounded-2xl glass-card hover:border-[#d4af37] transition flex items-center justify-between group">
+        <button onclick="selectRole('Master')" class="w-full p-4 rounded-2xl glass-card hover:border-[#c9973e] transition flex items-center justify-between group">
           <div class="flex items-center gap-3.5">
             <div class="w-11 h-11 rounded-xl gold-gradient flex items-center justify-center text-xl font-bold shadow">♛</div>
             <div class="text-left">
-              <div id="login-master-label" class="font-semibold text-base text-white group-hover:text-[#f3d576] transition">Master</div>
-              <div class="text-xs text-gray-400">Voller Zugriff & Steuerung (PIN)</div>
+              <div id="login-master-label" class="font-semibold text-base text-white group-hover:text-[#e5b55c] transition">Master</div>
+              <div class="text-xs text-slate-400">Voller Zugriff & Steuerung (PIN)</div>
             </div>
           </div>
-          <span class="text-[#d4af37] text-lg">→</span>
+          <span class="text-[#c9973e] text-lg">→</span>
         </button>
 
         <button onclick="selectRole('Daisy')" class="w-full p-4 rounded-2xl glass-card hover:border-rose-500/60 transition flex items-center justify-between group">
@@ -173,7 +171,7 @@
             <div class="w-11 h-11 rounded-xl crimson-gradient flex items-center justify-center text-xl font-bold shadow">🌸</div>
             <div class="text-left">
               <div id="login-daisy-label" class="font-semibold text-base text-white group-hover:text-rose-300 transition">Daisy</div>
-              <div class="text-xs text-gray-400">Direkter Zugang</div>
+              <div class="text-xs text-slate-400">Direkter Zugang</div>
             </div>
           </div>
           <span class="text-rose-400 text-lg">→</span>
@@ -182,17 +180,17 @@
 
       <!-- Master PIN Prompt -->
       <div id="master-pin-box" class="hidden mt-2 space-y-4 animate-fade">
-        <div class="text-sm text-gray-300">Bitte Master-PIN eingeben</div>
+        <div class="text-sm text-slate-300">Bitte Master-PIN eingeben</div>
         <input id="master-pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••"
                onkeydown="if(event.key==='Enter') verifyMasterPin()"
                class="w-full px-4 py-3.5 text-center text-2xl tracking-[0.4em] font-bold" />
         <div class="flex gap-3">
-          <button onclick="cancelPinPrompt()" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-sm font-medium">Zurück</button>
+          <button onclick="cancelPinPrompt()" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-medium">Zurück</button>
           <button onclick="verifyMasterPin()" class="flex-1 py-3 rounded-xl gold-gradient font-semibold text-sm shadow-lg">Entsperren</button>
         </div>
       </div>
 
-      <div class="mt-7 pt-4 border-t border-white/10 flex items-center justify-center gap-2 text-xs text-gray-400">
+      <div class="mt-7 pt-4 border-t border-slate-800 flex items-center justify-center gap-2 text-xs text-slate-400">
         <span id="login-sync-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span id="login-sync-text">Firebase Live-Sync aktiv</span>
       </div>
@@ -202,28 +200,28 @@
   <!-- Main Authenticated Application -->
   <div id="main-app" class="hidden max-w-4xl mx-auto">
     <!-- Top Header -->
-    <header class="sticky top-0 z-30 bg-[#09090d]/90 backdrop-blur-md border-b border-white/10 px-4 py-3">
+    <header class="sticky top-0 z-30 bg-[#0f1117]/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2.5 min-w-0">
           <div class="w-9 h-9 rounded-xl gold-gradient flex items-center justify-center text-lg shrink-0 shadow">👑</div>
           <div class="min-w-0">
             <div class="flex items-center gap-2">
-              <h1 id="header-title" class="font-display text-base sm:text-lg font-bold text-[#f3d576] truncate">DOMINION</h1>
+              <h1 id="header-title" class="font-display text-base sm:text-lg font-bold text-[#e5b55c] truncate">DOMINION</h1>
               <span id="sync-badge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 <span id="sync-status-label">Live</span>
               </span>
             </div>
-            <p id="header-subtitle" class="text-[11px] text-gray-400 truncate">D+W Connection</p>
+            <p id="header-subtitle" class="text-[11px] text-slate-400 truncate">D+W Connection</p>
           </div>
         </div>
 
         <div class="flex items-center gap-2 shrink-0">
-          <div class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs flex items-center gap-1.5">
+          <div class="px-3 py-1.5 rounded-xl bg-white/5 border border-slate-800 text-xs flex items-center gap-1.5">
             <span id="active-role-icon">♛</span>
-            <span id="active-role-name" class="font-semibold text-gray-200">Master</span>
+            <span id="active-role-name" class="font-semibold text-slate-200">Master</span>
           </div>
-          <button onclick="logoutRole()" title="Rolle wechseln" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-xs transition">
+          <button onclick="logoutRole()" title="Rolle wechseln" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-slate-800 text-slate-300 text-xs transition">
             🔒
           </button>
         </div>
@@ -236,14 +234,14 @@
       <!-- ==================== 1. DASHBOARD ==================== -->
       <section id="tab-dashboard" class="space-y-5 animate-fade">
         <!-- Welcome Banner -->
-        <div class="glass-card rounded-2xl p-5 border border-[#d4af37]/25 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/25 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <p class="text-xs uppercase tracking-widest text-[#d4af37] font-semibold">Willkommen zurück</p>
+            <p class="text-xs uppercase tracking-widest text-[#c9973e] font-semibold">Willkommen zurück</p>
             <h2 id="dash-greeting" class="text-xl sm:text-2xl font-bold text-white mt-0.5">Hallo, Master</h2>
-            <p id="dash-date" class="text-xs text-gray-400 mt-1"></p>
+            <p id="dash-date" class="text-xs text-slate-400 mt-1"></p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button onclick="switchTab('chat')" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-200 flex items-center gap-1.5 transition">
+            <button onclick="switchTab('chat')" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-slate-800 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition">
               💬 <span>Chat öffnen</span>
             </button>
             <button onclick="switchTab('kalender')" class="px-3.5 py-2 rounded-xl gold-gradient text-xs font-semibold flex items-center gap-1.5 shadow transition">
@@ -252,19 +250,32 @@
           </div>
         </div>
 
+        <!-- RESTORED UPDATE / CHANGELOG BOX (v2.3) -->
+        <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/30 space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
+              <span>🚀</span> Update-News: Dominion v2.3
+            </h3>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Neu</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Willkommen in Version 2.3! Neu integriert ist die Unterstützung für <strong>Firebase Cloud Messaging (FCM) Web-Push-Benachrichtigungen</strong>. Aktiviere Push-Benachrichtigungen unter <em>Einstellungen → Sicherheit</em>, um auch im Hintergrund sofort über neue Chat-Nachrichten informiert zu werden.
+          </p>
+        </div>
+
         <!-- Quick Overview Metrics -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div onclick="switchTab('kalender')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#d4af37]/50 transition">
-            <div class="flex items-center justify-between text-gray-400 text-xs mb-1">
+          <div onclick="switchTab('kalender')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Termine</span>
               <span>📅</span>
             </div>
             <div id="stat-kalender" class="text-2xl font-bold text-white">0</div>
-            <div class="text-[11px] text-[#d4af37] mt-1">Anstehend</div>
+            <div class="text-[11px] text-[#c9973e] mt-1">Anstehend</div>
           </div>
 
-          <div onclick="switchTab('einkauf')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#d4af37]/50 transition">
-            <div class="flex items-center justify-between text-gray-400 text-xs mb-1">
+          <div onclick="switchTab('einkauf')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Einkauf</span>
               <span>🛒</span>
             </div>
@@ -273,7 +284,7 @@
           </div>
 
           <div onclick="switchTab('strafbuch')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-rose-500/50 transition">
-            <div class="flex items-center justify-between text-gray-400 text-xs mb-1">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Strafbuch</span>
               <span>⚖️</span>
             </div>
@@ -281,8 +292,8 @@
             <div class="text-[11px] text-rose-400 mt-1">Offene Einträge</div>
           </div>
 
-          <div onclick="jumpToTarget('verwaltung', 'aufgaben')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#d4af37]/50 transition">
-            <div class="flex items-center justify-between text-gray-400 text-xs mb-1">
+          <div onclick="jumpToTarget('verwaltung', 'aufgaben')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Aufgaben</span>
               <span>✅</span>
             </div>
@@ -292,16 +303,16 @@
         </div>
 
         <!-- LIVE ACTIVITY STREAM / FEED -->
-        <div class="glass-card rounded-2xl p-5 border border-[#d4af37]/25">
+        <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#d4af37] animate-ping"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#c9973e] animate-ping"></span>
               <div>
-                <h3 class="font-display text-base font-bold text-[#f3d576]">Aktivitäts-Stream</h3>
-                <p class="text-xs text-gray-400">Live-Verlauf aller Änderungen & Aktionen</p>
+                <h3 class="font-display text-base font-bold text-[#e5b55c]">Aktivitäts-Stream</h3>
+                <p class="text-xs text-slate-400">Live-Verlauf aller Änderungen & Aktionen</p>
               </div>
             </div>
-            <span id="feed-count-badge" class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300">0 Einträge</span>
+            <span id="feed-count-badge" class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 border border-slate-800 text-slate-300">0 Einträge</span>
           </div>
 
           <div id="activity-feed-list" class="space-y-2.5 max-h-[380px] overflow-y-auto custom-scroll pr-1">
@@ -312,10 +323,10 @@
         <!-- Upcoming Events Preview -->
         <div class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="font-semibold text-sm text-gray-200 flex items-center gap-2">
+            <h3 class="font-semibold text-sm text-slate-200 flex items-center gap-2">
               <span>📅</span> Nächste Termine
             </h3>
-            <button onclick="switchTab('kalender')" class="text-xs text-[#d4af37] hover:underline">Alle ansehen →</button>
+            <button onclick="switchTab('kalender')" class="text-xs text-[#c9973e] hover:underline">Alle ansehen →</button>
           </div>
           <div id="dash-upcoming-events" class="space-y-2"></div>
         </div>
@@ -323,17 +334,17 @@
 
       <!-- ==================== 2. CHAT ==================== -->
       <section id="tab-chat" class="hidden space-y-4 animate-fade">
-        <div class="glass-card rounded-2xl overflow-hidden flex flex-col h-[72vh] max-h-[680px] border border-[#d4af37]/25">
+        <div class="glass-card rounded-2xl overflow-hidden flex flex-col h-[72vh] max-h-[680px] border border-[#c9973e]/25">
           <!-- Chat Header -->
-          <div class="px-4 py-3 bg-white/[0.03] border-b border-white/10 flex items-center justify-between">
+          <div class="px-4 py-3 bg-white/[0.03] border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
               <span class="text-lg">💬</span>
               <div>
                 <h2 class="font-semibold text-sm text-white">Privater Kanal</h2>
-                <p id="chat-participants-label" class="text-[11px] text-gray-400">Master & Daisy • Verschlüsselter Raum</p>
+                <p id="chat-participants-label" class="text-[11px] text-slate-400">Master & Daisy • Verschlüsselter Raum</p>
               </div>
             </div>
-            <span id="chat-msg-count" class="text-[11px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-full">0 Nachrichten</span>
+            <span id="chat-msg-count" class="text-[11px] text-slate-400 bg-white/5 px-2.5 py-1 rounded-full">0 Nachrichten</span>
           </div>
 
           <!-- Messages Area -->
@@ -342,21 +353,21 @@
           </div>
 
           <!-- Image Preview Strip before sending -->
-          <div id="chat-attachment-preview" class="hidden px-4 py-2 bg-white/5 border-t border-white/10 flex items-center justify-between">
-            <div class="flex items-center gap-2 text-xs text-gray-300">
-              <img id="chat-preview-img" src="" alt="Vorschau" class="w-10 h-10 object-cover rounded-lg border border-white/20" />
+          <div id="chat-attachment-preview" class="hidden px-4 py-2 bg-white/5 border-t border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs text-slate-300">
+              <img id="chat-preview-img" src="" alt="Vorschau" class="w-10 h-10 object-cover rounded-lg border border-slate-700" />
               <span>Bild bereit zum Senden</span>
             </div>
             <button onclick="clearChatAttachment()" class="text-xs text-rose-400 hover:text-rose-300 px-2 py-1">Entfernen ✕</button>
           </div>
 
           <!-- Chat Input Bar -->
-          <div class="p-3 bg-black/40 border-t border-white/10 flex items-center gap-2">
-            <label class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 cursor-pointer transition shrink-0" title="Bild anhängen">
+          <div class="p-3 bg-black/40 border-t border-slate-800 flex items-center gap-2">
+            <label class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 cursor-pointer transition shrink-0" title="Bild anhängen">
               📷
               <input id="chat-image-input" type="file" accept="image/*" class="hidden" onchange="handleChatImageSelect(event)" />
             </label>
-            <button id="chat-mic-btn" onclick="toggleVoiceRecording()" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 transition shrink-0" title="Sprachnachricht">
+            <button id="chat-mic-btn" onclick="toggleVoiceRecording()" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 transition shrink-0" title="Sprachnachricht">
               🎙️
             </button>
             <input id="chat-input" type="text" placeholder="Nachricht schreiben..."
@@ -374,13 +385,13 @@
         <div class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="font-display text-lg font-bold text-[#f3d576]">Kalender & Termine</h2>
-              <p class="text-xs text-gray-400">Gemeinsame Planung & Verabredungen</p>
+              <h2 class="font-display text-lg font-bold text-[#e5b55c]">Kalender & Termine</h2>
+              <p class="text-xs text-slate-400">Gemeinsame Planung & Verabredungen</p>
             </div>
           </div>
 
           <!-- Add Event Form -->
-          <div id="kalender-add-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+          <div id="kalender-add-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
             <input id="cal-title" type="text" placeholder="Titel des Termins..." class="sm:col-span-2 px-3.5 py-2.5 text-sm" />
             <input id="cal-date" type="date" class="px-3 py-2.5 text-sm" />
             <div class="flex gap-2">
@@ -398,10 +409,10 @@
         <div class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="font-display text-lg font-bold text-[#f3d576]">Einkaufsliste</h2>
-              <p class="text-xs text-gray-400">Besorgungen, Wünsche & Vorräte</p>
+              <h2 class="font-display text-lg font-bold text-[#e5b55c]">Einkaufsliste</h2>
+              <p class="text-xs text-slate-400">Besorgungen, Wünsche & Vorräte</p>
             </div>
-            <button onclick="clearCompletedShopping()" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition">Erledigte löschen</button>
+            <button onclick="clearCompletedShopping()" class="text-xs px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition">Erledigte löschen</button>
           </div>
 
           <div id="einkauf-add-box" class="flex flex-col sm:flex-row gap-2.5 mb-5">
@@ -420,7 +431,7 @@
           <div class="flex items-center justify-between mb-4">
             <div>
               <h2 class="font-display text-lg font-bold text-rose-400">Strafbuch</h2>
-              <p class="text-xs text-gray-400">Vergehen, Auflagen & erledigte Sühne</p>
+              <p class="text-xs text-slate-400">Vergehen, Auflagen & erledigte Sühne</p>
             </div>
           </div>
 
@@ -434,21 +445,21 @@
         </div>
       </section>
 
-      <!-- ==================== 6. VERWALTUNG (CLEANED: ONLY OPERATIONAL CATEGORIES) ==================== -->
+      <!-- ==================== 6. VERWALTUNG ==================== -->
       <section id="tab-verwaltung" class="hidden space-y-4 animate-fade">
         <div class="glass-card rounded-2xl p-5">
           <div class="mb-4">
-            <h2 class="font-display text-lg font-bold text-[#f3d576]">Verwaltung</h2>
-            <p class="text-xs text-gray-400">Inventar, Regeln, Aufgaben & Belohnungen</p>
+            <h2 class="font-display text-lg font-bold text-[#e5b55c]">Verwaltung</h2>
+            <p class="text-xs text-slate-400">Inventar, Regeln, Aufgaben & Belohnungen</p>
           </div>
 
-          <!-- Sub-Navigation for Verwaltung (Only 6 operational categories) -->
-          <div id="verwaltung-subtabs" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-4 border-b border-white/10">
-            <!-- Rendered dynamically based on permissions -->
+          <!-- Sub-Navigation for Verwaltung -->
+          <div id="verwaltung-subtabs" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-4 border-b border-slate-800">
+            <!-- Rendered dynamically -->
           </div>
 
-          <!-- Add Item Box for Active Management Category -->
-          <div id="mgmt-add-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+          <!-- Add Item Box -->
+          <div id="mgmt-add-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
             <input id="mgmt-title" type="text" placeholder="Bezeichnung..." class="px-3.5 py-2.5 text-sm" />
             <input id="mgmt-desc" type="text" placeholder="Details / Beschreibung..." class="px-3.5 py-2.5 text-sm" />
             <button onclick="addMgmtItem()" class="px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">Anlegen</button>
@@ -458,27 +469,26 @@
         </div>
       </section>
 
-      <!-- ==================== 7. EINSTELLUNGEN (NEW MAIN TAB FOR BOTH ROLES) ==================== -->
+      <!-- ==================== 7. EINSTELLUNGEN ==================== -->
       <section id="tab-einstellungen" class="hidden space-y-4 animate-fade">
-        <div class="glass-card rounded-2xl p-5 border border-[#d4af37]/25">
+        <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
           <div class="mb-4">
-            <h2 class="font-display text-lg font-bold text-[#f3d576]">Einstellungen</h2>
-            <p id="settings-role-subtitle" class="text-xs text-gray-400">Persönliche Optionen & Systemkonfiguration</p>
+            <h2 class="font-display text-lg font-bold text-[#e5b55c]">Einstellungen</h2>
+            <p id="settings-role-subtitle" class="text-xs text-slate-400">Persönliche Optionen & Systemkonfiguration</p>
           </div>
 
           <!-- Sub-Tabs inside Einstellungen -->
-          <div id="settings-subtabs" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-5 border-b border-white/10">
+          <div id="settings-subtabs" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-5 border-b border-slate-800">
             <!-- Master: Basics, Berechtigungen, Sicherheit | Daisy: Basics only -->
           </div>
 
           <!-- SUB-TAB A: BASICS (Visible to BOTH Master & Daisy) -->
           <div id="settings-panel-basics" class="space-y-5">
-            <!-- 1. Rollen & Usernamen -->
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-4">
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-semibold text-sm text-white flex items-center gap-2">👤 Rollen- & Usernamen</h3>
-                  <p class="text-xs text-gray-400">Anzeigenamen im Dashboard, Chat und Aktivitäts-Stream</p>
+                  <p class="text-xs text-slate-400">Anzeigenamen im Dashboard, Chat und Aktivitäts-Stream</p>
                 </div>
                 <span id="daisy-username-perm-badge" class="hidden text-[11px] px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
                   🔒 Durch Master gesperrt
@@ -487,43 +497,41 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1.5">Name für Rolle 1 (Master)</label>
+                  <label class="block text-xs text-slate-400 mb-1.5">Name für Rolle 1 (Master)</label>
                   <input id="basic-master-name" type="text" placeholder="Master" class="w-full px-3.5 py-2.5 text-sm" />
                 </div>
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1.5">Name für Rolle 2 (Daisy)</label>
+                  <label class="block text-xs text-slate-400 mb-1.5">Name für Rolle 2 (Daisy)</label>
                   <input id="basic-daisy-name" type="text" placeholder="Daisy" class="w-full px-3.5 py-2.5 text-sm" />
                 </div>
               </div>
             </div>
 
-            <!-- 2. App-Kopfzeile & Raumtitel -->
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-4">
               <div>
                 <h3 class="font-semibold text-sm text-white flex items-center gap-2">✨ App-Erscheinungsbild</h3>
-                <p class="text-xs text-gray-400">Titel und Unterzeile der Anwendung</p>
+                <p class="text-xs text-slate-400">Titel und Unterzeile der Anwendung</p>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1.5">App-Titel</label>
+                  <label class="block text-xs text-slate-400 mb-1.5">App-Titel</label>
                   <input id="basic-app-title" type="text" placeholder="DOMINION" class="w-full px-3.5 py-2.5 text-sm" />
                 </div>
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1.5">Untertitel / Motto</label>
+                  <label class="block text-xs text-slate-400 mb-1.5">Untertitel / Motto</label>
                   <input id="basic-app-subtitle" type="text" placeholder="D+W Connection" class="w-full px-3.5 py-2.5 text-sm" />
                 </div>
               </div>
             </div>
 
-            <!-- 3. Komfort & Standardwerte -->
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-4">
               <div>
                 <h3 class="font-semibold text-sm text-white flex items-center gap-2">🎛️ Komfort & Standardwerte</h3>
-                <p class="text-xs text-gray-400">Voreinstellungen für Startansicht, Termine und Dashboard-Feed</p>
+                <p class="text-xs text-slate-400">Voreinstellungen für Startansicht, Termine und Dashboard-Feed</p>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1.5">Standard-Startansicht (Gerät)</label>
+                  <label class="block text-xs text-slate-400 mb-1.5">Standard-Startansicht (Gerät)</label>
                   <select id="basic-default-tab" class="w-full px-3.5 py-2.5 text-sm">
                     <option value="dashboard">🏠 Dashboard</option>
                     <option value="chat">💬 Chat</option>
@@ -532,11 +540,11 @@
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1.5">Standard-Uhrzeit (Termine)</label>
-                  <input id="basic-default-time" type="time" value="19:00" class="w-full px-3.5 py-2.5 text-sm" />
+                  <label class="block text-xs text-slate-400 mb-1.5">Standard-Uhrzeit (Termine)</label>
+                  <input id="basic-default-time" type="time" value="18:00" class="w-full px-3.5 py-2.5 text-sm" />
                 </div>
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1.5">Aktivitäts-Feed Umfang</label>
+                  <label class="block text-xs text-slate-400 mb-1.5">Aktivitäts-Feed Umfang</label>
                   <select id="basic-feed-limit" class="w-full px-3.5 py-2.5 text-sm">
                     <option value="10">Letzte 10 Einträge</option>
                     <option value="20">Letzte 20 Einträge</option>
@@ -562,24 +570,22 @@
               Hier legst du fest, welche Bereiche und Aktionen für <strong>Daisy</strong> freigeschaltet sind. Änderungen werden sofort über Firebase synchronisiert.
             </div>
 
-            <!-- Special Username Permission Highlight Card -->
-            <div class="p-4 rounded-2xl bg-white/[0.04] border border-[#d4af37]/30 flex items-center justify-between gap-4">
+            <div class="p-4 rounded-2xl bg-white/[0.04] border border-[#c9973e]/30 flex items-center justify-between gap-4">
               <div>
-                <div class="font-semibold text-sm text-[#f3d576] flex items-center gap-2">
+                <div class="font-semibold text-sm text-[#e5b55c] flex items-center gap-2">
                   <span>🏷️</span> Username ändern erlauben
                 </div>
-                <p class="text-xs text-gray-400 mt-0.5">Erlaubt Daisy, ihren eigenen Anzeigenamen unter „Einstellungen → Basics“ selbst anzupassen.</p>
+                <p class="text-xs text-slate-400 mt-0.5">Erlaubt Daisy, ihren eigenen Anzeigenamen unter „Einstellungen → Basics“ selbst anzupassen.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer shrink-0">
                 <input id="perm-username-toggle" type="checkbox" class="sr-only peer" onchange="toggleUsernamePermission(this.checked)">
-                <div class="w-12 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d4af37]"></div>
+                <div class="w-12 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#c9973e]"></div>
               </label>
             </div>
 
-            <!-- Granular Matrix -->
-            <div class="overflow-x-auto rounded-2xl border border-white/10">
+            <div class="overflow-x-auto rounded-2xl border border-slate-800">
               <table class="w-full text-left text-xs">
-                <thead class="bg-white/5 text-gray-300 uppercase tracking-wider">
+                <thead class="bg-white/5 text-slate-300 uppercase tracking-wider">
                   <tr>
                     <th class="p-3.5">Bereich</th>
                     <th class="p-3.5 text-center">Sichtbar</th>
@@ -588,32 +594,32 @@
                     <th class="p-3.5 text-center">Löschen</th>
                   </tr>
                 </thead>
-                <tbody id="permissions-matrix-body" class="divide-y divide-white/10">
+                <tbody id="permissions-matrix-body" class="divide-y divide-slate-800">
                   <!-- Populated dynamically -->
                 </tbody>
               </table>
             </div>
           </div>
 
-          <!-- SUB-TAB C: SICHERHEIT & LIVE-SYNC (MASTER ONLY) -->
+          <!-- SUB-TAB C: SICHERHEIT & PUSH (MASTER ONLY) -->
           <div id="settings-panel-sicherheit" class="hidden space-y-5">
             <!-- Firebase Live-Sync -->
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3.5">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-semibold text-sm text-white flex items-center gap-2">☁️ Firebase Echtzeit-Synchronisation</h3>
-                  <p class="text-xs text-gray-400">Verbindet beide Geräte automatisch im selben Raum</p>
+                  <p class="text-xs text-slate-400">Verbindet beide Geräte automatisch im selben Raum</p>
                 </div>
                 <span id="fb-conn-pill" class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Verbunden</span>
               </div>
 
               <div class="space-y-3">
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1">Firebase Realtime Database URL</label>
+                  <label class="block text-xs text-slate-400 mb-1">Firebase Realtime Database URL</label>
                   <input id="sec-fb-url" type="url" class="w-full px-3.5 py-2.5 text-xs font-mono" />
                 </div>
                 <div>
-                  <label class="block text-xs text-gray-400 mb-1">Raum-Code (Room ID)</label>
+                  <label class="block text-xs text-slate-400 mb-1">Raum-Code (Room ID)</label>
                   <input id="sec-fb-room" type="text" class="w-full px-3.5 py-2.5 text-sm" />
                 </div>
                 <button onclick="saveFirebaseConfig()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs shadow">
@@ -622,8 +628,25 @@
               </div>
             </div>
 
+            <!-- FCM Push Notifications (New in v2.3) -->
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-semibold text-sm text-white flex items-center gap-2">🔔 Web-Push-Benachrichtigungen (FCM)</h3>
+                  <p class="text-xs text-slate-400">Erhalte Push-Nachrichten bei neuen Chat-Nachrichten im Hintergrund</p>
+                </div>
+                <span id="push-status-pill" class="text-[11px] px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">Nicht aktiv</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Aktiviere Push-Benachrichtigungen, um den Service Worker zu registrieren und Benachrichtigungen im Hintergrund zu erlauben.
+              </p>
+              <button onclick="requestPushPermissions()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs shadow">
+                🔔 Push-Benachrichtigungen aktivieren
+              </button>
+            </div>
+
             <!-- Master PIN -->
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3">
               <h3 class="font-semibold text-sm text-white flex items-center gap-2">🔑 Master-PIN ändern</h3>
               <div class="flex flex-col sm:flex-row gap-2.5">
                 <input id="sec-new-pin" type="password" inputmode="numeric" maxlength="8" placeholder="Neuer PIN (min. 4 Ziffern)" class="flex-1 px-3.5 py-2.5 text-sm" />
@@ -634,9 +657,9 @@
             </div>
 
             <!-- JSON Backup & Restore -->
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3">
               <h3 class="font-semibold text-sm text-white flex items-center gap-2">💾 Datensicherung (JSON Backup)</h3>
-              <p class="text-xs text-gray-400">Exportiere oder importiere den kompletten Zustand inkl. Chatverlauf.</p>
+              <p class="text-xs text-slate-400">Exportiere oder importiere den kompletten Zustand inkl. Chatverlauf.</p>
               <div class="flex flex-wrap gap-2.5">
                 <button onclick="exportBackupJSON()" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-medium text-white transition">
                   ⬇️ Backup exportieren (.json)
@@ -652,7 +675,7 @@
             <div class="p-4 rounded-2xl bg-rose-950/25 border border-rose-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 class="font-semibold text-sm text-rose-300">⚠️ Werksreset</h3>
-                <p class="text-xs text-gray-400">Setzt alle lokalen und synchronisierten Daten auf Standardwerte zurück.</p>
+                <p class="text-xs text-slate-400">Setzt alle lokalen und synchronisierten Daten auf Standardwerte zurück.</p>
               </div>
               <button onclick="confirmFactoryReset()" class="px-4 py-2.5 rounded-xl crimson-gradient text-xs font-semibold shrink-0">
                 Alles zurücksetzen
@@ -666,47 +689,48 @@
   </div>
 
   <!-- Bottom Navigation Bar (7 Main Tabs) -->
-  <nav id="bottom-nav" class="hidden fixed bottom-0 inset-x-0 z-40 bg-[#0d0d14]/95 backdrop-blur-lg border-t border-white/10 px-1 py-1.5">
+  <nav id="bottom-nav" class="hidden fixed bottom-0 inset-x-0 z-40 bg-[#171a24]/95 backdrop-blur-lg border-t border-slate-800 px-1 py-1.5">
     <div class="max-w-4xl mx-auto grid grid-cols-7 gap-0.5">
-      <button data-tab="dashboard" onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-gray-400 hover:text-white transition">
+      <button data-tab="dashboard" onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">🏠</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Dashboard</span>
       </button>
-      <button data-tab="chat" onclick="switchTab('chat')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-gray-400 hover:text-white transition relative">
+      <button data-tab="chat" onclick="switchTab('chat')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition relative">
         <span class="text-base sm:text-lg leading-none">💬</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Chat</span>
       </button>
-      <button data-tab="kalender" onclick="switchTab('kalender')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-gray-400 hover:text-white transition">
+      <button data-tab="kalender" onclick="switchTab('kalender')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">📅</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Kalender</span>
       </button>
-      <button data-tab="einkauf" onclick="switchTab('einkauf')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-gray-400 hover:text-white transition">
+      <button data-tab="einkauf" onclick="switchTab('einkauf')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">🛒</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Einkauf</span>
       </button>
-      <button data-tab="strafbuch" onclick="switchTab('strafbuch')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-gray-400 hover:text-white transition">
+      <button data-tab="strafbuch" onclick="switchTab('strafbuch')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">⚖️</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Strafbuch</span>
       </button>
-      <button data-tab="verwaltung" onclick="switchTab('verwaltung')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-gray-400 hover:text-white transition">
+      <button data-tab="verwaltung" onclick="switchTab('verwaltung')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">📦</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Verwaltung</span>
       </button>
-      <button data-tab="einstellungen" onclick="switchTab('einstellungen')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-gray-400 hover:text-white transition">
+      <button data-tab="einstellungen" onclick="switchTab('einstellungen')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">⚙️</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Einstellungen</span>
       </button>
     </div>
   </nav>
 
-  <!-- Firebase Compat SDKs for Seamless Realtime Database Sync -->
+  <!-- Firebase Compat SDKs (App, Database, Messaging) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
   <script>
     /**
      * =========================================================================
-     * DOMINION APP v2.2 - STATE, MIGRATION & REALTIME SYNC ENGINE
+     * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
     const STORAGE_KEY = 'dominion_app_state_v2';
@@ -737,9 +761,7 @@
     ];
 
     function createDefaultPermissions() {
-      const perms = {
-        username: true // Dedicated permission for Daisy to change her display name
-      };
+      const perms = { username: true };
       PERMISSION_CATEGORIES.forEach(cat => {
         perms[cat.id] = {
           visible: true,
@@ -753,7 +775,7 @@
 
     function createDefaultState() {
       return {
-        version: '2.2',
+        version: '2.3',
         pin: '1234',
         firebase: {
           url: DEFAULT_FB_URL,
@@ -764,7 +786,7 @@
           daisyName: 'Daisy',
           appTitle: 'DOMINION',
           appSubtitle: 'D+W Connection',
-          defaultEventTime: '19:00',
+          defaultEventTime: '18:00',
           feedLimit: 20
         },
         permissions: createDefaultPermissions(),
@@ -772,7 +794,7 @@
           {
             id: 'msg-welcome-1',
             sender: 'Master',
-            text: 'Willkommen in Dominion v2.2. Unser privater Bereich ist bereit.',
+            text: 'Willkommen in Dominion v2.3 mit Web-Push-Unterstützung.',
             timestamp: Date.now() - 3600000
           }
         ],
@@ -787,12 +809,13 @@
           regeln: [],
           aufgaben: []
         },
-        activityFeed: []
+        activityFeed: [],
+        fcmToken: null
       };
     }
 
     let appState = createDefaultState();
-    let currentRole = null; // 'Master' | 'Daisy'
+    let currentRole = null;
     let activeTab = 'dashboard';
     let activeMgmtCategory = 'kleidung';
     let activeSettingsSubTab = 'basics';
@@ -802,10 +825,8 @@
     let isRecordingAudio = false;
     let firebaseDbRef = null;
     let isApplyingRemoteUpdate = false;
+    let messagingInstance = null;
 
-    /**
-     * Load & safely migrate state so existing chat messages and data are never lost
-     */
     function loadState() {
       try {
         let raw = localStorage.getItem(STORAGE_KEY);
@@ -818,7 +839,6 @@
             }
           }
         }
-
         if (raw) {
           const parsed = JSON.parse(raw);
           appState = mergeWithDefaults(parsed);
@@ -837,32 +857,22 @@
       const merged = {
         ...def,
         ...incoming,
-        version: '2.2',
+        version: '2.3',
         pin: incoming.pin || def.pin,
         firebase: {
           url: (incoming.firebase && incoming.firebase.url) ? incoming.firebase.url : DEFAULT_FB_URL,
           room: (incoming.firebase && incoming.firebase.room) ? incoming.firebase.room : DEFAULT_ROOM_CODE
         },
-        basics: {
-          ...def.basics,
-          ...(incoming.basics || {})
-        },
-        permissions: {
-          ...def.permissions,
-          ...(incoming.permissions || {})
-        },
+        basics: { ...def.basics, ...(incoming.basics || {}) },
+        permissions: { ...def.permissions, ...(incoming.permissions || {}) },
         chat: Array.isArray(incoming.chat) ? incoming.chat : def.chat,
         kalender: Array.isArray(incoming.kalender) ? incoming.kalender : [],
         einkauf: Array.isArray(incoming.einkauf) ? incoming.einkauf : [],
         strafbuch: Array.isArray(incoming.strafbuch) ? incoming.strafbuch : [],
-        mgmt: {
-          ...def.mgmt,
-          ...(incoming.mgmt || {})
-        },
-        activityFeed: Array.isArray(incoming.activityFeed) ? incoming.activityFeed : []
+        mgmt: { ...def.mgmt, ...(incoming.mgmt || {}) },
+        activityFeed: Array.isArray(incoming.activityFeed) ? incoming.activityFeed : [],
+        fcmToken: incoming.fcmToken || null
       };
-
-      // Ensure username permission boolean exists
       if (typeof merged.permissions.username !== 'boolean') {
         merged.permissions.username = true;
       }
@@ -892,7 +902,7 @@
     }
 
     /**
-     * Firebase Realtime Database Initialization & Live Listener
+     * Firebase Realtime Database & FCM Push Setup
      */
     function initFirebaseSync() {
       const fbUrl = (appState.firebase.url || DEFAULT_FB_URL).trim();
@@ -903,7 +913,6 @@
         if (!firebase.apps.length) {
           firebase.initializeApp({ databaseURL: fbUrl });
         } else {
-          // Re-use or re-init if URL changed
           const currentApp = firebase.app();
           if (currentApp.options.databaseURL !== fbUrl) {
             currentApp.delete().then(() => {
@@ -914,9 +923,65 @@
           }
         }
         attachFirebaseListener(safeRoomPath);
+        initFCM(fbUrl);
       } catch (err) {
         console.warn('Firebase Init Fallback:', err);
         updateSyncIndicator(false);
+      }
+    }
+
+    function initFCM(fbUrl) {
+      try {
+        if (firebase.messaging.isSupported()) {
+          messagingInstance = firebase.messaging();
+          if ('serviceWorker' in navigator) {
+            const swCode = `
+              importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+              importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+              firebase.initializeApp({ databaseURL: "${fbUrl}" });
+              const messaging = firebase.messaging();
+              messaging.onBackgroundMessage((payload) => {
+                const title = payload.notification ? payload.notification.title : 'Dominion Nachricht';
+                const options = {
+                  body: payload.notification ? payload.notification.body : 'Neue Aktivität',
+                  icon: '/favicon.ico'
+                };
+                self.registration.showNotification(title, options);
+              });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(e => console.warn('SW registration warning:', e));
+          }
+        }
+      } catch (e) {
+        console.warn('FCM setup warning:', e);
+      }
+    }
+
+    async function requestPushPermissions() {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          showToast('Push-Berechtigung erteilt!');
+          if (messagingInstance) {
+            const token = await messagingInstance.getToken().catch(() => null);
+            if (token) {
+              appState.fcmToken = token;
+              persistState();
+            }
+          }
+          const pill = document.getElementById('push-status-pill');
+          if (pill) {
+            pill.textContent = 'Aktiviert';
+            pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+          }
+        } else {
+          showToast('Push-Berechtigung verweigert.', 'error');
+        }
+      } catch (err) {
+        console.error('Push error:', err);
+        showToast('Push konnte nicht aktiviert werden.', 'error');
       }
     }
 
@@ -930,13 +995,11 @@
         updateSyncIndicator(true);
         const remoteData = snapshot.val();
         if (!remoteData) {
-          // Push initial local state (preserving any existing local chat history!)
           firebaseDbRef.set(sanitizeForFirebase(appState));
           return;
         }
 
         isApplyingRemoteUpdate = true;
-        // Preserve existing chat messages if remote chat was empty while local had messages
         const localChatBackup = Array.isArray(appState.chat) ? [...appState.chat] : [];
         appState = mergeWithDefaults(remoteData);
         if (appState.chat.length === 0 && localChatBackup.length > 0) {
@@ -975,20 +1038,12 @@
       }
     }
 
-    /**
-     * Helper: Get Display Names for Roles
-     */
     function getDisplayName(roleKey) {
       if (roleKey === 'Master') return appState.basics.masterName || 'Master';
       if (roleKey === 'Daisy') return appState.basics.daisyName || 'Daisy';
       return roleKey;
     }
 
-    /**
-     * =========================================================================
-     * ACTIVITY FEED ENGINE (WITH DIRECT "ANSEHEN →" JUMP TARGETS)
-     * =========================================================================
-     */
     function logActivity(actionText, targetTab, targetSubCategory = null, targetItemId = null) {
       const actorName = getDisplayName(currentRole);
       const entry = {
@@ -1006,14 +1061,12 @@
         appState.activityFeed = [];
       }
       appState.activityFeed.unshift(entry);
-      // Keep max 100 entries in storage
       if (appState.activityFeed.length > 100) {
         appState.activityFeed = appState.activityFeed.slice(0, 100);
       }
     }
 
     function jumpToTarget(tabId, subCategory = null, itemId = null) {
-      // Check permission for Daisy
       if (currentRole === 'Daisy') {
         if (tabId === 'verwaltung' && subCategory) {
           const perm = appState.permissions[subCategory];
@@ -1039,7 +1092,6 @@
 
       switchTab(tabId);
 
-      // Highlight specific item or container after render
       setTimeout(() => {
         if (itemId) {
           const el = document.getElementById('item-' + itemId);
@@ -1069,11 +1121,6 @@
              d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
     }
 
-    /**
-     * =========================================================================
-     * AUTHENTICATION & ROLE SELECTION
-     * =========================================================================
-     */
     function selectRole(role) {
       if (role === 'Master') {
         document.getElementById('role-select-buttons').classList.add('hidden');
@@ -1107,7 +1154,6 @@
       document.getElementById('main-app').classList.remove('hidden');
       document.getElementById('bottom-nav').classList.remove('hidden');
 
-      // Load device preferred start tab
       const prefs = getDevicePrefs();
       const startTab = prefs.defaultTab || 'dashboard';
       activeSettingsSubTab = 'basics';
@@ -1137,11 +1183,6 @@
       localStorage.setItem(DEVICE_PREFS_KEY, JSON.stringify(prefs));
     }
 
-    /**
-     * =========================================================================
-     * NAVIGATION & PERMISSION CHECKS
-     * =========================================================================
-     */
     function hasPermission(category, action) {
       if (currentRole === 'Master') return true;
       if (category === 'username') return !!appState.permissions.username;
@@ -1151,7 +1192,6 @@
     }
 
     function switchTab(tabId) {
-      // If Daisy tries to open a hidden main tab, redirect to dashboard
       if (currentRole === 'Daisy' && ['kalender', 'einkauf', 'strafbuch'].includes(tabId)) {
         if (!hasPermission(tabId, 'visible')) {
           showToast('Dieser Tab ist für dich nicht freigeschaltet.', 'error');
@@ -1161,22 +1201,20 @@
 
       activeTab = tabId;
 
-      // Toggle sections
       const allTabs = ['dashboard', 'chat', 'kalender', 'einkauf', 'strafbuch', 'verwaltung', 'einstellungen'];
       allTabs.forEach(t => {
         const el = document.getElementById('tab-' + t);
         if (el) el.classList.toggle('hidden', t !== tabId);
       });
 
-      // Highlight nav button
       document.querySelectorAll('.nav-btn').forEach(btn => {
         const isCurrent = btn.getAttribute('data-tab') === tabId;
         if (isCurrent) {
-          btn.classList.add('text-[#f3d576]', 'bg-white/10');
-          btn.classList.remove('text-gray-400');
+          btn.classList.add('text-[#e5b55c]', 'bg-white/10');
+          btn.classList.remove('text-slate-400');
         } else {
-          btn.classList.remove('text-[#f3d576]', 'bg-white/10');
-          btn.classList.add('text-gray-400');
+          btn.classList.remove('text-[#e5b55c]', 'bg-white/10');
+          btn.classList.add('text-slate-400');
         }
       });
 
@@ -1186,14 +1224,9 @@
       }
     }
 
-    /**
-     * =========================================================================
-     * UI RENDERING PIPELINE
-     * =========================================================================
-     */
     function updateLoginLabels() {
       document.getElementById('login-app-title').textContent = appState.basics.appTitle || 'DOMINION';
-      document.getElementById('login-app-subtitle').textContent = (appState.basics.appSubtitle || 'D+W Connection') + ' • v2.2';
+      document.getElementById('login-app-subtitle').textContent = (appState.basics.appSubtitle || 'D+W Connection') + ' • v2.3';
       document.getElementById('login-master-label').textContent = getDisplayName('Master');
       document.getElementById('login-daisy-label').textContent = getDisplayName('Daisy');
     }
@@ -1202,13 +1235,11 @@
       updateLoginLabels();
       if (!currentRole) return;
 
-      // Header branding & active role name
       document.getElementById('header-title').textContent = appState.basics.appTitle || 'DOMINION';
       document.getElementById('header-subtitle').textContent = appState.basics.appSubtitle || 'D+W Connection';
       document.getElementById('active-role-icon').textContent = currentRole === 'Master' ? '♛' : '🌸';
       document.getElementById('active-role-name').textContent = getDisplayName(currentRole);
 
-      // Update Nav Visibility for Daisy (Einstellungen is ALWAYS visible to both!)
       document.querySelectorAll('.nav-btn').forEach(btn => {
         const tab = btn.getAttribute('data-tab');
         if (currentRole === 'Daisy' && ['kalender', 'einkauf', 'strafbuch'].includes(tab)) {
@@ -1227,7 +1258,6 @@
       renderEinstellungen();
     }
 
-    /* ---------------- 1. DASHBOARD & LIVE ACTIVITY FEED ---------------- */
     function renderDashboard() {
       document.getElementById('dash-greeting').textContent = `Hallo, ${getDisplayName(currentRole)}`;
       const now = new Date();
@@ -1235,13 +1265,11 @@
         weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
       });
 
-      // Metrics
       document.getElementById('stat-kalender').textContent = appState.kalender.length;
       document.getElementById('stat-einkauf').textContent = appState.einkauf.filter(i => !i.done).length;
       document.getElementById('stat-strafbuch').textContent = appState.strafbuch.filter(i => !i.resolved).length;
       document.getElementById('stat-aufgaben').textContent = (appState.mgmt.aufgaben || []).filter(i => !i.done).length;
 
-      // Render Activity Feed
       const limit = parseInt(appState.basics.feedLimit || 20, 10);
       const feedItems = (appState.activityFeed || []).slice(0, limit);
       document.getElementById('feed-count-badge').textContent = `${feedItems.length} Einträge`;
@@ -1249,30 +1277,30 @@
       const feedContainer = document.getElementById('activity-feed-list');
       if (feedItems.length === 0) {
         feedContainer.innerHTML = `
-          <div class="text-center py-8 text-xs text-gray-500 border border-dashed border-white/10 rounded-xl">
+          <div class="text-center py-8 text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
             Noch keine Aktivitäten protokolliert. Sobald Termine, Artikel oder Einträge erstellt werden, erscheinen sie hier live.
           </div>`;
       } else {
         feedContainer.innerHTML = feedItems.map(item => {
           const isMasterActor = item.actorRole === 'Master';
           const badgeColor = isMasterActor
-            ? 'bg-[#d4af37]/15 text-[#f3d576] border-[#d4af37]/30'
+            ? 'bg-[#c9973e]/15 text-[#e5b55c] border-[#c9973e]/30'
             : 'bg-rose-500/15 text-rose-300 border-rose-500/30';
           const liveActorName = getDisplayName(item.actorRole) || item.actorName;
 
           return `
-            <div class="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 flex items-center justify-between gap-3 transition">
+            <div class="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-slate-800 flex items-center justify-between gap-3 transition">
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md border ${badgeColor}">
                     ${escapeHtml(liveActorName)}
                   </span>
-                  <span class="text-[11px] text-gray-500">${formatRelativeTime(item.timestamp)}</span>
+                  <span class="text-[11px] text-slate-500">${formatRelativeTime(item.timestamp)}</span>
                 </div>
-                <p class="text-xs sm:text-sm text-gray-200 mt-1 break-words">${escapeHtml(item.action)}</p>
+                <p class="text-xs sm:text-sm text-slate-200 mt-1 break-words">${escapeHtml(item.action)}</p>
               </div>
               <button onclick="jumpToTarget('${item.targetTab}', ${item.targetSubCategory ? `'${item.targetSubCategory}'` : 'null'}, ${item.targetItemId ? `'${item.targetItemId}'` : 'null'})"
-                      class="shrink-0 px-3 py-1.5 rounded-lg bg-[#d4af37]/15 hover:bg-[#d4af37] text-[#f3d576] hover:text-[#0b0b0f] border border-[#d4af37]/40 text-xs font-semibold transition">
+                      class="shrink-0 px-3 py-1.5 rounded-lg bg-[#c9973e]/15 hover:bg-[#c9973e] text-[#e5b55c] hover:text-[#0f1117] border border-[#c9973e]/40 text-xs font-semibold transition">
                 Ansehen →
               </button>
             </div>
@@ -1280,22 +1308,20 @@
         }).join('');
       }
 
-      // Upcoming events preview
       const upcomingBox = document.getElementById('dash-upcoming-events');
       const sortedEvents = [...appState.kalender].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).slice(0, 3);
       if (sortedEvents.length === 0) {
-        upcomingBox.innerHTML = `<p class="text-xs text-gray-500">Keine anstehenden Termine eingetragen.</p>`;
+        upcomingBox.innerHTML = `<p class="text-xs text-slate-500">Keine anstehenden Termine eingetragen.</p>`;
       } else {
         upcomingBox.innerHTML = sortedEvents.map(ev => `
-          <div onclick="jumpToTarget('kalender', null, '${ev.id}')" class="p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 flex items-center justify-between cursor-pointer transition">
-            <span class="text-xs font-medium text-gray-200">${escapeHtml(ev.title)}</span>
-            <span class="text-[11px] text-[#d4af37]">${formatDateDE(ev.date)} • ${escapeHtml(ev.time || '')}</span>
+          <div onclick="jumpToTarget('kalender', null, '${ev.id}')" class="p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-slate-800 flex items-center justify-between cursor-pointer transition">
+            <span class="text-xs font-medium text-slate-200">${escapeHtml(ev.title)}</span>
+            <span class="text-[11px] text-[#c9973e]">${formatDateDE(ev.date)} • ${escapeHtml(ev.time || '')}</span>
           </div>
         `).join('');
       }
     }
 
-    /* ---------------- 2. CHAT (WITH HISTORY & AUDIO/IMAGE) ---------------- */
     function renderChat() {
       const mName = getDisplayName('Master');
       const dName = getDisplayName('Daisy');
@@ -1306,7 +1332,7 @@
 
       const container = document.getElementById('chat-messages');
       if (messages.length === 0) {
-        container.innerHTML = `<div class="text-center text-xs text-gray-500 py-10">Noch keine Nachrichten vorhanden.</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-slate-500 py-10">Noch keine Nachrichten vorhanden.</div>`;
         return;
       }
 
@@ -1317,11 +1343,11 @@
 
         return `
           <div class="flex flex-col ${isMine ? 'items-end' : 'items-start'}">
-            <span class="text-[10px] text-gray-400 mb-1 px-1">${escapeHtml(senderDisplay)} • ${timeStr}</span>
+            <span class="text-[10px] text-slate-400 mb-1 px-1">${escapeHtml(senderDisplay)} • ${timeStr}</span>
             <div class="max-w-[82%] sm:max-w-[70%] rounded-2xl px-3.5 py-2.5 text-sm shadow ${
               isMine
-                ? 'gold-gradient text-[#0b0b0f] font-medium rounded-br-sm'
-                : 'bg-[#1d1d2b] text-gray-100 border border-white/10 rounded-bl-sm'
+                ? 'gold-gradient text-[#0f1117] font-medium rounded-br-sm'
+                : 'bg-[#1e2230] text-slate-100 border border-slate-800 rounded-bl-sm'
             }">
               ${msg.image ? `<img src="${msg.image}" alt="Anhang" class="rounded-xl max-h-56 w-auto mb-2 border border-black/20" />` : ''}
               ${msg.audio ? `<audio controls src="${msg.audio}" class="max-w-full h-9 mb-1"></audio>` : ''}
@@ -1414,7 +1440,6 @@
       scrollChatToBottom();
     }
 
-    /* ---------------- 3. KALENDER ---------------- */
     function renderKalender() {
       const canAdd = hasPermission('kalender', 'add');
       const canDelete = hasPermission('kalender', 'delete');
@@ -1422,22 +1447,22 @@
 
       const timeInput = document.getElementById('cal-time');
       if (timeInput && !timeInput.value) {
-        timeInput.value = appState.basics.defaultEventTime || '19:00';
+        timeInput.value = appState.basics.defaultEventTime || '18:00';
       }
 
       const list = document.getElementById('kalender-list');
       const sorted = [...appState.kalender].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
       if (sorted.length === 0) {
-        list.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Keine Termine vorhanden.</p>`;
+        list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Keine Termine vorhanden.</p>`;
         return;
       }
 
       list.innerHTML = sorted.map(ev => `
-        <div id="item-${ev.id}" class="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between gap-3">
+        <div id="item-${ev.id}" class="p-3.5 rounded-xl bg-white/[0.03] border border-slate-800 flex items-center justify-between gap-3">
           <div>
             <div class="font-semibold text-sm text-white">${escapeHtml(ev.title)}</div>
-            <div class="text-xs text-[#d4af37] mt-0.5">📅 ${formatDateDE(ev.date)} um ${escapeHtml(ev.time || '19:00')} Uhr</div>
+            <div class="text-xs text-[#c9973e] mt-0.5">📅 ${formatDateDE(ev.date)} um ${escapeHtml(ev.time || '18:00')} Uhr</div>
           </div>
           ${canDelete ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
         </div>
@@ -1448,7 +1473,7 @@
       if (!hasPermission('kalender', 'add')) return;
       const title = document.getElementById('cal-title').value.trim();
       const date = document.getElementById('cal-date').value;
-      const time = document.getElementById('cal-time').value || appState.basics.defaultEventTime || '19:00';
+      const time = document.getElementById('cal-time').value || appState.basics.defaultEventTime || '18:00';
 
       if (!title || !date) {
         showToast('Bitte Titel und Datum angeben.', 'error');
@@ -1476,7 +1501,6 @@
       refreshAllUI();
     }
 
-    /* ---------------- 4. EINKAUF ---------------- */
     function renderEinkauf() {
       const canAdd = hasPermission('einkauf', 'add');
       const canEdit = hasPermission('einkauf', 'edit');
@@ -1485,21 +1509,21 @@
 
       const list = document.getElementById('einkauf-list');
       if (appState.einkauf.length === 0) {
-        list.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Die Einkaufsliste ist leer.</p>`;
+        list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Die Einkaufsliste ist leer.</p>`;
         return;
       }
 
       list.innerHTML = appState.einkauf.map(item => `
-        <div id="item-${item.id}" class="p-3 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between gap-3">
+        <div id="item-${item.id}" class="p-3 rounded-xl bg-white/[0.03] border border-slate-800 flex items-center justify-between gap-3">
           <div onclick="${canEdit ? `toggleShoppingItem('${item.id}')` : ''}" class="flex items-center gap-3 flex-1 ${canEdit ? 'cursor-pointer' : ''}">
             <div class="w-5 h-5 rounded-md border flex items-center justify-center text-xs ${
-              item.done ? 'bg-emerald-500 border-emerald-500 text-black font-bold' : 'border-gray-500'
+              item.done ? 'bg-emerald-500 border-emerald-500 text-black font-bold' : 'border-slate-500'
             }">
               ${item.done ? '✓' : ''}
             </div>
             <div>
-              <div class="text-sm font-medium ${item.done ? 'line-through text-gray-500' : 'text-white'}">${escapeHtml(item.name)}</div>
-              ${item.note ? `<div class="text-[11px] text-gray-400">${escapeHtml(item.note)}</div>` : ''}
+              <div class="text-sm font-medium ${item.done ? 'line-through text-slate-500' : 'text-white'}">${escapeHtml(item.name)}</div>
+              ${item.note ? `<div class="text-[11px] text-slate-400">${escapeHtml(item.note)}</div>` : ''}
             </div>
           </div>
           ${canDelete ? `<button onclick="deleteShoppingItem('${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
@@ -1553,7 +1577,6 @@
       refreshAllUI();
     }
 
-    /* ---------------- 5. STRAFBUCH ---------------- */
     function renderStrafbuch() {
       const canAdd = hasPermission('strafbuch', 'add');
       const canEdit = hasPermission('strafbuch', 'edit');
@@ -1562,7 +1585,7 @@
 
       const list = document.getElementById('strafbuch-list');
       if (appState.strafbuch.length === 0) {
-        list.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Keine Einträge im Strafbuch.</p>`;
+        list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Keine Einträge im Strafbuch.</p>`;
         return;
       }
 
@@ -1575,10 +1598,10 @@
               </span>
               <span class="font-semibold text-sm text-white">${escapeHtml(entry.reason)}</span>
             </div>
-            <p class="text-xs text-gray-400 mt-1">Auflage: ${escapeHtml(entry.measure)}</p>
+            <p class="text-xs text-slate-400 mt-1">Auflage: ${escapeHtml(entry.measure)}</p>
           </div>
           <div class="flex items-center gap-1.5">
-            ${canEdit ? `<button onclick="togglePenaltyResolved('${entry.id}')" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-200">${entry.resolved ? 'Öffnen' : '✓ Erledigt'}</button>` : ''}
+            ${canEdit ? `<button onclick="togglePenaltyResolved('${entry.id}')" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-slate-200">${entry.resolved ? 'Öffnen' : '✓ Erledigt'}</button>` : ''}
             ${canDelete ? `<button onclick="deletePenaltyEntry('${entry.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
           </div>
         </div>
@@ -1620,7 +1643,6 @@
       refreshAllUI();
     }
 
-    /* ---------------- 6. VERWALTUNG (OPERATIONAL CATEGORIES ONLY) ---------------- */
     function renderVerwaltung() {
       const visibleCats = MGMT_CATEGORIES.filter(cat => hasPermission(cat.id, 'visible'));
       const subTabsEl = document.getElementById('verwaltung-subtabs');
@@ -1628,7 +1650,7 @@
       if (visibleCats.length === 0) {
         subTabsEl.innerHTML = '';
         document.getElementById('mgmt-add-box').classList.add('hidden');
-        document.getElementById('mgmt-items-list').innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Keine Verwaltungsbereiche freigeschaltet.</p>`;
+        document.getElementById('mgmt-items-list').innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Keine Verwaltungsbereiche freigeschaltet.</p>`;
         return;
       }
 
@@ -1641,7 +1663,7 @@
                 class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
                   activeMgmtCategory === cat.id
                     ? 'gold-gradient shadow'
-                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }">
           ${cat.label}
         </button>
@@ -1656,22 +1678,22 @@
       const listEl = document.getElementById('mgmt-items-list');
 
       if (items.length === 0) {
-        listEl.innerHTML = `<p class="text-xs text-gray-500 text-center py-6">Noch keine Einträge in dieser Kategorie.</p>`;
+        listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Noch keine Einträge in dieser Kategorie.</p>`;
         return;
       }
 
       listEl.innerHTML = items.map(item => `
-        <div id="item-${item.id}" class="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between gap-3">
+        <div id="item-${item.id}" class="p-3.5 rounded-xl bg-white/[0.03] border border-slate-800 flex items-center justify-between gap-3">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
               ${activeMgmtCategory === 'aufgaben' ? `
                 <button onclick="${canEdit ? `toggleMgmtDone('${activeMgmtCategory}', '${item.id}')` : ''}"
-                        class="w-5 h-5 rounded border flex items-center justify-center text-xs ${item.done ? 'bg-emerald-500 border-emerald-500 text-black font-bold' : 'border-gray-500'}">
+                        class="w-5 h-5 rounded border flex items-center justify-center text-xs ${item.done ? 'bg-emerald-500 border-emerald-500 text-black font-bold' : 'border-slate-500'}">
                   ${item.done ? '✓' : ''}
                 </button>` : ''}
-              <span class="font-semibold text-sm ${item.done ? 'line-through text-gray-500' : 'text-white'} truncate">${escapeHtml(item.title)}</span>
+              <span class="font-semibold text-sm ${item.done ? 'line-through text-slate-500' : 'text-white'} truncate">${escapeHtml(item.title)}</span>
             </div>
-            ${item.desc ? `<p class="text-xs text-gray-400 mt-1 break-words">${escapeHtml(item.desc)}</p>` : ''}
+            ${item.desc ? `<p class="text-xs text-slate-400 mt-1 break-words">${escapeHtml(item.desc)}</p>` : ''}
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             ${canDelete ? `<button onclick="deleteMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
@@ -1729,23 +1751,20 @@
       refreshAllUI();
     }
 
-    /* ---------------- 7. EINSTELLUNGEN (BASICS, BERECHTIGUNGEN, SICHERHEIT) ---------------- */
     function renderEinstellungen() {
       const isMaster = currentRole === 'Master';
       const subTabsEl = document.getElementById('settings-subtabs');
 
-      // Master sees: Basics, Berechtigungen, Sicherheit
-      // Daisy sees: ONLY Basics
       if (isMaster) {
         subTabsEl.innerHTML = `
-          <button onclick="selectSettingsSubTab('basics')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'basics' ? 'gold-gradient shadow' : 'bg-white/5 text-gray-300 hover:bg-white/10'}">
+          <button onclick="selectSettingsSubTab('basics')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'basics' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🎛️ Basics
           </button>
-          <button onclick="selectSettingsSubTab('berechtigungen')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'berechtigungen' ? 'gold-gradient shadow' : 'bg-white/5 text-gray-300 hover:bg-white/10'}">
+          <button onclick="selectSettingsSubTab('berechtigungen')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'berechtigungen' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🔐 Berechtigungen
           </button>
-          <button onclick="selectSettingsSubTab('sicherheit')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'sicherheit' ? 'gold-gradient shadow' : 'bg-white/5 text-gray-300 hover:bg-white/10'}">
-            🛡️ Sicherheit
+          <button onclick="selectSettingsSubTab('sicherheit')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'sicherheit' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
+            🛡️ Sicherheit & Push
           </button>
         `;
       } else {
@@ -1761,7 +1780,6 @@
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
 
-      // Populate Basics Fields
       const masterNameInput = document.getElementById('basic-master-name');
       const daisyNameInput = document.getElementById('basic-daisy-name');
       const appTitleInput = document.getElementById('basic-app-title');
@@ -1776,7 +1794,7 @@
       daisyNameInput.value = appState.basics.daisyName || 'Daisy';
       appTitleInput.value = appState.basics.appTitle || 'DOMINION';
       appSubInput.value = appState.basics.appSubtitle || 'D+W Connection';
-      defaultTimeInput.value = appState.basics.defaultEventTime || '19:00';
+      defaultTimeInput.value = appState.basics.defaultEventTime || '18:00';
       feedLimitSelect.value = String(appState.basics.feedLimit || 20);
 
       const prefs = getDevicePrefs();
@@ -1790,7 +1808,6 @@
         daisyLockBadge.classList.add('hidden');
         clearFeedBtn.classList.remove('hidden');
       } else {
-        // Daisy permissions in Basics
         masterNameInput.disabled = true;
         appTitleInput.disabled = true;
         appSubInput.disabled = true;
@@ -1801,7 +1818,6 @@
         daisyLockBadge.classList.toggle('hidden', canEditUsername);
       }
 
-      // Populate Berechtigungen & Sicherheit if Master
       if (isMaster) {
         renderPermissionsMatrix();
         document.getElementById('sec-fb-url').value = appState.firebase.url || DEFAULT_FB_URL;
@@ -1842,10 +1858,9 @@
         }
       }
 
-      appState.basics.defaultEventTime = document.getElementById('basic-default-time').value || '19:00';
+      appState.basics.defaultEventTime = document.getElementById('basic-default-time').value || '18:00';
       appState.basics.feedLimit = parseInt(document.getElementById('basic-feed-limit').value || '20', 10);
 
-      // Save device-local start tab
       const prefs = getDevicePrefs();
       prefs.defaultTab = document.getElementById('basic-default-tab').value || 'dashboard';
       saveDevicePrefs(prefs);
@@ -1863,7 +1878,6 @@
       showToast('Aktivitäts-Stream geleert.');
     }
 
-    /* ---------------- BERECHTIGUNGEN MATRIX (MASTER ONLY) ---------------- */
     function renderPermissionsMatrix() {
       document.getElementById('perm-username-toggle').checked = !!appState.permissions.username;
 
@@ -1872,12 +1886,12 @@
         const p = appState.permissions[cat.id] || { visible: true, add: false, edit: false, delete: false };
         return `
           <tr class="hover:bg-white/[0.02]">
-            <td class="p-3.5 font-medium text-gray-200">${cat.label}</td>
+            <td class="p-3.5 font-medium text-slate-200">${cat.label}</td>
             ${['visible', 'add', 'edit', 'delete'].map(action => `
               <td class="p-3.5 text-center">
                 <input type="checkbox" ${p[action] ? 'checked' : ''}
                        onchange="updateCategoryPermission('${cat.id}', '${action}', this.checked)"
-                       class="w-4 h-4 accent-[#d4af37] rounded cursor-pointer" />
+                       class="w-4 h-4 accent-[#c9973e] rounded cursor-pointer" />
               </td>
             `).join('')}
           </tr>
@@ -1903,7 +1917,6 @@
       showToast('Berechtigung aktualisiert.');
     }
 
-    /* ---------------- SICHERHEIT & BACKUP (MASTER ONLY) ---------------- */
     function saveFirebaseConfig() {
       if (currentRole !== 'Master') return;
       const url = document.getElementById('sec-fb-url').value.trim() || DEFAULT_FB_URL;
@@ -1971,19 +1984,14 @@
       );
     }
 
-    /**
-     * =========================================================================
-     * UI HELPERS (TOASTS, CUSTOM MODAL, FORMATTING)
-     * =========================================================================
-     */
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       const borderStyle = type === 'error'
         ? 'border-rose-500/50 bg-rose-950/90 text-rose-100'
         : type === 'info'
-          ? 'border-amber-400/50 bg-gray-900/95 text-amber-200'
-          : 'border-[#d4af37]/50 bg-[#14141f]/95 text-[#f3d576]';
+          ? 'border-amber-400/50 bg-slate-900/95 text-amber-200'
+          : 'border-[#c9973e]/50 bg-[#161924]/95 text-[#e5b55c]';
 
       toast.className = `px-4 py-3 rounded-xl border text-xs font-medium shadow-xl backdrop-blur-md animate-fade ${borderStyle}`;
       toast.textContent = message;
@@ -2036,7 +2044,6 @@
       return `${parts[2]}.${parts[1]}.${parts[0]}`;
     }
 
-    // Boot Application
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
       updateLoginLabels();
