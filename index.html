@@ -250,7 +250,7 @@
           </div>
         </div>
 
-        <!-- RESTORED UPDATE / CHANGELOG BOX (v2.3) -->
+        <!-- UPDATE / CHANGELOG BOX (v2.3) -->
         <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/30 space-y-2">
           <div class="flex items-center justify-between">
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
@@ -259,7 +259,7 @@
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Neu</span>
           </div>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Willkommen in Version 2.3! Neu integriert ist die Unterstützung für <strong>Firebase Cloud Messaging (FCM) Web-Push-Benachrichtigungen</strong>. Aktiviere Push-Benachrichtigungen unter <em>Einstellungen → Sicherheit</em>, um auch im Hintergrund sofort über neue Chat-Nachrichten informiert zu werden.
+            Willkommen in Version 2.3! Neu integriert sind <strong>Firebase Cloud Messaging (FCM) Web-Push-Benachrichtigungen</strong>, der <strong>visuelle Monatskalender</strong> mit Overlay-Ansicht (Master / Daisy / Übereinander) sowie die automatische <strong>Rechtefilterung im Aktivitäts-Stream</strong> für Daisy.
           </p>
         </div>
 
@@ -382,24 +382,79 @@
 
       <!-- ==================== 3. KALENDER ==================== -->
       <section id="tab-kalender" class="hidden space-y-4 animate-fade">
-        <div class="glass-card rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-4">
+        <div class="glass-card rounded-2xl p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 class="font-display text-lg font-bold text-[#e5b55c]">Kalender & Termine</h2>
-              <p class="text-xs text-slate-400">Gemeinsame Planung & Verabredungen</p>
+              <p class="text-xs text-slate-400">Gemeinsame Planung & überlagerte Übersicht</p>
+            </div>
+
+            <!-- Role Filter Toggle: Alle (Übereinander) | Master | Daisy -->
+            <div class="inline-flex p-1 rounded-xl bg-black/40 border border-slate-800 self-start">
+              <button id="cal-filter-all" onclick="setCalendarFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition gold-gradient shadow">
+                👥 Alle (Übereinander)
+              </button>
+              <button id="cal-filter-Master" onclick="setCalendarFilter('Master')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+                ♛ <span id="cal-filter-master-name">Master</span>
+              </button>
+              <button id="cal-filter-Daisy" onclick="setCalendarFilter('Daisy')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+                🌸 <span id="cal-filter-daisy-name">Daisy</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Visual Month Calendar Grid -->
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-slate-800">
+            <div class="flex items-center justify-between mb-3">
+              <button onclick="changeCalendarMonth(-1)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 flex items-center justify-center text-sm font-bold transition">‹</button>
+              <div class="text-center">
+                <span id="cal-month-label" class="font-display text-sm sm:text-base font-bold text-white">Monat Jahr</span>
+                <div class="flex items-center justify-center gap-3 mt-1 text-[10px] text-slate-400">
+                  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#c9973e]"></span> <span id="cal-legend-master">Master</span></span>
+                  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> <span id="cal-legend-daisy">Daisy</span></span>
+                </div>
+              </div>
+              <button onclick="changeCalendarMonth(1)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 flex items-center justify-center text-sm font-bold transition">›</button>
+            </div>
+
+            <!-- Weekday Headers -->
+            <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <div>Mo</div>
+              <div>Di</div>
+              <div>Mi</div>
+              <div>Do</div>
+              <div>Fr</div>
+              <div>Sa</div>
+              <div>So</div>
+            </div>
+
+            <!-- Calendar Days Grid -->
+            <div id="cal-grid-days" class="grid grid-cols-7 gap-1">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Selected Date Filter Banner -->
+            <div id="cal-selected-day-bar" class="hidden mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-xs">
+              <span id="cal-selected-day-text" class="text-[#e5b55c] font-medium">Ausgewählter Tag:</span>
+              <button onclick="clearSelectedCalendarDate()" class="text-slate-400 hover:text-white underline">Alle Monatstermine zeigen</button>
             </div>
           </div>
 
           <!-- Add Event Form -->
-          <div id="kalender-add-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
-            <input id="cal-title" type="text" placeholder="Titel des Termins..." class="sm:col-span-2 px-3.5 py-2.5 text-sm" />
-            <input id="cal-date" type="date" class="px-3 py-2.5 text-sm" />
-            <div class="flex gap-2">
-              <input id="cal-time" type="time" class="flex-1 px-3 py-2.5 text-sm" />
+          <div id="kalender-add-box" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
+            <input id="cal-title" type="text" placeholder="Titel des Termins..." class="sm:col-span-5 px-3.5 py-2.5 text-sm" />
+            <input id="cal-date" type="date" class="sm:col-span-3 px-3 py-2.5 text-sm" />
+            <input id="cal-time" type="time" class="sm:col-span-2 px-3 py-2.5 text-sm" />
+            <div class="sm:col-span-2 flex gap-2">
+              <select id="cal-owner" title="Zuordnung" class="flex-1 px-2 py-2.5 text-xs">
+                <option value="Master">♛ Master</option>
+                <option value="Daisy">🌸 Daisy</option>
+              </select>
               <button onclick="addCalendarEvent()" class="px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm shrink-0">+</button>
             </div>
           </div>
 
+          <!-- Filtered Events List -->
           <div id="kalender-list" class="space-y-2.5"></div>
         </div>
       </section>
@@ -738,7 +793,7 @@
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
     const DEFAULT_ROOM_CODE = 'D+W Connection';
-
+    const FCM_VAPID_KEY = 'BIjo1CgqJnE-B12MQNhsc-PBNigNW1JhuPz241wPvVnveqnlrPOxBblc0bVt5ZNBGuzODM1fj83ibkb_hgnGVaU';
     const MGMT_CATEGORIES = [
       { id: 'kleidung', label: '👗 Kleidung', singular: 'Kleidung' },
       { id: 'toys', label: '🔮 Toys', singular: 'Toy' },
@@ -819,6 +874,10 @@
     let activeTab = 'dashboard';
     let activeMgmtCategory = 'kleidung';
     let activeSettingsSubTab = 'basics';
+    let calFilterRole = 'all'; // 'all' | 'Master' | 'Daisy'
+    let calViewYear = new Date().getFullYear();
+    let calViewMonth = new Date().getMonth();
+    let calSelectedDate = null;
     let pendingChatImage = null;
     let mediaRecorder = null;
     let audioChunks = [];
@@ -826,6 +885,7 @@
     let firebaseDbRef = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
+    let swRegistration = null;
 
     function loadState() {
       try {
@@ -935,23 +995,22 @@
         if (firebase.messaging.isSupported()) {
           messagingInstance = firebase.messaging();
           if ('serviceWorker' in navigator) {
-            const swCode = `
-              importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
-              importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
-              firebase.initializeApp({ databaseURL: "${fbUrl}" });
-              const messaging = firebase.messaging();
-              messaging.onBackgroundMessage((payload) => {
-                const title = payload.notification ? payload.notification.title : 'Dominion Nachricht';
-                const options = {
-                  body: payload.notification ? payload.notification.body : 'Neue Aktivität',
-                  icon: '/favicon.ico'
-                };
-                self.registration.showNotification(title, options);
-              });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(e => console.warn('SW registration warning:', e));
+            navigator.serviceWorker.register('./firebase-messaging-sw.js')
+              .then((registration) => {
+                swRegistration = registration;
+                if (Notification.permission === 'granted' && messagingInstance) {
+                  messagingInstance.getToken({
+                    vapidKey: FCM_VAPID_KEY,
+                    serviceWorkerRegistration: registration
+                  }).then((token) => {
+                    if (token && appState.fcmToken !== token) {
+                      appState.fcmToken = token;
+                      persistState();
+                    }
+                  }).catch(e => console.warn('FCM silent token refresh warning:', e));
+                }
+              })
+              .catch(e => console.warn('SW registration warning:', e));
           }
         }
       } catch (e) {
@@ -964,8 +1023,18 @@
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
           showToast('Push-Berechtigung erteilt!');
+          if (!swRegistration && 'serviceWorker' in navigator) {
+            swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js').catch(() => null);
+          }
           if (messagingInstance) {
-            const token = await messagingInstance.getToken().catch(() => null);
+            const tokenOptions = { vapidKey: FCM_VAPID_KEY };
+            if (swRegistration) {
+              tokenOptions.serviceWorkerRegistration = swRegistration;
+            }
+            const token = await messagingInstance.getToken(tokenOptions).catch((err) => {
+              console.warn('getToken Fehler:', err);
+              return null;
+            });
             if (token) {
               appState.fcmToken = token;
               persistState();
@@ -1046,6 +1115,13 @@
 
     function logActivity(actionText, targetTab, targetSubCategory = null, targetItemId = null) {
       const actorName = getDisplayName(currentRole);
+      let permissionKey = targetTab;
+      if (targetTab === 'verwaltung' && targetSubCategory) {
+        permissionKey = targetSubCategory;
+      } else if (targetTab === 'einstellungen' && targetSubCategory) {
+        permissionKey = targetSubCategory;
+      }
+
       const entry = {
         id: 'act-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
         actorRole: currentRole,
@@ -1053,6 +1129,7 @@
         action: actionText,
         targetTab: targetTab,
         targetSubCategory: targetSubCategory,
+        permissionKey: permissionKey,
         targetItemId: targetItemId,
         timestamp: Date.now()
       };
@@ -1064,6 +1141,48 @@
       if (appState.activityFeed.length > 100) {
         appState.activityFeed = appState.activityFeed.slice(0, 100);
       }
+    }
+
+    function isActivityVisibleForDaisy(item) {
+      if (!item) return false;
+      const permKey = item.permissionKey || (item.targetTab === 'verwaltung' ? item.targetSubCategory : item.targetTab);
+
+      // Interne Master-Bereiche (Berechtigungen, Sicherheit) sind für Daisy unsichtbar
+      if (item.targetTab === 'einstellungen') {
+        if (item.targetSubCategory === 'berechtigungen' || item.targetSubCategory === 'sicherheit' ||
+            permKey === 'permissions' || permKey === 'security' ||
+            permKey === 'berechtigungen' || permKey === 'sicherheit') {
+          return false;
+        }
+        // Änderungen unter Basics nur zeigen, wenn sie nicht reine Master-Interne sind
+        if (item.targetSubCategory === 'basics' || permKey === 'basics' || permKey === 'username') {
+          return true;
+        }
+        return false;
+      }
+
+      if (item.targetTab === 'chat' || permKey === 'chat') {
+        return true;
+      }
+
+      // Prüfe Sichtbarkeit in der Berechtigungsmatrix (inkl. englischer/deutscher Alias-Schlüssel)
+      const aliasMap = {
+        calendar: 'kalender',
+        shopping: 'einkauf',
+        punishments: 'strafbuch',
+        clothes: 'kleidung',
+        penalties: 'strafen',
+        rewards: 'belohnungen',
+        rules: 'regeln',
+        tasks: 'aufgaben'
+      };
+      const resolvedKey = aliasMap[permKey] || permKey;
+
+      if (resolvedKey && appState.permissions && appState.permissions[resolvedKey]) {
+        return !!appState.permissions[resolvedKey].visible;
+      }
+
+      return true;
     }
 
     function jumpToTarget(tabId, subCategory = null, itemId = null) {
@@ -1271,7 +1390,11 @@
       document.getElementById('stat-aufgaben').textContent = (appState.mgmt.aufgaben || []).filter(i => !i.done).length;
 
       const limit = parseInt(appState.basics.feedLimit || 20, 10);
-      const feedItems = (appState.activityFeed || []).slice(0, limit);
+      const rawFeed = appState.activityFeed || [];
+      const visibleFeed = currentRole === 'Daisy'
+        ? rawFeed.filter(item => isActivityVisibleForDaisy(item))
+        : rawFeed;
+      const feedItems = visibleFeed.slice(0, limit);
       document.getElementById('feed-count-badge').textContent = `${feedItems.length} Einträge`;
 
       const feedContainer = document.getElementById('activity-feed-list');
@@ -1440,33 +1563,200 @@
       scrollChatToBottom();
     }
 
+    function getEventOwnerRole(ev) {
+      if (ev.owner === 'Master' || ev.owner === 'Daisy') return ev.owner;
+      if (ev.createdBy === 'Master' || ev.createdBy === 'Daisy') return ev.createdBy;
+      return 'Master';
+    }
+
+    function setCalendarFilter(role) {
+      calFilterRole = role;
+      renderKalender();
+    }
+
+    function changeCalendarMonth(delta) {
+      calViewMonth += delta;
+      if (calViewMonth < 0) {
+        calViewMonth = 11;
+        calViewYear -= 1;
+      } else if (calViewMonth > 11) {
+        calViewMonth = 0;
+        calViewYear += 1;
+      }
+      renderKalender();
+    }
+
+    function selectCalendarDate(isoDate) {
+      if (calSelectedDate === isoDate) {
+        calSelectedDate = null;
+      } else {
+        calSelectedDate = isoDate;
+        const dateInput = document.getElementById('cal-date');
+        if (dateInput) dateInput.value = isoDate;
+      }
+      renderKalender();
+    }
+
+    function clearSelectedCalendarDate() {
+      calSelectedDate = null;
+      renderKalender();
+    }
+
     function renderKalender() {
       const canAdd = hasPermission('kalender', 'add');
       const canDelete = hasPermission('kalender', 'delete');
       document.getElementById('kalender-add-box').classList.toggle('hidden', !canAdd);
+
+      const mName = getDisplayName('Master');
+      const dName = getDisplayName('Daisy');
+      const fMasterLabel = document.getElementById('cal-filter-master-name');
+      const fDaisyLabel = document.getElementById('cal-filter-daisy-name');
+      const legMaster = document.getElementById('cal-legend-master');
+      const legDaisy = document.getElementById('cal-legend-daisy');
+      if (fMasterLabel) fMasterLabel.textContent = mName;
+      if (fDaisyLabel) fDaisyLabel.textContent = dName;
+      if (legMaster) legMaster.textContent = mName;
+      if (legDaisy) legDaisy.textContent = dName;
+
+      // Update Filter Buttons Styling
+      ['all', 'Master', 'Daisy'].forEach(key => {
+        const btn = document.getElementById('cal-filter-' + key);
+        if (!btn) return;
+        if (calFilterRole === key) {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition gold-gradient shadow';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white';
+        }
+      });
+
+      const ownerSelect = document.getElementById('cal-owner');
+      if (ownerSelect && ownerSelect.options.length >= 2) {
+        ownerSelect.options[0].text = `♛ ${mName}`;
+        ownerSelect.options[1].text = `🌸 ${dName}`;
+      }
 
       const timeInput = document.getElementById('cal-time');
       if (timeInput && !timeInput.value) {
         timeInput.value = appState.basics.defaultEventTime || '18:00';
       }
 
+      // Filter events according to role toggle
+      const roleFilteredEvents = appState.kalender.filter(ev => {
+        if (calFilterRole === 'all') return true;
+        return getEventOwnerRole(ev) === calFilterRole;
+      });
+
+      // Render Visual Month Grid
+      const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+      const monthLabelEl = document.getElementById('cal-month-label');
+      if (monthLabelEl) {
+        monthLabelEl.textContent = `${monthNames[calViewMonth]} ${calViewYear}`;
+      }
+
+      const gridEl = document.getElementById('cal-grid-days');
+      if (gridEl) {
+        const firstDay = new Date(calViewYear, calViewMonth, 1);
+        const startOffset = (firstDay.getDay() + 6) % 7; // Monday = 0
+        const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+        const todayIso = new Date().toISOString().slice(0, 10);
+
+        let cellsHtml = '';
+        for (let i = 0; i < startOffset; i++) {
+          cellsHtml += `<div class="h-14 sm:h-16 rounded-xl bg-white/[0.01] border border-transparent"></div>`;
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const mm = String(calViewMonth + 1).padStart(2, '0');
+          const dd = String(day).padStart(2, '0');
+          const iso = `${calViewYear}-${mm}-${dd}`;
+          const dayEvents = roleFilteredEvents.filter(ev => ev.date === iso);
+          const masterEvents = dayEvents.filter(ev => getEventOwnerRole(ev) === 'Master');
+          const daisyEvents = dayEvents.filter(ev => getEventOwnerRole(ev) === 'Daisy');
+
+          const isToday = iso === todayIso;
+          const isSelected = iso === calSelectedDate;
+
+          let cellBorder = 'border-slate-800/80 hover:border-slate-600';
+          let cellBg = 'bg-white/[0.02]';
+          if (isSelected) {
+            cellBorder = 'border-[#e5b55c] ring-1 ring-[#e5b55c]/50';
+            cellBg = 'bg-[#c9973e]/15';
+          } else if (isToday) {
+            cellBorder = 'border-[#c9973e]/60';
+            cellBg = 'bg-white/[0.05]';
+          }
+
+          // Overlay badges showing Master (Gold) & Daisy (Rose) simultaneously
+          let markersHtml = '';
+          if (dayEvents.length > 0) {
+            markersHtml = `<div class="mt-1 space-y-0.5 overflow-hidden">`;
+            if (masterEvents.length > 0) {
+              markersHtml += `<div class="text-[9px] leading-tight px-1 py-0.5 rounded bg-[#c9973e]/25 text-[#e5b55c] truncate font-medium">♛ ${masterEvents.length > 1 ? masterEvents.length + ' Termine' : escapeHtml(masterEvents[0].title)}</div>`;
+            }
+            if (daisyEvents.length > 0) {
+              markersHtml += `<div class="text-[9px] leading-tight px-1 py-0.5 rounded bg-rose-500/25 text-rose-300 truncate font-medium">🌸 ${daisyEvents.length > 1 ? daisyEvents.length + ' Termine' : escapeHtml(daisyEvents[0].title)}</div>`;
+            }
+            markersHtml += `</div>`;
+          }
+
+          cellsHtml += `
+            <button type="button" onclick="selectCalendarDate('${iso}')"
+                    class="h-14 sm:h-16 p-1 rounded-xl border ${cellBorder} ${cellBg} flex flex-col justify-between text-left transition overflow-hidden">
+              <span class="text-[11px] font-semibold ${isToday ? 'text-[#e5b55c]' : 'text-slate-300'}">${day}</span>
+              ${markersHtml}
+            </button>
+          `;
+        }
+        gridEl.innerHTML = cellsHtml;
+      }
+
+      const dayBar = document.getElementById('cal-selected-day-bar');
+      const dayBarText = document.getElementById('cal-selected-day-text');
+      if (dayBar && dayBarText) {
+        if (calSelectedDate) {
+          dayBar.classList.remove('hidden');
+          dayBarText.textContent = `Gefiltert nach Tag: ${formatDateDE(calSelectedDate)}`;
+        } else {
+          dayBar.classList.add('hidden');
+        }
+      }
+
+      // List below grid
       const list = document.getElementById('kalender-list');
-      const sorted = [...appState.kalender].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+      let listEvents = [...roleFilteredEvents];
+      if (calSelectedDate) {
+        listEvents = listEvents.filter(ev => ev.date === calSelectedDate);
+      }
+      const sorted = listEvents.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
       if (sorted.length === 0) {
-        list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Keine Termine vorhanden.</p>`;
+        list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Keine Termine für diese Auswahl vorhanden.</p>`;
         return;
       }
 
-      list.innerHTML = sorted.map(ev => `
-        <div id="item-${ev.id}" class="p-3.5 rounded-xl bg-white/[0.03] border border-slate-800 flex items-center justify-between gap-3">
-          <div>
-            <div class="font-semibold text-sm text-white">${escapeHtml(ev.title)}</div>
-            <div class="text-xs text-[#c9973e] mt-0.5">📅 ${formatDateDE(ev.date)} um ${escapeHtml(ev.time || '18:00')} Uhr</div>
+      list.innerHTML = sorted.map(ev => {
+        const ownerRole = getEventOwnerRole(ev);
+        const ownerName = getDisplayName(ownerRole);
+        const isMasterEv = ownerRole === 'Master';
+        const pillClass = isMasterEv
+          ? 'bg-[#c9973e]/15 text-[#e5b55c] border-[#c9973e]/30'
+          : 'bg-rose-500/15 text-rose-300 border-rose-500/30';
+
+        return `
+          <div id="item-${ev.id}" class="p-3.5 rounded-xl bg-white/[0.03] border ${isMasterEv ? 'border-[#c9973e]/25' : 'border-rose-500/25'} flex items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md border ${pillClass}">
+                  ${isMasterEv ? '♛' : '🌸'} ${escapeHtml(ownerName)}
+                </span>
+                <span class="font-semibold text-sm text-white">${escapeHtml(ev.title)}</span>
+              </div>
+              <div class="text-xs text-slate-400 mt-1">📅 ${formatDateDE(ev.date)} um ${escapeHtml(ev.time || '18:00')} Uhr</div>
+            </div>
+            ${canDelete ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
           </div>
-          ${canDelete ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function addCalendarEvent() {
@@ -1474,15 +1764,17 @@
       const title = document.getElementById('cal-title').value.trim();
       const date = document.getElementById('cal-date').value;
       const time = document.getElementById('cal-time').value || appState.basics.defaultEventTime || '18:00';
+      const ownerEl = document.getElementById('cal-owner');
+      const owner = ownerEl ? ownerEl.value : currentRole;
 
       if (!title || !date) {
         showToast('Bitte Titel und Datum angeben.', 'error');
         return;
       }
 
-      const newEv = { id: 'cal-' + Date.now(), title, date, time, createdBy: currentRole };
+      const newEv = { id: 'cal-' + Date.now(), title, date, time, owner, createdBy: currentRole };
       appState.kalender.push(newEv);
-      logActivity(`hat neuen Termin angelegt: „${title}“ (${formatDateDE(date)})`, 'kalender', null, newEv.id);
+      logActivity(`hat neuen Termin angelegt (${getDisplayName(owner)}): „${title}“ (${formatDateDE(date)})`, 'kalender', null, newEv.id);
 
       document.getElementById('cal-title').value = '';
       persistState();
