@@ -1590,7 +1590,7 @@
                 return;
               }
               appState.chat.push({
-                id: 'msg-' + Date.now(),
+                id: 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
                 sender: currentRole,
                 audio: audioDataUrl,
                 audioMimeType: blob.type || actualMimeType,
@@ -1643,7 +1643,7 @@
       if (!text && !pendingChatImage) return;
 
       appState.chat.push({
-        id: 'msg-' + Date.now(),
+        id: 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
         sender: currentRole,
         text: text,
         image: pendingChatImage || null,
