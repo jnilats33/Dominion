@@ -2007,23 +2007,40 @@
         event.target.value = '';
         return;
       }
-      if (file.size > 8 * 1024 * 1024) {
-        showToast('Das Bild ist zu groß. Bitte maximal 8 MB verwenden.', 'error');
+      if (file.size > 12 * 1024 * 1024) {
+        showToast('Das Bild ist zu groß. Bitte maximal 12 MB verwenden.', 'error');
         event.target.value = '';
         return;
       }
-      const reader = new FileReader();
-      reader.onload = e => {
-        if (typeof e.target.result !== 'string') {
-          showToast('Das Bild konnte nicht gelesen werden.', 'error');
-          return;
+
+      const objectUrl = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const maxDimension = 1280;
+          const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error('Canvas nicht verfügbar');
+          context.fillStyle = '#ffffff';
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          mgmtDraftImage = canvas.toDataURL('image/jpeg', 0.8);
+          document.getElementById('mgmt-image-preview-img').src = mgmtDraftImage;
+          document.getElementById('mgmt-image-preview').classList.remove('hidden');
+        } catch (err) {
+          showToast('Das Bild konnte nicht verarbeitet werden.', 'error');
+        } finally {
+          URL.revokeObjectURL(objectUrl);
         }
-        mgmtDraftImage = e.target.result;
-        document.getElementById('mgmt-image-preview-img').src = mgmtDraftImage;
-        document.getElementById('mgmt-image-preview').classList.remove('hidden');
       };
-      reader.onerror = () => showToast('Das Bild konnte nicht gelesen werden.', 'error');
-      reader.readAsDataURL(file);
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        showToast('Das Bild konnte nicht geöffnet werden.', 'error');
+      };
+      image.src = objectUrl;
     }
 
     function clearMgmtDraftImage() {
