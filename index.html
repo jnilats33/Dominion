@@ -517,12 +517,12 @@
           <div id="mgmt-add-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
             <input id="mgmt-title" type="text" placeholder="Bezeichnung..." class="px-3.5 py-2.5 text-sm" />
             <input id="mgmt-desc" type="text" placeholder="Details / Beschreibung..." class="px-3.5 py-2.5 text-sm" />
-            <button onclick="addMgmtItem()" class="px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">Anlegen</button>
+            <div class="flex gap-2"><button id="mgmt-submit-button" onclick="addMgmtItem()" class="flex-1 px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">Anlegen</button><button id="mgmt-cancel-edit" onclick="cancelMgmtEdit()" class="hidden px-3 py-2.5 rounded-xl bg-white/10 text-slate-300 text-sm">Abbrechen</button></div>
             <div id="mgmt-image-controls" class="hidden sm:col-span-3 col-span-1 space-y-2">
               <div class="flex flex-wrap gap-2">
                 <button type="button" onclick="document.getElementById('mgmt-image-file').click()" class="px-3 py-2 rounded-lg bg-white/5 text-xs text-slate-200">📁 Datei auswählen</button>
                 <button type="button" onclick="document.getElementById('mgmt-image-camera').click()" class="px-3 py-2 rounded-lg bg-white/5 text-xs text-slate-200">📷 Kamera</button>
-                <button type="button" onclick="clearMgmtDraftImage()" class="px-3 py-2 rounded-lg bg-rose-500/10 text-xs text-rose-300">✕ Bild entfernen</button>
+                <button type="button" onclick="removeMgmtImage()" class="px-3 py-2 rounded-lg bg-rose-500/10 text-xs text-rose-300">✕ Bild entfernen</button>
               </div>
               <input id="mgmt-image-file" type="file" accept="image/*" class="hidden" onchange="handleMgmtImageSelect(event)" />
               <input id="mgmt-image-camera" type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMgmtImageSelect(event)" />
@@ -892,6 +892,8 @@
     let calSelectedDate = null;
     let pendingChatImage = null;
     let mgmtDraftImage = null;
+    let mgmtEditingItemId = null;
+    let mgmtImageRemoved = false;
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecordingAudio = false;
@@ -2058,6 +2060,7 @@
           context.fillRect(0, 0, canvas.width, canvas.height);
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
           mgmtDraftImage = canvas.toDataURL('image/jpeg', 0.8);
+          mgmtImageRemoved = false;
           document.getElementById('mgmt-image-preview-img').src = mgmtDraftImage;
           document.getElementById('mgmt-image-preview').classList.remove('hidden');
         } catch (err) {
@@ -2075,6 +2078,7 @@
 
     function clearMgmtDraftImage() {
       mgmtDraftImage = null;
+      mgmtImageRemoved = false;
       const preview = document.getElementById('mgmt-image-preview');
       const image = document.getElementById('mgmt-image-preview-img');
       const fileInput = document.getElementById('mgmt-image-file');
@@ -2115,8 +2119,12 @@
       const canAdd = hasPermission(activeMgmtCategory, 'add');
       const canEdit = hasPermission(activeMgmtCategory, 'edit');
       const canDelete = hasPermission(activeMgmtCategory, 'delete');
-      document.getElementById('mgmt-add-box').classList.toggle('hidden', !canAdd);
-      document.getElementById('mgmt-image-controls').classList.toggle('hidden', !canAdd || !['kleidung', 'toys'].includes(activeMgmtCategory));
+      const isEditing = !!mgmtEditingItemId;
+      document.getElementById('mgmt-add-box').classList.toggle('hidden', !canAdd && !(isEditing && canEdit));
+      document.getElementById('mgmt-image-controls').classList.toggle('hidden', !(canAdd || (isEditing && canEdit)) || !['kleidung', 'toys'].includes(activeMgmtCategory));
+      document.getElementById('mgmt-submit-button').textContent = isEditing ? 'Änderungen speichern' : 'Anlegen';
+      document.getElementById('mgmt-submit-button').onclick = isEditing ? saveMgmtEdit : addMgmtItem;
+      document.getElementById('mgmt-cancel-edit').classList.toggle('hidden', !isEditing);
 
       const items = appState.mgmt[activeMgmtCategory] || [];
       const listEl = document.getElementById('mgmt-items-list');
@@ -2141,19 +2149,69 @@
             ${item.imgUrl ? `<img src="${escapeHtml(item.imgUrl)}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 w-auto mt-2 border border-slate-700" />` : ''}
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            ${canDelete ? `<button onclick="deleteMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
+            ${canEdit ? `<button onclick="editMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 text-xs" title="Bearbeiten">✏️</button>` : ''}
+            ${canDelete ? `<button onclick="deleteMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs" title="Löschen">🗑️</button>` : ''}
           </div>
         </div>
       `).join('');
     }
 
     function selectMgmtCategory(catId) {
-      if (activeMgmtCategory !== catId) clearMgmtDraftImage();
+      if (activeMgmtCategory !== catId) { cancelMgmtEdit(); clearMgmtDraftImage(); }
       activeMgmtCategory = catId;
       renderVerwaltung();
     }
 
+    function editMgmtItem(catId, itemId) {
+      if (catId !== activeMgmtCategory || !hasPermission(catId, 'edit')) return;
+      const item = (appState.mgmt[catId] || []).find(entry => entry.id === itemId);
+      if (!item) return;
+      mgmtEditingItemId = itemId; mgmtDraftImage = null; mgmtImageRemoved = false;
+      document.getElementById('mgmt-title').value = item.title || '';
+      document.getElementById('mgmt-desc').value = item.desc || '';
+      const preview = document.getElementById('mgmt-image-preview');
+      const previewImg = document.getElementById('mgmt-image-preview-img');
+      if (item.imgUrl && ['kleidung', 'toys'].includes(catId)) { previewImg.src = item.imgUrl; preview.classList.remove('hidden'); }
+      else { previewImg.src = ''; preview.classList.add('hidden'); }
+      renderVerwaltung();
+      document.getElementById('mgmt-add-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function removeMgmtImage() {
+      mgmtDraftImage = null; mgmtImageRemoved = true;
+      const preview = document.getElementById('mgmt-image-preview');
+      const previewImg = document.getElementById('mgmt-image-preview-img');
+      if (previewImg) previewImg.src = ''; if (preview) preview.classList.add('hidden');
+      const fileInput = document.getElementById('mgmt-image-file'); const cameraInput = document.getElementById('mgmt-image-camera');
+      if (fileInput) fileInput.value = ''; if (cameraInput) cameraInput.value = '';
+    }
+
+    function cancelMgmtEdit() {
+      mgmtEditingItemId = null;
+      document.getElementById('mgmt-title').value = ''; document.getElementById('mgmt-desc').value = '';
+      clearMgmtDraftImage();
+      renderVerwaltung();
+    }
+
+    function saveMgmtEdit() {
+      const catId = activeMgmtCategory;
+      if (!mgmtEditingItemId || !hasPermission(catId, 'edit')) return;
+      const item = (appState.mgmt[catId] || []).find(entry => entry.id === mgmtEditingItemId);
+      if (!item) { cancelMgmtEdit(); return; }
+      const title = document.getElementById('mgmt-title').value.trim();
+      const desc = document.getElementById('mgmt-desc').value.trim();
+      if (!title) { showToast('Bitte eine Bezeichnung eingeben.', 'error'); return; }
+      const oldTitle = item.title || ''; item.title = title; item.desc = desc;
+      if (['kleidung', 'toys'].includes(catId)) { if (mgmtDraftImage) item.imgUrl = mgmtDraftImage; else if (mgmtImageRemoved) delete item.imgUrl; }
+      const catObj = MGMT_CATEGORIES.find(category => category.id === catId);
+      logActivity('hat ' + (catObj ? catObj.singular : 'Eintrag') + ' bearbeitet: „' + oldTitle + '“ → „' + title + '“', 'verwaltung', catId, item.id);
+      mgmtEditingItemId = null;
+      document.getElementById('mgmt-title').value = ''; document.getElementById('mgmt-desc').value = '';
+      clearMgmtDraftImage(); persistState(); refreshAllUI(); showToast('Änderungen gespeichert.');
+    }
+
     function addMgmtItem() {
+      if (mgmtEditingItemId) return saveMgmtEdit();
       if (!hasPermission(activeMgmtCategory, 'add')) return;
       const title = document.getElementById('mgmt-title').value.trim();
       const desc = document.getElementById('mgmt-desc').value.trim();
