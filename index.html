@@ -897,6 +897,7 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecordingAudio = false;
+    let recordingStartedAt = 0;
     let firebaseDbRef = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
@@ -977,10 +978,16 @@
     function persistChat() {
       saveStateLocalOnly();
       if (firebaseDbRef && !isApplyingRemoteUpdate) {
-        firebaseDbRef.child('chat').set(sanitizeForFirebase(appState.chat || [])).catch(err => {
-          console.warn('Chat-Sync Fehler:', err);
-          updateSyncIndicator(false);
-        });
+        firebaseDbRef.child('chat').transaction(remote => sanitizeForFirebase(mergeChatMessages(remote, appState.chat || [])), (error, committed, snapshot) => {
+          if (error || !committed) {
+            console.warn('Chat-Sync Fehler:', error || 'Transaktion abgebrochen');
+            updateSyncIndicator(false);
+            return;
+          }
+          appState.chat = mergeChatMessages(appState.chat, snapshot.val());
+          saveStateLocalOnly();
+          if (activeTab === 'chat') renderChat();
+        }, false);
       }
     }
 
@@ -1102,7 +1109,8 @@
         updateSyncIndicator(true);
         const remoteData = snapshot.val();
         if (!remoteData) {
-          firebaseDbRef.set(sanitizeForFirebase(appState));
+          console.warn('Leerer Firebase-Raum: kein automatisches Überschreiben aus lokalem Gerätestand.');
+          updateSyncIndicator(false);
           return;
         }
 
@@ -1126,10 +1134,7 @@
           isApplyingRemoteUpdate = false;
         }
         if (chatNeedsSync) {
-          firebaseDbRef.child('chat').set(sanitizeForFirebase(mergedChat)).catch(err => {
-            console.warn('Chat-Abgleich Fehler:', err);
-            updateSyncIndicator(false);
-          });
+          persistChat();
         }
       }, (error) => {
         console.warn('Firebase Listener Error:', error);
@@ -1544,7 +1549,7 @@
       container.querySelectorAll('audio').forEach(audio => {
         audio.addEventListener('loadedmetadata', () => {
           const label = audio.parentElement.querySelector('[data-audio-duration]');
-          if (label && !label.textContent && Number.isFinite(audio.duration)) {
+          if (label && Number.isFinite(audio.duration) && audio.duration > 0) {
             label.textContent = formatAudioDuration(audio.duration);
           }
         }, { once: true });
@@ -1580,17 +1585,23 @@
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           mediaRecorder = new MediaRecorder(stream);
+          recordingStartedAt = Date.now();
           audioChunks = [];
           mediaRecorder.ondataavailable = e => {
             if (e.data && e.data.size > 0) audioChunks.push(e.data);
           };
           mediaRecorder.onstop = () => {
-            const actualMimeType = mediaRecorder.mimeType || (audioChunks[0] && audioChunks[0].type) || 'audio/webm';
+            if (!audioChunks.length) {
+              stream.getTracks().forEach(t => t.stop());
+              showToast('Keine Audiodaten aufgenommen.', 'error');
+              return;
+            }
+            const actualMimeType = mediaRecorder.mimeType || (audioChunks[0] && audioChunks[0].type) || 'application/octet-stream';
             const blob = new Blob(audioChunks, { type: actualMimeType });
             const reader = new FileReader();
             const audioProbe = new Audio();
             const objectUrl = URL.createObjectURL(blob);
-            let duration = null;
+            let duration = Math.max(1, Math.round((Date.now() - recordingStartedAt) / 1000));
             let fileReady = false;
             let metadataReady = false;
             let audioDataUrl = null;
@@ -1614,7 +1625,7 @@
             };
             audioProbe.preload = 'metadata';
             audioProbe.onloadedmetadata = () => {
-              if (Number.isFinite(audioProbe.duration)) duration = audioProbe.duration;
+              if (Number.isFinite(audioProbe.duration) && audioProbe.duration > 0) duration = audioProbe.duration;
               metadataReady = true;
               URL.revokeObjectURL(objectUrl);
               finalizeMessage();
