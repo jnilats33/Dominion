@@ -1511,21 +1511,41 @@
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           mediaRecorder = new MediaRecorder(stream);
           audioChunks = [];
-          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) audioChunks.push(e.data);
+          };
           mediaRecorder.onstop = () => {
-            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            const actualMimeType = mediaRecorder.mimeType || (audioChunks[0] && audioChunks[0].type) || 'application/octet-stream';
+            const blob = new Blob(audioChunks, { type: actualMimeType });
             const reader = new FileReader();
-            reader.onloadend = () => {
+            const audioProbe = new Audio();
+            const objectUrl = URL.createObjectURL(blob);
+            let duration = null;
+            audioProbe.preload = 'metadata';
+            audioProbe.onloadedmetadata = () => {
+              if (Number.isFinite(audioProbe.duration)) duration = audioProbe.duration;
+              URL.revokeObjectURL(objectUrl);
+            };
+            audioProbe.onerror = () => URL.revokeObjectURL(objectUrl);
+            audioProbe.src = objectUrl;
+            reader.onload = () => {
+              if (typeof reader.result !== 'string' || !reader.result.startsWith('data:audio/')) {
+                showToast('Die Audioaufnahme konnte nicht verarbeitet werden.', 'error');
+                return;
+              }
               appState.chat.push({
                 id: 'msg-' + Date.now(),
                 sender: currentRole,
                 audio: reader.result,
+                audioMimeType: blob.type || actualMimeType,
+                duration: duration,
                 timestamp: Date.now()
               });
               persistState();
               renderChat();
               scrollChatToBottom();
             };
+            reader.onerror = () => showToast('Die Audioaufnahme konnte nicht gelesen werden.', 'error');
             reader.readAsDataURL(blob);
             stream.getTracks().forEach(t => t.stop());
           };
