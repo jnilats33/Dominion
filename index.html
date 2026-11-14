@@ -1515,7 +1515,7 @@
             if (e.data && e.data.size > 0) audioChunks.push(e.data);
           };
           mediaRecorder.onstop = () => {
-            const actualMimeType = mediaRecorder.mimeType || (audioChunks[0] && audioChunks[0].type) || 'application/octet-stream';
+            const actualMimeType = mediaRecorder.mimeType || (audioChunks[0] && audioChunks[0].type) || 'audio/webm';
             const blob = new Blob(audioChunks, { type: actualMimeType });
             const reader = new FileReader();
             const audioProbe = new Audio();
@@ -1526,7 +1526,7 @@
             let audioDataUrl = null;
             const finalizeMessage = () => {
               if (!fileReady || !metadataReady) return;
-              if (typeof audioDataUrl !== 'string' || !audioDataUrl.startsWith('data:audio/')) {
+              if (typeof audioDataUrl !== 'string' || !audioDataUrl.startsWith('data:')) {
                 showToast('Die Audioaufnahme konnte nicht verarbeitet werden.', 'error');
                 return;
               }
