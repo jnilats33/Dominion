@@ -1521,22 +1521,19 @@
             const audioProbe = new Audio();
             const objectUrl = URL.createObjectURL(blob);
             let duration = null;
-            audioProbe.preload = 'metadata';
-            audioProbe.onloadedmetadata = () => {
-              if (Number.isFinite(audioProbe.duration)) duration = audioProbe.duration;
-              URL.revokeObjectURL(objectUrl);
-            };
-            audioProbe.onerror = () => URL.revokeObjectURL(objectUrl);
-            audioProbe.src = objectUrl;
-            reader.onload = () => {
-              if (typeof reader.result !== 'string' || !reader.result.startsWith('data:audio/')) {
+            let fileReady = false;
+            let metadataReady = false;
+            let audioDataUrl = null;
+            const finalizeMessage = () => {
+              if (!fileReady || !metadataReady) return;
+              if (typeof audioDataUrl !== 'string' || !audioDataUrl.startsWith('data:audio/')) {
                 showToast('Die Audioaufnahme konnte nicht verarbeitet werden.', 'error');
                 return;
               }
               appState.chat.push({
                 id: 'msg-' + Date.now(),
                 sender: currentRole,
-                audio: reader.result,
+                audio: audioDataUrl,
                 audioMimeType: blob.type || actualMimeType,
                 duration: duration,
                 timestamp: Date.now()
@@ -1544,6 +1541,24 @@
               persistState();
               renderChat();
               scrollChatToBottom();
+            };
+            audioProbe.preload = 'metadata';
+            audioProbe.onloadedmetadata = () => {
+              if (Number.isFinite(audioProbe.duration)) duration = audioProbe.duration;
+              metadataReady = true;
+              URL.revokeObjectURL(objectUrl);
+              finalizeMessage();
+            };
+            audioProbe.onerror = () => {
+              metadataReady = true;
+              URL.revokeObjectURL(objectUrl);
+              finalizeMessage();
+            };
+            audioProbe.src = objectUrl;
+            reader.onload = () => {
+              audioDataUrl = reader.result;
+              fileReady = true;
+              finalizeMessage();
             };
             reader.onerror = () => showToast('Die Audioaufnahme konnte nicht gelesen werden.', 'error');
             reader.readAsDataURL(blob);
