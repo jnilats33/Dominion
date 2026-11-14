@@ -963,11 +963,34 @@
     function persistState() {
       saveStateLocalOnly();
       if (firebaseDbRef && !isApplyingRemoteUpdate) {
-        firebaseDbRef.set(sanitizeForFirebase(appState)).catch(err => {
+        const stateWithoutChat = { ...appState };
+        delete stateWithoutChat.chat;
+        firebaseDbRef.update(sanitizeForFirebase(stateWithoutChat)).catch(err => {
           console.warn('Firebase Sync Fehler:', err);
           updateSyncIndicator(false);
         });
       }
+    }
+
+    function persistChat() {
+      saveStateLocalOnly();
+      if (firebaseDbRef && !isApplyingRemoteUpdate) {
+        firebaseDbRef.child('chat').set(sanitizeForFirebase(appState.chat || [])).catch(err => {
+          console.warn('Chat-Sync Fehler:', err);
+          updateSyncIndicator(false);
+        });
+      }
+    }
+
+    function mergeChatMessages(localMessages, remoteMessages) {
+      const messagesById = new Map();
+      [...(Array.isArray(localMessages) ? localMessages : []), ...(Array.isArray(remoteMessages) ? remoteMessages : [])]
+        .forEach((message, index) => {
+          if (!message || typeof message !== 'object') return;
+          const fallbackId = 'legacy-' + (message.sender || '') + '-' + (message.timestamp || index) + '-' + JSON.stringify(message);
+          messagesById.set(message.id ? String(message.id) : fallbackId, message);
+        });
+      return Array.from(messagesById.values()).sort((a, b) => Number(a.timestamp || 0) - Number(b.timestamp || 0));
     }
 
     function sanitizeForFirebase(obj) {
@@ -1084,12 +1107,19 @@
         isApplyingRemoteUpdate = true;
         const localChatBackup = Array.isArray(appState.chat) ? [...appState.chat] : [];
         appState = mergeWithDefaults(remoteData);
-        if (appState.chat.length === 0 && localChatBackup.length > 0) {
-          appState.chat = localChatBackup;
-        }
+        const remoteChat = Array.isArray(appState.chat) ? appState.chat : [];
+        const mergedChat = mergeChatMessages(localChatBackup, remoteChat);
+        const chatNeedsSync = JSON.stringify(mergedChat) !== JSON.stringify(remoteChat);
+        appState.chat = mergedChat;
         saveStateLocalOnly();
         refreshAllUI();
         isApplyingRemoteUpdate = false;
+        if (chatNeedsSync) {
+          firebaseDbRef.child('chat').set(sanitizeForFirebase(mergedChat)).catch(err => {
+            console.warn('Chat-Abgleich Fehler:', err);
+            updateSyncIndicator(false);
+          });
+        }
       }, (error) => {
         console.warn('Firebase Listener Error:', error);
         updateSyncIndicator(false);
@@ -1567,7 +1597,7 @@
                 duration: duration,
                 timestamp: Date.now()
               });
-              persistState();
+              persistChat();
               renderChat();
               scrollChatToBottom();
             };
@@ -1622,7 +1652,7 @@
 
       input.value = '';
       clearChatAttachment();
-      persistState();
+      persistChat();
       renderChat();
       scrollChatToBottom();
     }
