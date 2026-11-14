@@ -518,6 +518,18 @@
             <input id="mgmt-title" type="text" placeholder="Bezeichnung..." class="px-3.5 py-2.5 text-sm" />
             <input id="mgmt-desc" type="text" placeholder="Details / Beschreibung..." class="px-3.5 py-2.5 text-sm" />
             <button onclick="addMgmtItem()" class="px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">Anlegen</button>
+            <div id="mgmt-image-controls" class="hidden sm:col-span-3 col-span-1 space-y-2">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="document.getElementById('mgmt-image-file').click()" class="px-3 py-2 rounded-lg bg-white/5 text-xs text-slate-200">📁 Datei auswählen</button>
+                <button type="button" onclick="document.getElementById('mgmt-image-camera').click()" class="px-3 py-2 rounded-lg bg-white/5 text-xs text-slate-200">📷 Kamera</button>
+                <button type="button" onclick="clearMgmtDraftImage()" class="px-3 py-2 rounded-lg bg-rose-500/10 text-xs text-rose-300">✕ Bild entfernen</button>
+              </div>
+              <input id="mgmt-image-file" type="file" accept="image/*" class="hidden" onchange="handleMgmtImageSelect(event)" />
+              <input id="mgmt-image-camera" type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMgmtImageSelect(event)" />
+              <div id="mgmt-image-preview" class="hidden">
+                <img id="mgmt-image-preview-img" alt="Bildvorschau" class="rounded-xl max-h-48 w-auto border border-slate-700" />
+              </div>
+            </div>
           </div>
 
           <div id="mgmt-items-list" class="space-y-2.5"></div>
@@ -879,6 +891,7 @@
     let calViewMonth = new Date().getMonth();
     let calSelectedDate = null;
     let pendingChatImage = null;
+    let mgmtDraftImage = null;
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecordingAudio = false;
@@ -1445,6 +1458,12 @@
       }
     }
 
+    function formatAudioDuration(seconds) {
+      if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) return '';
+      const total = Math.floor(seconds);
+      return Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0');
+    }
+
     function renderChat() {
       const mName = getDisplayName('Master');
       const dName = getDisplayName('Daisy');
@@ -1463,6 +1482,7 @@
         const isMine = msg.sender === currentRole;
         const senderDisplay = getDisplayName(msg.sender);
         const timeStr = new Date(msg.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        const durationLabel = formatAudioDuration(msg.duration);
 
         return `
           <div class="flex flex-col ${isMine ? 'items-end' : 'items-start'}">
@@ -1473,12 +1493,21 @@
                 : 'bg-[#1e2230] text-slate-100 border border-slate-800 rounded-bl-sm'
             }">
               ${msg.image ? `<img src="${msg.image}" alt="Anhang" class="rounded-xl max-h-56 w-auto mb-2 border border-black/20" />` : ''}
-              ${msg.audio ? `<audio controls src="${msg.audio}" class="max-w-full h-9 mb-1"></audio>` : ''}
+              ${msg.audio ? `<audio controls preload="metadata" src="${msg.audio}" class="max-w-full h-9 mb-1"></audio><span class="block text-[10px] opacity-70" data-audio-duration>${durationLabel}</span>` : ''}
               ${msg.text ? `<p class="whitespace-pre-wrap break-words leading-relaxed">${escapeHtml(msg.text)}</p>` : ''}
             </div>
           </div>
         `;
       }).join('');
+
+      container.querySelectorAll('audio').forEach(audio => {
+        audio.addEventListener('loadedmetadata', () => {
+          const label = audio.parentElement.querySelector('[data-audio-duration]');
+          if (label && !label.textContent && Number.isFinite(audio.duration)) {
+            label.textContent = formatAudioDuration(audio.duration);
+          }
+        }, { once: true });
+      });
     }
 
     function scrollChatToBottom() {
@@ -1970,6 +1999,45 @@
       refreshAllUI();
     }
 
+    function handleMgmtImageSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!file.type || !file.type.startsWith('image/')) {
+        showToast('Bitte eine Bilddatei auswählen.', 'error');
+        event.target.value = '';
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        showToast('Das Bild ist zu groß. Bitte maximal 8 MB verwenden.', 'error');
+        event.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        if (typeof e.target.result !== 'string') {
+          showToast('Das Bild konnte nicht gelesen werden.', 'error');
+          return;
+        }
+        mgmtDraftImage = e.target.result;
+        document.getElementById('mgmt-image-preview-img').src = mgmtDraftImage;
+        document.getElementById('mgmt-image-preview').classList.remove('hidden');
+      };
+      reader.onerror = () => showToast('Das Bild konnte nicht gelesen werden.', 'error');
+      reader.readAsDataURL(file);
+    }
+
+    function clearMgmtDraftImage() {
+      mgmtDraftImage = null;
+      const preview = document.getElementById('mgmt-image-preview');
+      const image = document.getElementById('mgmt-image-preview-img');
+      const fileInput = document.getElementById('mgmt-image-file');
+      const cameraInput = document.getElementById('mgmt-image-camera');
+      if (image) image.src = '';
+      if (preview) preview.classList.add('hidden');
+      if (fileInput) fileInput.value = '';
+      if (cameraInput) cameraInput.value = '';
+    }
+
     function renderVerwaltung() {
       const visibleCats = MGMT_CATEGORIES.filter(cat => hasPermission(cat.id, 'visible'));
       const subTabsEl = document.getElementById('verwaltung-subtabs');
@@ -1977,6 +2045,7 @@
       if (visibleCats.length === 0) {
         subTabsEl.innerHTML = '';
         document.getElementById('mgmt-add-box').classList.add('hidden');
+        document.getElementById('mgmt-image-controls').classList.add('hidden');
         document.getElementById('mgmt-items-list').innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Keine Verwaltungsbereiche freigeschaltet.</p>`;
         return;
       }
@@ -2000,6 +2069,7 @@
       const canEdit = hasPermission(activeMgmtCategory, 'edit');
       const canDelete = hasPermission(activeMgmtCategory, 'delete');
       document.getElementById('mgmt-add-box').classList.toggle('hidden', !canAdd);
+      document.getElementById('mgmt-image-controls').classList.toggle('hidden', !canAdd || !['kleidung', 'toys'].includes(activeMgmtCategory));
 
       const items = appState.mgmt[activeMgmtCategory] || [];
       const listEl = document.getElementById('mgmt-items-list');
@@ -2021,6 +2091,7 @@
               <span class="font-semibold text-sm ${item.done ? 'line-through text-slate-500' : 'text-white'} truncate">${escapeHtml(item.title)}</span>
             </div>
             ${item.desc ? `<p class="text-xs text-slate-400 mt-1 break-words">${escapeHtml(item.desc)}</p>` : ''}
+            ${item.imgUrl ? `<img src="${escapeHtml(item.imgUrl)}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 w-auto mt-2 border border-slate-700" />` : ''}
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             ${canDelete ? `<button onclick="deleteMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
@@ -2030,6 +2101,7 @@
     }
 
     function selectMgmtCategory(catId) {
+      if (activeMgmtCategory !== catId) clearMgmtDraftImage();
       activeMgmtCategory = catId;
       renderVerwaltung();
     }
@@ -2042,6 +2114,7 @@
 
       const catObj = MGMT_CATEGORIES.find(c => c.id === activeMgmtCategory);
       const newItem = { id: 'mgmt-' + Date.now(), title, desc, done: false };
+      if (['kleidung', 'toys'].includes(activeMgmtCategory) && mgmtDraftImage) newItem.imgUrl = mgmtDraftImage;
       if (!Array.isArray(appState.mgmt[activeMgmtCategory])) {
         appState.mgmt[activeMgmtCategory] = [];
       }
@@ -2051,6 +2124,7 @@
 
       document.getElementById('mgmt-title').value = '';
       document.getElementById('mgmt-desc').value = '';
+      clearMgmtDraftImage();
       persistState();
       refreshAllUI();
       showToast('Eintrag angelegt.');
