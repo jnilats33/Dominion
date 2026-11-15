@@ -885,6 +885,7 @@
     let audioChunks = [];
     let isRecordingAudio = false;
     let firebaseDbRef = null;
+    let firebaseRoomPathPending = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
     let productionAuthUser = null;
@@ -980,13 +981,14 @@
           const currentApp = firebase.app();
           if (currentApp.options.databaseURL !== fbUrl) {
             currentApp.delete().then(() => {
-              firebase.initializeApp({ databaseURL: fbUrl });
-              attachFirebaseListener(safeRoomPath);
+              firebase.initializeApp({ ...FIREBASE_WEB_CONFIG, databaseURL: fbUrl });
+              firebaseRoomPathPending = safeRoomPath;
+              initProductionAuth();
             });
             return;
           }
         }
-        attachFirebaseListener(safeRoomPath);
+        firebaseRoomPathPending = safeRoomPath;
         initProductionAuth();
         initFCM(fbUrl);
       } catch (err) {
@@ -1012,6 +1014,7 @@
           }
         }
         renderProductionAuthPanel();
+        updateAuthenticatedFirebaseSync();
       });
     }
 
@@ -1139,6 +1142,19 @@
         console.error('Push error:', err);
         showToast('Push konnte nicht aktiviert werden.', 'error');
       }
+    }
+
+    // Database listeners start only after Firebase has restored a verified session.
+    // This avoids permission errors when the database rules become restrictive.
+    function updateAuthenticatedFirebaseSync() {
+      const verified = !!productionAuthUser && ['Master', 'Daisy'].includes(productionAuthRole);
+      if (!verified) {
+        if (firebaseDbRef) firebaseDbRef.off();
+        firebaseDbRef = null;
+        updateSyncIndicator(false);
+        return;
+      }
+      if (firebaseRoomPathPending) attachFirebaseListener(firebaseRoomPathPending);
     }
 
     function attachFirebaseListener(safeRoomPath) {
