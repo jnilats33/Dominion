@@ -780,6 +780,7 @@
   <!-- Firebase Compat SDKs (App, Database, Messaging) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
   <script>
@@ -793,6 +794,7 @@
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
     const DEFAULT_ROOM_CODE = 'D+W Connection';
+    const FIREBASE_WEB_CONFIG = {"apiKey":"AIzaSyC3YyPJsXsX-u2EHKHcByPVj1Ru2Fn3YPo","authDomain":"dominionapp-45bfa.firebaseapp.com","databaseURL":"https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app","projectId":"dominionapp-45bfa","storageBucket":"dominionapp-45bfa.firebasestorage.app","messagingSenderId":"1047436704498","appId":"1:1047436704498:web:4b7f9b229b5ad7cc0fee6b"};
     const FCM_VAPID_KEY = 'BIjo1CgqJnE-B12MQNhsc-PBNigNW1JhuPz241wPvVnveqnlrPOxBblc0bVt5ZNBGuzODM1fj83ibkb_hgnGVaU';
     const MGMT_CATEGORIES = [
       { id: 'kleidung', label: '👗 Kleidung', singular: 'Kleidung' },
@@ -885,6 +887,8 @@
     let firebaseDbRef = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
+    let productionAuthUser = null;
+    let productionAuthRole = null;
     let swRegistration = null;
 
     function loadState() {
@@ -971,7 +975,7 @@
 
       try {
         if (!firebase.apps.length) {
-          firebase.initializeApp({ databaseURL: fbUrl });
+          firebase.initializeApp({ ...FIREBASE_WEB_CONFIG, databaseURL: fbUrl });
         } else {
           const currentApp = firebase.app();
           if (currentApp.options.databaseURL !== fbUrl) {
@@ -983,10 +987,93 @@
           }
         }
         attachFirebaseListener(safeRoomPath);
+        initProductionAuth();
         initFCM(fbUrl);
       } catch (err) {
         console.warn('Firebase Init Fallback:', err);
         updateSyncIndicator(false);
+      }
+    }
+
+    // Authentication is additive: existing PIN and role selection remain unchanged.
+    function initProductionAuth() {
+      firebase.auth().onAuthStateChanged(async user => {
+        productionAuthUser = null;
+        productionAuthRole = null;
+        if (user) {
+          try {
+            const claims = (await user.getIdTokenResult()).claims;
+            if (['Master', 'Daisy'].includes(claims.dominionTestRole)) {
+              productionAuthUser = user;
+              productionAuthRole = claims.dominionTestRole;
+            }
+          } catch (error) {
+            console.warn('Firebase Auth role check failed:', error);
+          }
+        }
+        renderProductionAuthPanel();
+      });
+    }
+
+    function renderProductionAuthPanel() {
+      const panel = document.getElementById('production-firebase-auth-panel');
+      if (!panel || !currentRole) return;
+      const verified = productionAuthUser && productionAuthRole === currentRole;
+      const other = productionAuthUser && !verified;
+      panel.innerHTML = `
+        <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
+          <h3 class="font-semibold text-sm">🔐 Firebase-Anmeldung</h3>
+          <p class="text-xs text-slate-400">Zusätzliche Anmeldung für die künftige sichere Synchronisierung. Die bisherige Dominion-Anmeldung bleibt bestehen.</p>
+          <p class="text-xs ${verified ? 'text-emerald-300' : 'text-amber-300'}">${verified ? '✓ Firebase-Konto für ' + currentRole + ' bestätigt' : other ? 'Ein Firebase-Konto für ' + productionAuthRole + ' ist angemeldet. Bitte abmelden.' : 'Firebase-Anmeldung für ' + currentRole + ' ausstehend.'}</p>
+          ${productionAuthUser ? '<button type="button" onclick="signOutProductionFirebase()" class="px-3 py-2 text-xs rounded-lg bg-white/10">Firebase-Konto abmelden</button>' : `
+          <form onsubmit="signInProductionFirebase(event)" class="space-y-2">
+            <input id="production-auth-email" type="email" autocomplete="username" required placeholder="Firebase-E-Mail-Adresse" class="w-full rounded-lg bg-slate-800 border border-slate-600 px-3 py-2 text-sm text-white">
+            <input id="production-auth-password" type="password" autocomplete="current-password" required placeholder="Firebase-Passwort" class="w-full rounded-lg bg-slate-800 border border-slate-600 px-3 py-2 text-sm text-white">
+            <button type="submit" class="px-3 py-2 text-xs rounded-lg bg-amber-600 text-white">Bei Firebase anmelden</button>
+          </form>`}
+          <p class="text-[11px] text-slate-500">Die Datenbankregeln sind noch nicht umgestellt.</p>
+        </div>`;
+    }
+
+    async function signInProductionFirebase(event) {
+      event.preventDefault();
+      const role = currentRole;
+      const email = document.getElementById('production-auth-email')?.value.trim();
+      const password = document.getElementById('production-auth-password')?.value;
+      if (!role || !email || !password) return;
+      try {
+        const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const claims = (await result.user.getIdTokenResult(true)).claims;
+        if (claims.dominionTestRole !== role) {
+          await firebase.auth().signOut();
+          productionAuthUser = null;
+          productionAuthRole = null;
+          renderProductionAuthPanel();
+          showToast('Firebase-Konto gehört nicht zur gewählten Rolle.', 'error');
+          return;
+        }
+        productionAuthUser = result.user;
+        productionAuthRole = role;
+        renderProductionAuthPanel();
+        showToast('Firebase-Anmeldung erfolgreich!', 'success');
+      } catch (error) {
+        console.warn('Firebase Auth error:', error.code || error.message);
+        showToast('Firebase-Anmeldung fehlgeschlagen. Zugangsdaten prüfen.', 'error');
+      } finally {
+        const field = document.getElementById('production-auth-password');
+        if (field) field.value = '';
+      }
+    }
+
+    async function signOutProductionFirebase() {
+      try {
+        await firebase.auth().signOut();
+        productionAuthUser = null;
+        productionAuthRole = null;
+        renderProductionAuthPanel();
+        showToast('Firebase-Konto abgemeldet.');
+      } catch (error) {
+        showToast('Firebase-Abmeldung fehlgeschlagen.', 'error');
       }
     }
 
@@ -1279,6 +1366,7 @@
 
       refreshAllUI();
       switchTab(startTab);
+      renderProductionAuthPanel();
     }
 
     function logoutRole() {
@@ -2071,6 +2159,14 @@
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
+      const authParent = document.getElementById(isMaster ? 'settings-panel-sicherheit' : 'settings-panel-basics');
+      let authPanel = document.getElementById('production-firebase-auth-panel');
+      if (!authPanel) {
+        authPanel = document.createElement('div');
+        authPanel.id = 'production-firebase-auth-panel';
+      }
+      if (authParent && authPanel.parentElement !== authParent) authParent.appendChild(authPanel);
+      renderProductionAuthPanel();
 
       const masterNameInput = document.getElementById('basic-master-name');
       const daisyNameInput = document.getElementById('basic-daisy-name');
