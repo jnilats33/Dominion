@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.4</title>
+  <title>Dominion App v2.5</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,6 +178,14 @@
         </button>
       </div>
 
+      <div id="daisy-pin-box" class="hidden mt-2 space-y-4 animate-fade">
+        <div class="text-sm text-slate-300">Bitte PIN eingeben</div>
+        <input id="daisy-pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••" onkeydown="if(event.key==='Enter') verifyDaisyPin()" class="w-full px-4 py-3.5 text-center text-2xl tracking-[0.4em] font-bold" />
+        <div class="flex gap-3">
+          <button onclick="cancelPinPrompt()" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm">Zurück</button>
+          <button onclick="verifyDaisyPin()" class="flex-1 py-3 rounded-xl gold-gradient font-semibold text-sm">Entsperren</button>
+        </div>
+      </div>
       <!-- Master PIN Prompt -->
       <div id="master-pin-box" class="hidden mt-2 space-y-4 animate-fade">
         <div class="text-sm text-slate-300">Bitte Master-PIN eingeben</div>
@@ -254,13 +262,13 @@
         <div id="dashboard-section-news" class="glass-card rounded-2xl p-5 border border-[#c9973e]/30 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
-              <span>🚀</span> Update-News: Dominion <span id="current-app-version-news">v2.4</span>
+              <span>🚀</span> Update-News: Dominion <span id="current-app-version-news">v2.5</span>
             </h3>
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Aktuelle Version</span>
           </div>
           <p class="text-[11px] text-slate-400">Veröffentlicht am 17.11.2026</p>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Das Dashboard wird persönlicher: sieben Statistik-Kacheln inklusive Toys, Kleidung und Regeln; einklappbare und festpinnbare Bereiche; einheitliche Kartenoptik sowie <strong>Einstellungen → Ansicht → Dashboard</strong> zum individuellen Ein- und Ausblenden für Master und Daisy. Außerdem erhältst du hier einen ausklappbaren Versionsverlauf.
+            Neu in v2.5: Daisy sieht in der Übersicht nur Statistik-Kacheln für freigegebene Bereiche. Außerdem kann Daisy eine eigene Anmelde-PIN unter Einstellungen → Sicherheit einrichten und ändern. Ein zuvor angemeldeter Master kann ohne Daisy-PIN zu Daisy wechseln; der Rückweg zu Master bleibt PIN-geschützt.
           </p>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
@@ -268,6 +276,10 @@
               <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
             </summary>
             <div class="mt-3 space-y-3 text-xs text-slate-300">
+              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
+                <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.4 · 17.11.2026</strong><span class="text-slate-500">Vorherige Version</span></div>
+                <p>Sieben Statistik-Kacheln, einklappbare und festpinnbare Dashboard-Bereiche, einheitliche Kartenoptik, persönliche Sichtbarkeitseinstellungen sowie ausklappbarer Versionsverlauf.</p>
+              </div>
               <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
                 <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">15.11.2026 · Produktivänderungen</strong><span class="text-slate-500">GitHub-Änderungsdatum</span></div>
                 <p>Wiederherstellung des Bilder-Uploads und der Bildbearbeitung für Toys und Kleidung; dauerhafte, kategoriespezifische Artikelnummern. Außerdem Anpassungen an Firebase-Authentifizierung und Datenbankanbindung.</p>
@@ -292,7 +304,7 @@
             <button type="button" id="dashboard-metrics-pin" onclick="toggleDashboardMetricsPin()" aria-pressed="false" title="Übersicht geöffnet halten" aria-label="Übersicht geöffnet halten" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">📌</button>
           </div>
           <div id="dashboard-metrics-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div onclick="switchTab('kalender')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+          <div onclick="switchTab('kalender')" data-dashboard-permission="kalender" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Termine</span>
               <span>📅</span>
@@ -301,7 +313,7 @@
             <div class="text-[11px] text-[#c9973e] mt-1">Anstehend</div>
           </div>
 
-          <div onclick="switchTab('einkauf')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+          <div onclick="switchTab('einkauf')" data-dashboard-permission="einkauf" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Einkauf</span>
               <span>🛒</span>
@@ -310,7 +322,7 @@
             <div class="text-[11px] text-emerald-400 mt-1">Offene Artikel</div>
           </div>
 
-          <div onclick="switchTab('strafbuch')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-rose-500/50 transition">
+          <div onclick="switchTab('strafbuch')" data-dashboard-permission="strafbuch" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-rose-500/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Strafbuch</span>
               <span>⚖️</span>
@@ -319,7 +331,7 @@
             <div class="text-[11px] text-rose-400 mt-1">Offene Einträge</div>
           </div>
 
-          <div onclick="jumpToTarget('verwaltung', 'aufgaben')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+          <div onclick="jumpToTarget('verwaltung', 'aufgaben')" data-dashboard-permission="aufgaben" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Aufgaben</span>
               <span>✅</span>
@@ -328,7 +340,7 @@
             <div class="text-[11px] text-amber-300 mt-1">Aktiv</div>
           </div>
 
-          <div onclick="jumpToTarget('verwaltung', 'toys')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+          <div onclick="jumpToTarget('verwaltung', 'toys')" data-dashboard-permission="toys" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Toys</span>
               <span>🔮</span>
@@ -337,7 +349,7 @@
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
 
-          <div onclick="jumpToTarget('verwaltung', 'kleidung')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+          <div onclick="jumpToTarget('verwaltung', 'kleidung')" data-dashboard-permission="kleidung" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Kleidung</span>
               <span>👗</span>
@@ -346,7 +358,7 @@
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
 
-          <div onclick="jumpToTarget('verwaltung', 'regeln')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+          <div onclick="jumpToTarget('verwaltung', 'regeln')" data-dashboard-permission="regeln" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Regeln</span>
               <span>📜</span>
@@ -627,6 +639,17 @@
             </div>
           </div>
 
+          <div id="settings-panel-daisy-security" class="hidden space-y-5">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-4">
+              <h3 class="font-semibold text-sm text-white">🔐 <span id="daisy-security-pin-label">PIN</span></h3>
+              <p class="text-xs text-slate-400">Nach der Einrichtung schützt die PIN die Anmeldung für diese Rolle.</p>
+              <p id="daisy-pin-status" class="text-xs text-amber-300"></p>
+              <label class="block text-xs text-slate-400">Bisherige PIN (nur bei Änderung)<input id="daisy-old-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" class="w-full px-3.5 py-2.5 mt-1" /></label>
+              <label class="block text-xs text-slate-400">Neue PIN (4–8 Ziffern)<input id="daisy-new-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password" class="w-full px-3.5 py-2.5 mt-1" /></label>
+              <label class="block text-xs text-slate-400">Neue PIN bestätigen<input id="daisy-confirm-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password" class="w-full px-3.5 py-2.5 mt-1" /></label>
+              <button onclick="changeDaisyPin()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs">PIN speichern</button>
+            </div>
+          </div>
           <!-- SUB-TAB A: BASICS (Visible to BOTH Master & Daisy) -->
           <div id="settings-panel-basics" class="space-y-5">
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-4">
@@ -881,7 +904,7 @@
      */
     // Release identifier: change this once for each new deployed app version.
     // Do not confuse it with the persisted data/schema version in appState.
-    const APP_VERSION = '2.4';
+    const APP_VERSION = '2.5';
     document.title = 'Dominion App v' + APP_VERSION;
     const currentVersionNews = document.getElementById('current-app-version-news');
     if (currentVersionNews) currentVersionNews.textContent = 'v' + APP_VERSION;
@@ -959,6 +982,7 @@
       return {
         version: '2.3',
         pin: '1234',
+        daisyPin: null,
         firebase: {
           url: DEFAULT_FB_URL,
           room: DEFAULT_ROOM_CODE
@@ -998,6 +1022,7 @@
 
     let appState = createDefaultState();
     let currentRole = null;
+    let masterToDaisyBypass = false;
     let activeTab = 'dashboard';
     let activeMgmtCategory = 'kleidung';
     let mgmtDraftImage = null;
@@ -1052,6 +1077,7 @@
         ...incoming,
         version: '2.3',
         pin: incoming.pin || def.pin,
+        daisyPin: typeof incoming.daisyPin === 'string' && /^\d{4,8}$/.test(incoming.daisyPin) ? incoming.daisyPin : null,
         firebase: {
           url: (incoming.firebase && incoming.firebase.url) ? incoming.firebase.url : DEFAULT_FB_URL,
           room: (incoming.firebase && incoming.firebase.room) ? incoming.firebase.room : DEFAULT_ROOM_CODE
@@ -1479,12 +1505,30 @@
         pinInput.value = '';
         setTimeout(() => pinInput.focus(), 80);
       } else {
-        enterApp('Daisy');
+        if (masterToDaisyBypass || !appState.daisyPin) {
+          enterApp('Daisy');
+        } else {
+          document.getElementById('role-select-buttons').classList.add('hidden');
+          document.getElementById('daisy-pin-box').classList.remove('hidden');
+          const pinInput = document.getElementById('daisy-pin-input');
+          pinInput.value = '';
+          setTimeout(() => pinInput.focus(), 80);
+        }
+      }
+    }
+
+    function verifyDaisyPin() {
+      const entered = document.getElementById('daisy-pin-input').value.trim();
+      if (appState.daisyPin && entered === appState.daisyPin) enterApp('Daisy');
+      else {
+        showToast('Falscher PIN für ' + getDisplayName('Daisy') + '!', 'error');
+        document.getElementById('daisy-pin-input').value = '';
       }
     }
 
     function cancelPinPrompt() {
       document.getElementById('master-pin-box').classList.add('hidden');
+      document.getElementById('daisy-pin-box').classList.add('hidden');
       document.getElementById('role-select-buttons').classList.remove('hidden');
     }
 
@@ -1500,6 +1544,7 @@
 
     function enterApp(role) {
       currentRole = role;
+      masterToDaisyBypass = false;
       document.getElementById('role-screen').classList.add('hidden');
       document.getElementById('main-app').classList.remove('hidden');
       document.getElementById('bottom-nav').classList.remove('hidden');
@@ -1514,6 +1559,7 @@
     }
 
     function logoutRole() {
+      masterToDaisyBypass = currentRole === 'Master';
       currentRole = null;
       document.getElementById('main-app').classList.add('hidden');
       document.getElementById('bottom-nav').classList.add('hidden');
@@ -1773,7 +1819,15 @@
       `).join('');
     }
 
+    function updateDashboardMetricPermissions() {
+      document.querySelectorAll('#dashboard-metrics-grid [data-dashboard-permission]').forEach(tile => {
+        const category = tile.getAttribute('data-dashboard-permission');
+        tile.classList.toggle('hidden', currentRole !== 'Master' && !hasPermission(category, 'visible'));
+      });
+    }
+
     function renderDashboard() {
+      updateDashboardMetricPermissions();
       updateDashboardVisibilityUI();
       updateDashboardMetricsUI();
       updateDashboardSectionsUI();
@@ -2589,17 +2643,21 @@
           </button>
         `;
       } else {
-        if (!['basics', 'ansicht'].includes(activeSettingsSubTab)) activeSettingsSubTab = 'basics';
+        if (!['basics', 'ansicht', 'daisy-security'].includes(activeSettingsSubTab)) activeSettingsSubTab = 'basics';
         subTabsEl.innerHTML = `
           <button onclick="selectSettingsSubTab('basics')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'basics' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🎛️ Basics
           </button>
+          <button onclick="selectSettingsSubTab('daisy-security')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'daisy-security' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">🔐 Sicherheit</button>
           <button onclick="selectSettingsSubTab('ansicht')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'ansicht' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             👁️ Ansicht
           </button>
         `;
       }
 
+      document.getElementById('settings-panel-daisy-security').classList.toggle('hidden', isMaster || activeSettingsSubTab !== 'daisy-security');
+      document.getElementById('daisy-pin-status').textContent = appState.daisyPin ? 'PIN eingerichtet' : 'Noch keine PIN eingerichtet';
+      document.getElementById('daisy-security-pin-label').textContent = getDisplayName('Daisy') + '-PIN';
       document.getElementById('settings-panel-ansicht').classList.toggle('hidden', activeSettingsSubTab !== 'ansicht');
       renderDashboardVisibilitySettings();
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
@@ -2660,7 +2718,7 @@
     }
 
     function selectSettingsSubTab(subTab) {
-      if (currentRole !== 'Master' && !['basics', 'ansicht'].includes(subTab)) return;
+      if (currentRole !== 'Master' && !['basics', 'ansicht', 'daisy-security'].includes(subTab)) return;
       activeSettingsSubTab = subTab;
       renderEinstellungen();
     }
@@ -2760,6 +2818,21 @@
       saveStateLocalOnly();
       initFirebaseSync();
       showToast('Firebase-Verbindung aktualisiert.');
+    }
+
+    function changeDaisyPin() {
+      if (currentRole !== 'Daisy') return;
+      const oldPin = document.getElementById('daisy-old-pin').value.trim();
+      const newPin = document.getElementById('daisy-new-pin').value.trim();
+      const confirmation = document.getElementById('daisy-confirm-pin').value.trim();
+      if (appState.daisyPin && oldPin !== appState.daisyPin) return showToast('Bisherige PIN für ' + getDisplayName('Daisy') + ' falsch.', 'error');
+      if (!/^\d{4,8}$/.test(newPin)) return showToast('PIN: 4 bis 8 Ziffern erforderlich.', 'error');
+      if (newPin !== confirmation) return showToast('Die neuen PINs stimmen nicht überein.', 'error');
+      appState.daisyPin = newPin;
+      ['daisy-old-pin', 'daisy-new-pin', 'daisy-confirm-pin'].forEach(id => document.getElementById(id).value = '');
+      persistState();
+      renderEinstellungen();
+      showToast('PIN für ' + getDisplayName('Daisy') + ' gespeichert.');
     }
 
     function changeMasterPin() {
