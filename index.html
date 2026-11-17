@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.3</title>
+  <title>Dominion App v2.4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -152,7 +152,7 @@
         <span class="text-3xl">👑</span>
       </div>
       <h1 id="login-app-title" class="font-display text-2xl sm:text-3xl font-bold tracking-wider text-[#e5b55c]">DOMINION</h1>
-      <p id="login-app-subtitle" class="text-xs uppercase tracking-[0.22em] text-slate-400 mt-1 mb-7">Exklusive Verbindung • v2.3</p>
+      <p id="login-app-subtitle" class="text-xs uppercase tracking-[0.22em] text-slate-400 mt-1 mb-7">Exklusive Verbindung • v2.4</p>
 
       <div id="role-select-buttons" class="space-y-3.5">
         <button onclick="selectRole('Master')" class="w-full p-4 rounded-2xl glass-card hover:border-[#c9973e] transition flex items-center justify-between group">
@@ -254,7 +254,7 @@
         <div id="dashboard-section-news" class="glass-card rounded-2xl p-5 border border-[#c9973e]/30 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
-              <span>🚀</span> Update-News: Dominion v2.4
+              <span>🚀</span> Update-News: Dominion <span id="current-app-version-news">v2.4</span>
             </h3>
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Aktuelle Version</span>
           </div>
@@ -879,6 +879,12 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
+    // Release identifier: change this once for each new deployed app version.
+    // Do not confuse it with the persisted data/schema version in appState.
+    const APP_VERSION = '2.4';
+    document.title = 'Dominion App v' + APP_VERSION;
+    const currentVersionNews = document.getElementById('current-app-version-news');
+    if (currentVersionNews) currentVersionNews.textContent = 'v' + APP_VERSION;
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
@@ -1571,7 +1577,7 @@
 
     function updateLoginLabels() {
       document.getElementById('login-app-title').textContent = appState.basics.appTitle || 'DOMINION';
-      document.getElementById('login-app-subtitle').textContent = (appState.basics.appSubtitle || 'D+W Connection') + ' • v2.3';
+      document.getElementById('login-app-subtitle').textContent = (appState.basics.appSubtitle || 'D+W Connection') + ' • v' + APP_VERSION;
       document.getElementById('login-master-label').textContent = getDisplayName('Master');
       document.getElementById('login-daisy-label').textContent = getDisplayName('Daisy');
     }
