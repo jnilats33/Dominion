@@ -234,7 +234,7 @@
       <!-- ==================== 1. DASHBOARD ==================== -->
       <section id="tab-dashboard" class="space-y-5 animate-fade">
         <!-- Welcome Banner -->
-        <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/25 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div id="dashboard-section-welcome" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <p class="text-xs uppercase tracking-widest text-[#c9973e] font-semibold">Willkommen zurück</p>
             <h2 id="dash-greeting" class="text-xl sm:text-2xl font-bold text-white mt-0.5">Hallo, Master</h2>
@@ -250,21 +250,48 @@
           </div>
         </div>
 
-        <!-- UPDATE / CHANGELOG BOX (v2.3) -->
-        <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/30 space-y-2">
-          <div class="flex items-center justify-between">
+        <!-- UPDATE / CHANGELOG BOX -->
+        <div id="dashboard-section-news" class="glass-card rounded-2xl p-5 border border-[#c9973e]/30 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
-              <span>🚀</span> Update-News: Dominion v2.3
+              <span>🚀</span> Update-News: Dominion v2.4
             </h3>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Neu</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Aktuelle Version</span>
           </div>
+          <p class="text-[11px] text-slate-400">Veröffentlicht am 17.11.2026</p>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Willkommen in Version 2.3! Neu integriert sind <strong>Firebase Cloud Messaging (FCM) Web-Push-Benachrichtigungen</strong>, der <strong>visuelle Monatskalender</strong> mit Overlay-Ansicht (Master / Daisy / Übereinander) sowie die automatische <strong>Rechtefilterung im Aktivitäts-Stream</strong> für Daisy.
+            Das Dashboard wird persönlicher: sieben Statistik-Kacheln inklusive Toys, Kleidung und Regeln; einklappbare und festpinnbare Bereiche; einheitliche Kartenoptik sowie <strong>Einstellungen → Ansicht → Dashboard</strong> zum individuellen Ein- und Ausblenden für Master und Daisy. Außerdem erhältst du hier einen ausklappbaren Versionsverlauf.
           </p>
+          <details class="group border-t border-slate-800 pt-3">
+            <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
+              <span>📚 Frühere Updates und Änderungen anzeigen</span>
+              <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
+            </summary>
+            <div class="mt-3 space-y-3 text-xs text-slate-300">
+              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
+                <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">15.11.2026 · Produktivänderungen</strong><span class="text-slate-500">GitHub-Änderungsdatum</span></div>
+                <p>Wiederherstellung des Bilder-Uploads und der Bildbearbeitung für Toys und Kleidung; dauerhafte, kategoriespezifische Artikelnummern. Außerdem Anpassungen an Firebase-Authentifizierung und Datenbankanbindung.</p>
+                <p class="text-slate-500">Keiner gesonderten Versionsnummer zugeordnet.</p>
+              </div>
+              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
+                <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.3</strong><span class="text-slate-500">Veröffentlichungsdatum nicht dokumentiert</span></div>
+                <p>Die bisherige Update-Meldung nennt einen visuellen Monatskalender mit Master-/Daisy-Overlay, die Rechtefilterung des Aktivitäts-Streams für Daisy und die Integration von Firebase Cloud Messaging (FCM). Die zuverlässige Push-Zustellung ist noch nicht bestätigt.</p>
+              </div>
+              <p class="text-[11px] text-slate-500">Hinweis: GitHub dokumentiert Codeänderungen, nicht zwingend den Zeitpunkt ihrer tatsächlichen Freischaltung. Ältere Versionen ergänzen wir nur mit überprüfbaren Angaben.</p>
+            </div>
+          </details>
         </div>
 
         <!-- Quick Overview Metrics -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <section id="dashboard-section-metrics" class="glass-card rounded-2xl p-5" aria-label="Dashboard-Übersicht">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <button type="button" id="dashboard-metrics-toggle" onclick="toggleDashboardMetrics()" aria-expanded="true" aria-controls="dashboard-metrics-grid" class="flex items-center gap-2 text-sm font-semibold text-[#e5b55c] hover:text-white transition">
+              <span id="dashboard-metrics-arrow" aria-hidden="true">▾</span>
+              <span>Übersicht</span>
+            </button>
+            <button type="button" id="dashboard-metrics-pin" onclick="toggleDashboardMetricsPin()" aria-pressed="false" title="Übersicht geöffnet halten" aria-label="Übersicht geöffnet halten" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">📌</button>
+          </div>
+          <div id="dashboard-metrics-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div onclick="switchTab('kalender')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Termine</span>
@@ -300,35 +327,74 @@
             <div id="stat-aufgaben" class="text-2xl font-bold text-white">0</div>
             <div class="text-[11px] text-amber-300 mt-1">Aktiv</div>
           </div>
-        </div>
 
-        <!-- LIVE ACTIVITY STREAM / FEED -->
-        <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#c9973e] animate-ping"></span>
-              <div>
-                <h3 class="font-display text-base font-bold text-[#e5b55c]">Aktivitäts-Stream</h3>
-                <p class="text-xs text-slate-400">Live-Verlauf aller Änderungen & Aktionen</p>
-              </div>
+          <div onclick="jumpToTarget('verwaltung', 'toys')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+              <span>Toys</span>
+              <span>🔮</span>
             </div>
-            <span id="feed-count-badge" class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 border border-slate-800 text-slate-300">0 Einträge</span>
+            <div id="stat-toys" class="text-2xl font-bold text-white">0</div>
+            <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
 
-          <div id="activity-feed-list" class="space-y-2.5 max-h-[380px] overflow-y-auto custom-scroll pr-1">
-            <!-- Rendered dynamically -->
+          <div onclick="jumpToTarget('verwaltung', 'kleidung')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+              <span>Kleidung</span>
+              <span>👗</span>
+            </div>
+            <div id="stat-kleidung" class="text-2xl font-bold text-white">0</div>
+            <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
+          </div>
+
+          <div onclick="jumpToTarget('verwaltung', 'regeln')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+              <span>Regeln</span>
+              <span>📜</span>
+            </div>
+            <div id="stat-regeln" class="text-2xl font-bold text-white">0</div>
+            <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
+          </div>
+          </div>
+        </section>
+
+        <!-- LIVE ACTIVITY STREAM / FEED -->
+        <div id="dashboard-section-feed" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
+          <div class="flex items-center justify-between mb-4 gap-2">
+            <button type="button" id="dashboard-feed-toggle" onclick="toggleDashboardSection('feed')" aria-expanded="true" aria-controls="dashboard-feed-content" class="flex items-center gap-2.5 text-left hover:opacity-80 transition">
+              <span id="dashboard-feed-arrow" class="text-slate-300" aria-hidden="true">▾</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#c9973e] animate-ping"></span>
+              <span>
+                <span class="block font-display text-base font-bold text-[#e5b55c]">Aktivitäts-Stream</span>
+                <span class="block text-xs text-slate-400">Live-Verlauf aller Änderungen & Aktionen</span>
+              </span>
+            </button>
+            <div class="flex items-center gap-2 shrink-0">
+              <span id="feed-count-badge" class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 border border-slate-800 text-slate-300">0 Einträge</span>
+              <button type="button" id="dashboard-feed-pin" onclick="toggleDashboardSectionPin('feed')" aria-pressed="false" aria-label="Aktivitäts-Stream geöffnet halten" title="Aktivitäts-Stream geöffnet halten" class="px-2 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">📌</button>
+            </div>
+          </div>
+          <div id="dashboard-feed-content">
+            <div id="activity-feed-list" class="space-y-2.5 max-h-[380px] overflow-y-auto custom-scroll pr-1">
+              <!-- Rendered dynamically -->
+            </div>
           </div>
         </div>
 
         <!-- Upcoming Events Preview -->
-        <div class="glass-card rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="font-semibold text-sm text-slate-200 flex items-center gap-2">
+        <div id="dashboard-section-events" class="glass-card rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-3 gap-2">
+            <button type="button" id="dashboard-events-toggle" onclick="toggleDashboardSection('events')" aria-expanded="true" aria-controls="dashboard-events-content" class="flex items-center gap-2 text-left font-semibold text-sm text-slate-200 hover:text-[#e5b55c] transition">
+              <span id="dashboard-events-arrow" aria-hidden="true">▾</span>
               <span>📅</span> Nächste Termine
-            </h3>
-            <button onclick="switchTab('kalender')" class="text-xs text-[#c9973e] hover:underline">Alle ansehen →</button>
+            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="switchTab('kalender')" class="text-xs text-[#c9973e] hover:underline">Alle ansehen →</button>
+              <button type="button" id="dashboard-events-pin" onclick="toggleDashboardSectionPin('events')" aria-pressed="false" aria-label="Nächste Termine geöffnet halten" title="Nächste Termine geöffnet halten" class="px-2 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">📌</button>
+            </div>
           </div>
-          <div id="dash-upcoming-events" class="space-y-2"></div>
+          <div id="dashboard-events-content">
+            <div id="dash-upcoming-events" class="space-y-2"></div>
+          </div>
         </div>
       </section>
 
@@ -547,6 +613,18 @@
           <!-- Sub-Tabs inside Einstellungen -->
           <div id="settings-subtabs" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-5 border-b border-slate-800">
             <!-- Master: Basics, Berechtigungen, Sicherheit | Daisy: Basics only -->
+          </div>
+
+          <!-- Personal dashboard visibility preferences -->
+          <div id="settings-panel-ansicht" class="hidden space-y-5">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-4">
+              <div>
+                <h3 class="font-semibold text-sm text-white">🖥️ Dashboard</h3>
+                <p class="text-xs text-slate-400 mt-1">Wähle, welche Bereiche auf deinem Dashboard angezeigt werden. Einklappen und Festpinnen bleiben unabhängig davon.</p>
+              </div>
+              <div id="dashboard-visibility-options" class="space-y-3"></div>
+              <p class="text-[11px] text-slate-500">Diese Ansicht wird für deine Rolle auf diesem Gerät gespeichert.</p>
+            </div>
           </div>
 
           <!-- SUB-TAB A: BASICS (Visible to BOTH Master & Daisy) -->
@@ -1525,7 +1603,174 @@
       renderEinstellungen();
     }
 
+    // Dashboard layout is a per-browser preference, not shared room data.
+    const DASHBOARD_METRICS_PREF_KEY = 'dominion-dashboard-metrics-v1';
+    let dashboardMetricsPinned = false;
+    let dashboardMetricsExpanded = true;
+    try {
+      const savedMetrics = JSON.parse(localStorage.getItem(DASHBOARD_METRICS_PREF_KEY) || '{}');
+      dashboardMetricsPinned = savedMetrics.pinned === true;
+      dashboardMetricsExpanded = dashboardMetricsPinned || savedMetrics.expanded !== false;
+    } catch (err) {
+      console.warn('Dashboard-Ansicht konnte nicht geladen werden:', err);
+    }
+
+    function updateDashboardMetricsUI() {
+      const grid = document.getElementById('dashboard-metrics-grid');
+      const toggle = document.getElementById('dashboard-metrics-toggle');
+      const arrow = document.getElementById('dashboard-metrics-arrow');
+      const pin = document.getElementById('dashboard-metrics-pin');
+      if (!grid || !toggle || !arrow || !pin) return;
+      grid.classList.toggle('hidden', !dashboardMetricsExpanded);
+      toggle.setAttribute('aria-expanded', String(dashboardMetricsExpanded));
+      toggle.title = dashboardMetricsPinned ? 'Zum Einklappen zuerst Reißzwecke lösen' : (dashboardMetricsExpanded ? 'Übersicht einklappen' : 'Übersicht ausklappen');
+      arrow.textContent = dashboardMetricsExpanded ? '▾' : '▸';
+      pin.setAttribute('aria-pressed', String(dashboardMetricsPinned));
+      pin.setAttribute('aria-label', dashboardMetricsPinned ? 'Fixierung der Übersicht lösen' : 'Übersicht geöffnet halten');
+      pin.title = dashboardMetricsPinned ? 'Fixierung lösen' : 'Übersicht geöffnet halten';
+      pin.classList.toggle('bg-[#c9973e]/20', dashboardMetricsPinned);
+      pin.classList.toggle('ring-1', dashboardMetricsPinned);
+      pin.classList.toggle('ring-[#c9973e]/50', dashboardMetricsPinned);
+      pin.classList.toggle('text-[#e5b55c]', dashboardMetricsPinned);
+    }
+
+    function saveDashboardMetricsPreference() {
+      try {
+        localStorage.setItem(DASHBOARD_METRICS_PREF_KEY, JSON.stringify({
+          pinned: dashboardMetricsPinned,
+          expanded: dashboardMetricsExpanded
+        }));
+      } catch (err) {
+        console.warn('Dashboard-Ansicht konnte nicht gespeichert werden:', err);
+      }
+      updateDashboardMetricsUI();
+    }
+
+    function toggleDashboardMetrics() {
+      if (dashboardMetricsPinned) return;
+      dashboardMetricsExpanded = !dashboardMetricsExpanded;
+      saveDashboardMetricsPreference();
+    }
+
+    function toggleDashboardMetricsPin() {
+      dashboardMetricsPinned = !dashboardMetricsPinned;
+      if (dashboardMetricsPinned) dashboardMetricsExpanded = true;
+      saveDashboardMetricsPreference();
+    }
+
+    const DASHBOARD_SECTION_PREF_KEY = 'dominion-dashboard-sections-v1';
+    const dashboardSectionPreferences = { feed: { expanded: true, pinned: false }, events: { expanded: true, pinned: false } };
+    try {
+      const savedSections = JSON.parse(localStorage.getItem(DASHBOARD_SECTION_PREF_KEY) || '{}');
+      for (const section of ['feed', 'events']) {
+        const saved = savedSections[section] || {};
+        dashboardSectionPreferences[section].pinned = saved.pinned === true;
+        dashboardSectionPreferences[section].expanded = saved.pinned === true || saved.expanded !== false;
+      }
+    } catch (err) {
+      console.warn('Dashboard-Bereiche konnten nicht geladen werden:', err);
+    }
+
+    function updateDashboardSectionsUI() {
+      for (const section of ['feed', 'events']) {
+        const pref = dashboardSectionPreferences[section];
+        const content = document.getElementById('dashboard-' + section + '-content');
+        const toggle = document.getElementById('dashboard-' + section + '-toggle');
+        const arrow = document.getElementById('dashboard-' + section + '-arrow');
+        const pin = document.getElementById('dashboard-' + section + '-pin');
+        if (!content || !toggle || !arrow || !pin) continue;
+        content.classList.toggle('hidden', !pref.expanded);
+        toggle.setAttribute('aria-expanded', String(pref.expanded));
+        toggle.title = pref.pinned ? 'Zum Einklappen zuerst Reißzwecke lösen' : (pref.expanded ? 'Bereich einklappen' : 'Bereich ausklappen');
+        arrow.textContent = pref.expanded ? '▾' : '▸';
+        pin.setAttribute('aria-pressed', String(pref.pinned));
+        pin.setAttribute('aria-label', pref.pinned ? 'Fixierung lösen' : 'Bereich geöffnet halten');
+        pin.title = pref.pinned ? 'Fixierung lösen' : 'Bereich geöffnet halten';
+        pin.classList.toggle('bg-[#c9973e]/20', pref.pinned);
+        pin.classList.toggle('ring-1', pref.pinned);
+        pin.classList.toggle('ring-[#c9973e]/50', pref.pinned);
+        pin.classList.toggle('text-[#e5b55c]', pref.pinned);
+      }
+    }
+
+    function saveDashboardSectionPreferences() {
+      try {
+        localStorage.setItem(DASHBOARD_SECTION_PREF_KEY, JSON.stringify(dashboardSectionPreferences));
+      } catch (err) {
+        console.warn('Dashboard-Bereiche konnten nicht gespeichert werden:', err);
+      }
+      updateDashboardSectionsUI();
+    }
+
+    function toggleDashboardSection(section) {
+      const pref = dashboardSectionPreferences[section];
+      if (!pref || pref.pinned) return;
+      pref.expanded = !pref.expanded;
+      saveDashboardSectionPreferences();
+    }
+
+    function toggleDashboardSectionPin(section) {
+      const pref = dashboardSectionPreferences[section];
+      if (!pref) return;
+      pref.pinned = !pref.pinned;
+      if (pref.pinned) pref.expanded = true;
+      saveDashboardSectionPreferences();
+    }
+
+    const DASHBOARD_VISIBILITY_KEY = 'dominion-dashboard-visibility-v1';
+    const DASHBOARD_VISIBLE_SECTIONS = [
+      { id: 'welcome', label: 'Willkommen' },
+      { id: 'news', label: 'Update-News' },
+      { id: 'metrics', label: 'Übersicht' },
+      { id: 'feed', label: 'Aktivitäts-Stream' },
+      { id: 'events', label: 'Nächste Termine' }
+    ];
+    function getDashboardVisibility() {
+      try {
+        const all = JSON.parse(localStorage.getItem(DASHBOARD_VISIBILITY_KEY) || '{}');
+        const rolePrefs = all[currentRole] || {};
+        return rolePrefs && typeof rolePrefs === 'object' ? rolePrefs : {};
+      } catch (err) {
+        console.warn('Dashboard-Sichtbarkeit konnte nicht geladen werden:', err);
+        return {};
+      }
+    }
+    function setDashboardSectionVisible(section, visible) {
+      if (!DASHBOARD_VISIBLE_SECTIONS.some(entry => entry.id === section)) return;
+      try {
+        const all = JSON.parse(localStorage.getItem(DASHBOARD_VISIBILITY_KEY) || '{}');
+        if (!all[currentRole] || typeof all[currentRole] !== 'object') all[currentRole] = {};
+        all[currentRole][section] = visible;
+        localStorage.setItem(DASHBOARD_VISIBILITY_KEY, JSON.stringify(all));
+      } catch (err) {
+        console.warn('Dashboard-Sichtbarkeit konnte nicht gespeichert werden:', err);
+      }
+      updateDashboardVisibilityUI();
+      renderDashboardVisibilitySettings();
+    }
+    function updateDashboardVisibilityUI() {
+      const prefs = getDashboardVisibility();
+      for (const entry of DASHBOARD_VISIBLE_SECTIONS) {
+        const el = document.getElementById('dashboard-section-' + entry.id);
+        if (el) el.classList.toggle('hidden', prefs[entry.id] === false);
+      }
+    }
+    function renderDashboardVisibilitySettings() {
+      const box = document.getElementById('dashboard-visibility-options');
+      if (!box) return;
+      const prefs = getDashboardVisibility();
+      box.innerHTML = DASHBOARD_VISIBLE_SECTIONS.map(entry => `
+        <label class="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] border border-slate-800 px-3.5 py-3 cursor-pointer">
+          <span class="text-sm text-slate-200">${entry.label}</span>
+          <input type="checkbox" class="w-4 h-4 accent-amber-500" onchange="setDashboardSectionVisible('${entry.id}', this.checked)" ${prefs[entry.id] !== false ? 'checked' : ''} />
+        </label>
+      `).join('');
+    }
+
     function renderDashboard() {
+      updateDashboardVisibilityUI();
+      updateDashboardMetricsUI();
+      updateDashboardSectionsUI();
       document.getElementById('dash-greeting').textContent = `Hallo, ${getDisplayName(currentRole)}`;
       const now = new Date();
       document.getElementById('dash-date').textContent = now.toLocaleDateString('de-DE', {
@@ -1536,6 +1781,9 @@
       document.getElementById('stat-einkauf').textContent = appState.einkauf.filter(i => !i.done).length;
       document.getElementById('stat-strafbuch').textContent = appState.strafbuch.filter(i => !i.resolved).length;
       document.getElementById('stat-aufgaben').textContent = (appState.mgmt.aufgaben || []).filter(i => !i.done).length;
+      document.getElementById('stat-toys').textContent = (appState.mgmt.toys || []).length;
+      document.getElementById('stat-kleidung').textContent = (appState.mgmt.kleidung || []).length;
+      document.getElementById('stat-regeln').textContent = (appState.mgmt.regeln || []).length;
 
       const limit = parseInt(appState.basics.feedLimit || 20, 10);
       const rawFeed = appState.activityFeed || [];
@@ -2327,19 +2575,27 @@
           <button onclick="selectSettingsSubTab('berechtigungen')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'berechtigungen' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🔐 Berechtigungen
           </button>
+          <button onclick="selectSettingsSubTab('ansicht')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'ansicht' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
+            👁️ Ansicht
+          </button>
           <button onclick="selectSettingsSubTab('sicherheit')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'sicherheit' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🛡️ Sicherheit & Push
           </button>
         `;
       } else {
-        activeSettingsSubTab = 'basics';
+        if (!['basics', 'ansicht'].includes(activeSettingsSubTab)) activeSettingsSubTab = 'basics';
         subTabsEl.innerHTML = `
-          <button onclick="selectSettingsSubTab('basics')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap gold-gradient shadow">
+          <button onclick="selectSettingsSubTab('basics')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'basics' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🎛️ Basics
+          </button>
+          <button onclick="selectSettingsSubTab('ansicht')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'ansicht' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
+            👁️ Ansicht
           </button>
         `;
       }
 
+      document.getElementById('settings-panel-ansicht').classList.toggle('hidden', activeSettingsSubTab !== 'ansicht');
+      renderDashboardVisibilitySettings();
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
@@ -2398,7 +2654,7 @@
     }
 
     function selectSettingsSubTab(subTab) {
-      if (currentRole !== 'Master' && subTab !== 'basics') return;
+      if (currentRole !== 'Master' && !['basics', 'ansicht'].includes(subTab)) return;
       activeSettingsSubTab = subTab;
       renderEinstellungen();
     }
