@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.6</title>
+  <title>Dominion App v2.7</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -268,7 +268,7 @@
           </div>
           <p class="text-[11px] text-slate-400">Veröffentlicht am 18.11.2026</p>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Neu in Dominion v2.6: Die Aufgabenverwaltung unterstützt Deadlines, Statusanzeigen und die Bestätigung durch Master. Daisy kann außerdem organisatorische Aufgaben ohne Punkte oder Prüfung anlegen und selbst erledigen. Das Rewards-System bietet ein Punktekonto mit Buchungshistorie, automatische Punktebuchungen und kurze Meldungen bei Punkteänderungen. In den Berechtigungen legt Master die Punkte für neue Kleidung, Toys, Belohnungen, Strafen und Regeln fest. Das Dashboard zeigt im neuen Bereich <strong>Heute</strong> die Termine und Aufgabenfristen des aktuellen Tages; <strong>Nächste Termine</strong> bleibt erhalten. Die Einlösung von Belohnungen und Durchführung von Strafen ist für einen späteren Schritt vorgesehen.
+            Neu in Dominion v2.7: Punktwerte für Belohnungen und Strafen lassen sich direkt im Formular anlegen und bearbeiten. Master kann falsche Punktebuchungen nach Sicherheitsabfrage löschen. Daisy sieht vor dem Hinzufügen berechtigter Einträge den Punktebonus; für Master gibt es keine automatische Gutschrift. „Heute“ steht jetzt direkt unter der Übersicht. „Nächste Termine &amp; Deadlines“ zeigt Kalendertermine und offene Aufgabenfristen gemeinsam mit Rollenfilter.
           </p>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
@@ -276,6 +276,7 @@
               <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
             </summary>
             <div class="mt-3 space-y-3 text-xs text-slate-300">
+              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1"><strong class="text-[#e5b55c]">Dominion v2.6 · 18.11.2026</strong><p>Aufgabenverwaltung, Rewards-Punktekonto und automatische Punktevergabe, Dashboard-Bereich „Heute“, neue Statistik- und Ansichtseinstellungen.</p></div>
               <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
                 <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.5 · Dashboard-Update</strong><span class="text-slate-500">17.11.2026</span></div>
                 <p>Das Dashboard wird persönlicher: sieben Statistik-Kacheln inklusive Toys, Kleidung und Regeln; einklappbare und festpinnbare Bereiche; einheitliche Kartenoptik sowie <strong>Einstellungen → Ansicht → Dashboard</strong> zum individuellen Ein- und Ausblenden für Master und Daisy. Außerdem erhältst du hier einen ausklappbaren Versionsverlauf.</p>
@@ -374,6 +375,13 @@
           <div id="dashboard-reward-hint" class="text-xs text-slate-400 mt-2"></div>
         </div>
         <!-- LIVE ACTIVITY STREAM / FEED -->
+        <div id="dashboard-section-today" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="font-semibold text-sm text-[#e5b55c]">☀️ Heute <span id="dash-today-date" class="text-xs text-slate-400 font-normal"></span></h3>
+            <span id="dash-today-count" class="text-[11px] text-slate-400"></span>
+          </div>
+          <div id="dash-today-items" class="space-y-2"></div>
+        </div>
         <div id="dashboard-section-feed" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
           <div class="flex items-center justify-between mb-4 gap-2">
             <button type="button" id="dashboard-feed-toggle" onclick="toggleDashboardSection('feed')" aria-expanded="true" aria-controls="dashboard-feed-content" class="flex items-center gap-2.5 text-left hover:opacity-80 transition">
@@ -397,18 +405,11 @@
         </div>
 
         <!-- Upcoming Events Preview -->
-        <div id="dashboard-section-today" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h3 class="font-semibold text-sm text-[#e5b55c]">☀️ Heute <span id="dash-today-date" class="text-xs text-slate-400 font-normal"></span></h3>
-            <span id="dash-today-count" class="text-[11px] text-slate-400"></span>
-          </div>
-          <div id="dash-today-items" class="space-y-2"></div>
-        </div>
         <div id="dashboard-section-events" class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3 gap-2">
             <button type="button" id="dashboard-events-toggle" onclick="toggleDashboardSection('events')" aria-expanded="true" aria-controls="dashboard-events-content" class="flex items-center gap-2 text-left font-semibold text-sm text-slate-200 hover:text-[#e5b55c] transition">
               <span id="dashboard-events-arrow" aria-hidden="true">▾</span>
-              <span>📅</span> Nächste Termine
+              <span>📅</span> Nächste Termine & Deadlines
             </button>
             <div class="flex items-center gap-2">
               <button onclick="switchTab('kalender')" class="text-xs text-[#c9973e] hover:underline">Alle ansehen →</button>
@@ -416,6 +417,7 @@
             </div>
           </div>
           <div id="dashboard-events-content">
+            <div class="mb-3 flex items-center gap-2"><label for="dash-role-filter" class="text-xs text-slate-400">Rolle:</label><select id="dash-role-filter" onchange="setUpcomingFilter(this.value)" class="rounded-lg bg-slate-900 border border-slate-700 px-2 py-1 text-xs text-white"><option value="Master">Master</option><option value="both">Beide</option><option value="Daisy">Daisy</option></select></div>
             <div id="dash-upcoming-events" class="space-y-2"></div>
           </div>
         </div>
@@ -605,8 +607,9 @@
           <!-- Add Item Box -->
           <div id="mgmt-add-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
             <input id="mgmt-title" type="text" placeholder="Bezeichnung..." class="px-3.5 py-2.5 text-sm" />
-            <input id="mgmt-desc" type="text" placeholder="Details / Beschreibung..." class="px-3.5 py-2.5 text-sm" />
+            <input id="mgmt-desc" type="text" placeholder="Details / Beschreibung..." class="px-3.5 py-2.5 text-sm" /><label id="mgmt-points-wrap" class="hidden text-xs text-slate-300">Punktwert<input id="mgmt-points" type="number" min="0" step="1" value="0" class="w-full mt-1 px-3 py-2 rounded-lg" /></label>
             <div class="flex gap-2"><button id="mgmt-submit-button" onclick="addMgmtItem()" class="flex-1 px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">Anlegen</button><button id="mgmt-cancel-edit" onclick="cancelMgmtEdit()" class="hidden px-3 py-2.5 rounded-xl bg-white/10 text-slate-300 text-sm">Abbrechen</button></div>
+            <div id="mgmt-bonus-hint" class="hidden sm:col-span-3 text-xs text-emerald-300"></div>
             <div id="mgmt-image-controls" class="hidden sm:col-span-3 col-span-1 space-y-2">
               <div class="flex flex-wrap gap-2">
                 <button type="button" onclick="document.getElementById('mgmt-image-file').click()" class="px-3 py-2 rounded-lg bg-white/5 text-xs text-slate-200">📁 Datei auswählen</button>
@@ -963,7 +966,7 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
-    const APP_VERSION = '2.6';
+    const APP_VERSION = '2.7';
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
@@ -1075,6 +1078,7 @@
         },
         activityFeed: [],
         rewardLedger: [],
+        deletedRewardKeys: [],
         rewardRules: { kleidung: 0, toys: 0, belohnungen: 0, strafen: 0, regeln: 0 },
         fcmToken: null
       };
@@ -1150,6 +1154,7 @@
         mgmt: { ...def.mgmt, ...(incoming.mgmt || {}) },
         activityFeed: Array.isArray(incoming.activityFeed) ? incoming.activityFeed : [],
         rewardLedger: Array.isArray(incoming.rewardLedger) ? incoming.rewardLedger : [],
+        deletedRewardKeys: Array.isArray(incoming.deletedRewardKeys) ? incoming.deletedRewardKeys : [],
         rewardRules: { ...def.rewardRules, ...(incoming.rewardRules || {}) },
         fcmToken: incoming.fcmToken || null
       };
@@ -2064,20 +2069,40 @@
         }).join('');
       }
 
-      const upcomingBox = document.getElementById('dash-upcoming-events');
-      const sortedEvents = [...appState.kalender].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).slice(0, 3);
-      if (sortedEvents.length === 0) {
-        upcomingBox.innerHTML = `<p class="text-xs text-slate-500">Keine anstehenden Termine eingetragen.</p>`;
-      } else {
-        upcomingBox.innerHTML = sortedEvents.map(ev => `
-          <div onclick="jumpToTarget('kalender', null, '${ev.id}')" class="p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-slate-800 flex items-center justify-between cursor-pointer transition">
-            <span class="text-xs font-medium text-slate-200">${escapeHtml(ev.title)}</span>
-            <span class="text-[11px] text-[#c9973e]">${formatDateDE(ev.date)} • ${escapeHtml(ev.time || '')}</span>
-          </div>
-        `).join('');
-      }
+      renderUpcomingDashboard();
+
     }
 
+    const UPCOMING_FILTER_KEY = STORAGE_KEY + '-upcoming-role-';
+    function setUpcomingFilter(role) {
+      if (!['Master','Daisy','both'].includes(role)) return;
+      try { localStorage.setItem(UPCOMING_FILTER_KEY + currentRole, role); } catch (_) {}
+      renderUpcomingDashboard();
+    }
+    function renderUpcomingDashboard() {
+      let filter = 'both';
+      try { filter = localStorage.getItem(UPCOMING_FILTER_KEY + currentRole) || 'both'; } catch (_) {}
+      if (!['Master','Daisy','both'].includes(filter)) filter = 'both';
+      const select = document.getElementById('dash-role-filter');
+      select.options[0].textContent = getDisplayName('Master');
+      select.options[2].textContent = getDisplayName('Daisy');
+      select.value = filter;
+      const now = Date.now(), entries = [];
+      if (currentRole === 'Master' || hasPermission('kalender','visible')) for (const ev of appState.kalender || []) {
+        const role = getEventOwnerRole(ev);
+        const when = new Date(ev.date + 'T' + (ev.time || '00:00')).getTime();
+        if (Number.isFinite(when) && when >= now && (filter === 'both' || filter === role)) entries.push({type:'kalender', title:ev.title, role, when});
+      }
+      if (currentRole === 'Master' || hasPermission('aufgaben','visible')) for (const task of appState.mgmt.aufgaben || []) {
+        const role = task.assignee || 'Master';
+        const when = new Date(task.deadline || '').getTime();
+        if (Number.isFinite(when) && when >= now && !['done','rejected','review'].includes(taskStatus(task)) && (filter === 'both' || filter === role)) entries.push({type:'aufgaben', title:task.title, role, when});
+      }
+      entries.sort((a,b) => a.when-b.when);
+      document.getElementById('dash-upcoming-events').innerHTML = entries.length ? entries.slice(0,5).map(entry =>
+        '<button type="button" onclick="switchTab(\'' + entry.type + '\')" class="w-full text-left p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-slate-800 flex justify-between gap-2"><span class="text-xs text-slate-200">' + (entry.type === 'kalender' ? '📅 ' : '⏳ ') + escapeHtml(entry.title) + '<span class="block text-[10px] text-slate-500">' + escapeHtml(getDisplayName(entry.role)) + '</span></span><span class="text-[11px] text-[#c9973e] whitespace-nowrap">' + new Date(entry.when).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + '</span></button>'
+      ).join('') : '<p class="text-xs text-slate-500">Keine bevorstehenden Termine oder offenen Deadlines.</p>';
+    }
     function renderDashboardToday() {
       const now = new Date();
       const localDate = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
@@ -2799,7 +2824,7 @@
     function bookReward(key, amount, description) {
       if (!Number.isFinite(Number(amount)) || !amount) return false;
       if (!Array.isArray(appState.rewardLedger)) appState.rewardLedger = [];
-      if (appState.rewardLedger.some(row => row.id === key)) return false;
+      if (appState.rewardLedger.some(row => row.id === key) || (appState.deletedRewardKeys || []).includes(key)) return false;
       appState.rewardLedger.push({ id: key, amount: Number(amount), description, timestamp: Date.now() });
       if (currentRole) showRewardToast(Number(amount));
       return true;
@@ -2979,8 +3004,18 @@
       document.getElementById('rewards-balance').textContent = allowed ? rewardBalance() + ' Punkte' : '';
       document.getElementById('reward-rule-editor').innerHTML = '';
       document.getElementById('rewards-ledger').innerHTML = allowed
-        ? (appState.rewardLedger || []).slice().reverse().map(row => '<div class="flex justify-between gap-3 border-b border-slate-800 py-2 text-xs"><span>' + escapeHtml(row.description || '') + '<br><span class="text-slate-500">' + new Date(row.timestamp).toLocaleString('de-DE') + '</span></span><strong class="' + (row.amount >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (row.amount > 0 ? '+' : '') + row.amount + '</strong></div>').join('') || '<p class="text-xs text-slate-500">Noch keine Buchungen.</p>'
+        ? (appState.rewardLedger || []).slice().reverse().map(row => '<div class="flex justify-between gap-3 border-b border-slate-800 py-2 text-xs"><span>' + escapeHtml(row.description || '') + '<br><span class="text-slate-500">' + new Date(row.timestamp).toLocaleString('de-DE') + '</span></span><strong class="' + (row.amount >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (row.amount > 0 ? '+' : '') + row.amount + '</strong>' + (currentRole === 'Master' ? '<button class="ml-2 text-rose-300" title="Buchung löschen" onclick="deleteRewardBooking(' + JSON.stringify(String(row.id)) + ',' + JSON.stringify(String(row.timestamp)) + ')">🗑️</button>' : '') + '</div>').join('') || '<p class="text-xs text-slate-500">Noch keine Buchungen.</p>'
         : '';
+    }
+    function deleteRewardBooking(id, timestamp) {
+      if (currentRole !== 'Master') return;
+      const index = (appState.rewardLedger || []).findIndex(row => String(row.id) === id && String(row.timestamp) === timestamp);
+      if (index < 0) return;
+      const row = appState.rewardLedger[index];
+      if (!confirm('Buchung wirklich löschen?\n' + (row.description || '') + '\n' + row.amount + ' Punkte')) return;
+      (appState.deletedRewardKeys ||= []).push(row.id);
+      appState.rewardLedger.splice(index, 1);
+      persistState(); refreshAllUI(); showToast('Buchung gelöscht.');
     }
     function saveRewardRule(cat, value) {
       if (currentRole !== 'Master' || !['kleidung','toys','belohnungen','strafen','regeln'].includes(cat)) return;
@@ -3030,6 +3065,12 @@
       const isEditing = !!mgmtEditingItemId;
       document.getElementById('mgmt-add-box').classList.toggle('hidden', !canAdd && !(isEditing && canEdit));
       document.getElementById('mgmt-image-controls').classList.toggle('hidden', !(canAdd || (isEditing && canEdit)) || !['kleidung', 'toys'].includes(activeMgmtCategory));
+      document.getElementById('mgmt-points-wrap').classList.toggle('hidden', !['belohnungen','strafen'].includes(activeMgmtCategory));
+      const bonus = rewardAmount(appState.rewardRules?.[activeMgmtCategory]);
+      const hint = document.getElementById('mgmt-bonus-hint');
+      const showBonus = currentRole === 'Daisy' && !isEditing && canAdd && ['belohnungen','strafen','regeln','toys','kleidung'].includes(activeMgmtCategory) && bonus > 0;
+      hint.classList.toggle('hidden', !showBonus);
+      hint.textContent = showBonus ? '+' + bonus + ' Punkte' : '';
       document.getElementById('mgmt-submit-button').textContent = isEditing ? 'Änderungen speichern' : 'Anlegen';
       document.getElementById('mgmt-submit-button').onclick = isEditing ? saveMgmtEdit : addMgmtItem;
       document.getElementById('mgmt-cancel-edit').classList.toggle('hidden', !isEditing);
@@ -3056,7 +3097,7 @@
               ${item.itemNumber ? '<span class="text-xs font-mono text-amber-300">' + escapeHtml(item.itemNumber) + '</span>' : ''}
               <span class="font-semibold text-sm ${item.done ? 'line-through text-slate-500' : 'text-white'} truncate">${escapeHtml(item.title)}</span>
             </div>
-            ${rewardCategory ? `<p class="text-xs text-amber-300">Punktwert: ${Number(item.rewardPoints || 0)}</p>` : ''}
+            ${rewardCategory ? `<p class="text-xs text-amber-300">Punktwert: ${activeMgmtCategory === 'strafen' ? '−' : '+'}${rewardAmount(item.rewardPoints)}</p>` : ''}
             ${item.desc ? `<p class="text-xs text-slate-400 mt-1 break-words">${escapeHtml(item.desc)}</p>` : ''}
             ${item.imgUrl ? `<img src="${escapeHtml(item.imgUrl)}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 w-auto mt-2 border border-slate-700" />` : ''}
           </div>
@@ -3081,6 +3122,7 @@
       mgmtEditingItemId = itemId; mgmtDraftImage = null; mgmtImageRemoved = false;
       document.getElementById('mgmt-title').value = item.title || '';
       document.getElementById('mgmt-desc').value = item.desc || '';
+      document.getElementById('mgmt-points').value = rewardAmount(item.rewardPoints);
       const preview = document.getElementById('mgmt-image-preview');
       const previewImg = document.getElementById('mgmt-image-preview-img');
       if (item.imgUrl && ['kleidung', 'toys'].includes(catId)) { previewImg.src = item.imgUrl; preview.classList.remove('hidden'); }
@@ -3114,13 +3156,13 @@
       const desc = document.getElementById('mgmt-desc').value.trim();
       if (!title) { showToast('Bitte eine Bezeichnung eingeben.', 'error'); return; }
       const oldTitle = item.title || ''; item.title = title; item.desc = desc;
-      if (['belohnungen','strafen'].includes(catId)) { const v = prompt('Punktwert (0 = nicht festgelegt)', item.rewardPoints || 0); if (v !== null) item.rewardPoints = Math.max(0, Number(v) || 0); }
+      if (['belohnungen','strafen'].includes(catId)) item.rewardPoints = rewardAmount(document.getElementById('mgmt-points').value);
       if (['kleidung', 'toys'].includes(catId)) { if (mgmtDraftImage) item.imgUrl = mgmtDraftImage; else if (mgmtImageRemoved) delete item.imgUrl; }
       const catObj = MGMT_CATEGORIES.find(category => category.id === catId);
       logActivity('hat ' + (catObj ? catObj.singular : 'Eintrag') + ' bearbeitet: „' + oldTitle + '“ → „' + title + '“', 'verwaltung', catId, item.id);
       mgmtEditingItemId = null;
       document.getElementById('mgmt-title').value = ''; document.getElementById('mgmt-desc').value = '';
-      clearMgmtDraftImage(); persistState(); refreshAllUI(); showToast('Änderungen gespeichert.');
+      clearMgmtDraftImage(); document.getElementById('mgmt-points').value = '0'; persistState(); refreshAllUI(); showToast('Änderungen gespeichert.');
     }
 
     function addMgmtItem() {
@@ -3136,7 +3178,7 @@
       const next = (appState.mgmtCounters[activeMgmtCategory] || 0) + 1;
       appState.mgmtCounters[activeMgmtCategory] = next;
       const newItem = { id: 'mgmt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), itemNumber: prefix + '-' + String(next).padStart(4, '0'), title, desc, done: false };
-      if (['belohnungen','strafen'].includes(activeMgmtCategory)) { const v = prompt('Punktwert für diesen Eintrag', '0'); if (v === null) return; newItem.rewardPoints = Math.max(0, Number(v) || 0); }
+      if (['belohnungen','strafen'].includes(activeMgmtCategory)) newItem.rewardPoints = rewardAmount(document.getElementById('mgmt-points').value);
       if (['kleidung', 'toys'].includes(activeMgmtCategory) && mgmtDraftImage) newItem.imgUrl = mgmtDraftImage;
       if (!Array.isArray(appState.mgmt[activeMgmtCategory])) {
         appState.mgmt[activeMgmtCategory] = [];
@@ -3149,6 +3191,7 @@
       document.getElementById('mgmt-title').value = '';
       document.getElementById('mgmt-desc').value = '';
       clearMgmtDraftImage();
+      document.getElementById('mgmt-points').value = '0';
       persistState();
       refreshAllUI();
       showToast('Eintrag angelegt.');
