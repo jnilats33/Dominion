@@ -1070,7 +1070,7 @@
         },
         activityFeed: [],
         rewardLedger: [],
-        rewardRules: { kleidung: 0, toys: 0 },
+        rewardRules: { kleidung: 0, toys: 0, belohnungen: 0, strafen: 0, regeln: 0 },
         fcmToken: null
       };
     }
@@ -2975,7 +2975,7 @@
         : '';
     }
     function saveRewardRule(cat, value) {
-      if (currentRole !== 'Master' || !['kleidung','toys'].includes(cat)) return;
+      if (currentRole !== 'Master' || !['kleidung','toys','belohnungen','strafen','regeln'].includes(cat)) return;
       appState.rewardRules[cat] = rewardAmount(value);
       persistState(); refreshAllUI();
       showToast('Punktevergabe aktualisiert.');
@@ -3134,7 +3134,7 @@
         appState.mgmt[activeMgmtCategory] = [];
       }
       appState.mgmt[activeMgmtCategory].unshift(newItem);
-      if (currentRole === 'Daisy' && ['kleidung','toys'].includes(activeMgmtCategory)) bookReward('item:' + newItem.id, rewardAmount(appState.rewardRules[activeMgmtCategory]), 'Neuer Eintrag: ' + title);
+      if (currentRole === 'Daisy' && ['kleidung','toys','belohnungen','strafen','regeln'].includes(activeMgmtCategory)) bookReward('item:' + newItem.id, rewardAmount(appState.rewardRules[activeMgmtCategory]), 'Neuer Eintrag: ' + title);
 
       logActivity(`hat ${catObj ? catObj.singular : 'Eintrag'} hinzugefügt: „${title}“`, 'verwaltung', activeMgmtCategory, newItem.id);
 
@@ -3338,7 +3338,7 @@
                        class="w-4 h-4 accent-[#c9973e] rounded cursor-pointer" />
               </td>
             `).join('')}
-            ${['kleidung', 'toys'].includes(cat.id) ? `<td class="p-2 text-center"><input aria-label="Punkte für ${cat.label}" title="Punkte pro neuem Eintrag durch Daisy" type="number" min="0" step="1" value="${rewardAmount(appState.rewardRules?.[cat.id])}" onchange="saveRewardRule('${cat.id}',this.value)" class="w-16 max-w-full px-2 py-1.5 text-xs rounded-lg" /></td>` : '<td class="p-2 text-center text-slate-600">–</td>'}
+            ${['kleidung', 'toys', 'belohnungen', 'strafen', 'regeln'].includes(cat.id) ? `<td class="p-2 text-center"><input aria-label="Punkte für ${cat.label}" title="Punkte pro neuem Eintrag durch Daisy" type="number" min="0" step="1" value="${rewardAmount(appState.rewardRules?.[cat.id])}" onchange="saveRewardRule('${cat.id}',this.value)" class="w-16 max-w-full px-2 py-1.5 text-xs rounded-lg" /></td>` : '<td class="p-2 text-center text-slate-600">–</td>'}
           </tr>
         `;
       }).join('');
