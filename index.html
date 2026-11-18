@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.5</title>
+  <title>Dominion App v2.6</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -152,7 +152,7 @@
         <span class="text-3xl">👑</span>
       </div>
       <h1 id="login-app-title" class="font-display text-2xl sm:text-3xl font-bold tracking-wider text-[#e5b55c]">DOMINION</h1>
-      <p id="login-app-subtitle" class="text-xs uppercase tracking-[0.22em] text-slate-400 mt-1 mb-7">Exklusive Verbindung • v2.4</p>
+      <p id="login-app-subtitle" class="text-xs uppercase tracking-[0.22em] text-slate-400 mt-1 mb-7">Exklusive Verbindung • v2.3</p>
 
       <div id="role-select-buttons" class="space-y-3.5">
         <button onclick="selectRole('Master')" class="w-full p-4 rounded-2xl glass-card hover:border-[#c9973e] transition flex items-center justify-between group">
@@ -179,7 +179,7 @@
       </div>
 
       <div id="daisy-pin-box" class="hidden mt-2 space-y-4 animate-fade">
-        <div class="text-sm text-slate-300">Bitte PIN eingeben</div>
+        <div class="text-sm text-slate-300"><span id="daisy-pin-prompt-label">Bitte PIN eingeben</span></div>
         <input id="daisy-pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••" onkeydown="if(event.key==='Enter') verifyDaisyPin()" class="w-full px-4 py-3.5 text-center text-2xl tracking-[0.4em] font-bold" />
         <div class="flex gap-3">
           <button onclick="cancelPinPrompt()" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm">Zurück</button>
@@ -262,13 +262,13 @@
         <div id="dashboard-section-news" class="glass-card rounded-2xl p-5 border border-[#c9973e]/30 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
-              <span>🚀</span> Update-News: Dominion <span id="current-app-version-news">v2.5</span>
+              <span>🚀</span> Update-News: Dominion v2.6
             </h3>
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Aktuelle Version</span>
           </div>
-          <p class="text-[11px] text-slate-400">Veröffentlicht am 17.11.2026</p>
+          <p class="text-[11px] text-slate-400">Veröffentlicht am 18.11.2026</p>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Neu in v2.5: Daisy sieht in der Übersicht nur Statistik-Kacheln für freigegebene Bereiche. Außerdem kann Daisy eine eigene Anmelde-PIN unter Einstellungen → Sicherheit einrichten und ändern. Ein zuvor angemeldeter Master kann ohne Daisy-PIN zu Daisy wechseln; der Rückweg zu Master bleibt PIN-geschützt.
+            Das Dashboard wird persönlicher: sieben Statistik-Kacheln inklusive Toys, Kleidung und Regeln; einklappbare und festpinnbare Bereiche; einheitliche Kartenoptik sowie <strong>Einstellungen → Ansicht → Dashboard</strong> zum individuellen Ein- und Ausblenden für Master und Daisy. Außerdem erhältst du hier einen ausklappbaren Versionsverlauf.
           </p>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
@@ -276,10 +276,6 @@
               <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
             </summary>
             <div class="mt-3 space-y-3 text-xs text-slate-300">
-              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
-                <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.4 · 17.11.2026</strong><span class="text-slate-500">Vorherige Version</span></div>
-                <p>Sieben Statistik-Kacheln, einklappbare und festpinnbare Dashboard-Bereiche, einheitliche Kartenoptik, persönliche Sichtbarkeitseinstellungen sowie ausklappbarer Versionsverlauf.</p>
-              </div>
               <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
                 <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">15.11.2026 · Produktivänderungen</strong><span class="text-slate-500">GitHub-Änderungsdatum</span></div>
                 <p>Wiederherstellung des Bilder-Uploads und der Bildbearbeitung für Toys und Kleidung; dauerhafte, kategoriespezifische Artikelnummern. Außerdem Anpassungen an Firebase-Authentifizierung und Datenbankanbindung.</p>
@@ -331,7 +327,7 @@
             <div class="text-[11px] text-rose-400 mt-1">Offene Einträge</div>
           </div>
 
-          <div onclick="jumpToTarget('verwaltung', 'aufgaben')" data-dashboard-permission="aufgaben" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+          <div onclick="switchTab('aufgaben')" data-dashboard-permission="aufgaben" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
               <span>Aufgaben</span>
               <span>✅</span>
@@ -369,6 +365,10 @@
           </div>
         </section>
 
+        <div id="dashboard-section-rewards" class="glass-card rounded-2xl p-4 border border-[#c9973e]/25 cursor-pointer" onclick="switchTab('rewards')">
+          <div class="flex justify-between items-center"><span class="font-semibold text-sm">🎯 Punktekonto</span><span id="dashboard-reward-balance" class="text-xl font-bold">0</span></div>
+          <div id="dashboard-reward-hint" class="text-xs text-slate-400 mt-2"></div>
+        </div>
         <!-- LIVE ACTIVITY STREAM / FEED -->
         <div id="dashboard-section-feed" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
           <div class="flex items-center justify-between mb-4 gap-2">
@@ -393,6 +393,13 @@
         </div>
 
         <!-- Upcoming Events Preview -->
+        <div id="dashboard-section-today" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="font-semibold text-sm text-[#e5b55c]">☀️ Heute <span id="dash-today-date" class="text-xs text-slate-400 font-normal"></span></h3>
+            <span id="dash-today-count" class="text-[11px] text-slate-400"></span>
+          </div>
+          <div id="dash-today-items" class="space-y-2"></div>
+        </div>
         <div id="dashboard-section-events" class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3 gap-2">
             <button type="button" id="dashboard-events-toggle" onclick="toggleDashboardSection('events')" aria-expanded="true" aria-controls="dashboard-events-content" class="flex items-center gap-2 text-left font-semibold text-sm text-slate-200 hover:text-[#e5b55c] transition">
@@ -615,6 +622,43 @@
       </section>
 
       <!-- ==================== 7. EINSTELLUNGEN ==================== -->
+      <section id="tab-aufgaben" class="hidden space-y-4 animate-fade">
+        <div class="glass-card rounded-2xl p-5 space-y-4">
+          <h2 class="font-display text-lg font-bold text-[#e5b55c]">✅ Aufgaben</h2>
+          <div id="tasks-form" class="space-y-3 p-3 rounded-xl border border-slate-800">
+            <input id="task-title" placeholder="Neue Aufgabe" class="w-full px-3 py-2.5"/>
+            <textarea id="task-desc" placeholder="Beschreibung (optional)" class="w-full px-3 py-2.5"></textarea>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="text-xs text-slate-300">Für wen?
+                <select id="task-assignee" onchange="updateTaskForm()" class="w-full mt-1 px-2 py-2"><option value="Daisy">Daisy</option><option value="Master">Master</option></select>
+              </label>
+              <label class="text-xs text-slate-300">Deadline (Datum und Uhrzeit)
+                <input id="task-deadline" type="datetime-local" class="w-full mt-1 px-2 py-2"/>
+              </label>
+            </div>
+            <label id="task-kind-wrap" class="text-xs text-slate-300">Aufgabenart<select id="task-kind" onchange="updateTaskForm()" class="w-full mt-1 px-2 py-2"><option value="reward">Mit Punkten und Prüfung</option><option value="personal">Organisatorisch – ohne Punkte und Prüfung</option></select></label>
+            <div id="task-points-fields" class="grid grid-cols-2 gap-2">
+              <label class="text-xs text-slate-300">Punkte bei Erfüllung<input id="task-plus" type="number" min="0" value="0" class="w-full mt-1 px-2 py-2"/></label>
+              <label class="text-xs text-slate-300">Abzug pro Fristverstoß<input id="task-minus" type="number" min="0" value="0" class="w-full mt-1 px-2 py-2"/></label>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="saveTask()" class="px-4 py-2 rounded-xl gold-gradient text-xs font-semibold">Aufgabe speichern</button>
+              <button onclick="resetTaskForm()" class="px-4 py-2 rounded-xl bg-white/10 text-xs">Abbrechen</button>
+            </div>
+          </div>
+          <div id="task-list" class="space-y-3"></div>
+        </div>
+      </section>
+      <section id="tab-rewards" class="hidden space-y-4 animate-fade">
+        <div class="glass-card rounded-2xl p-5 space-y-4">
+          <h2 class="font-display text-lg font-bold text-[#e5b55c]">🎯 Rewards</h2>
+          <div class="text-xs text-slate-400">Daisys Punktekonto · Einlösung von Belohnungen und Durchführung von Strafen folgen später.</div>
+          <div id="rewards-balance" class="text-3xl font-bold"></div>
+          <div id="reward-rule-editor" class="space-y-2"></div>
+          <h3 class="text-sm font-semibold">Punkteverlauf</h3>
+          <div id="rewards-ledger" class="space-y-2"></div>
+        </div>
+      </section>
       <section id="tab-einstellungen" class="hidden space-y-4 animate-fade">
         <div class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
           <div class="mb-4">
@@ -647,7 +691,7 @@
               <label class="block text-xs text-slate-400">Bisherige PIN (nur bei Änderung)<input id="daisy-old-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" class="w-full px-3.5 py-2.5 mt-1" /></label>
               <label class="block text-xs text-slate-400">Neue PIN (4–8 Ziffern)<input id="daisy-new-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password" class="w-full px-3.5 py-2.5 mt-1" /></label>
               <label class="block text-xs text-slate-400">Neue PIN bestätigen<input id="daisy-confirm-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password" class="w-full px-3.5 py-2.5 mt-1" /></label>
-              <button onclick="changeDaisyPin()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs">PIN speichern</button>
+              <button onclick="changeDaisyPin()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs">Daisy-PIN speichern</button>
             </div>
           </div>
           <!-- SUB-TAB A: BASICS (Visible to BOTH Master & Daisy) -->
@@ -770,6 +814,15 @@
           </div>
 
           <!-- SUB-TAB C: SICHERHEIT & PUSH (MASTER ONLY) -->
+          <div id="settings-panel-benachrichtigungen" class="hidden space-y-5">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
+              <h3 class="font-semibold text-sm text-white">🔔 Benachrichtigungen auf diesem Gerät</h3>
+              <p class="text-xs text-slate-300">Erlaube Benachrichtigungen für dieses Smartphone. Die Zustellung bei geschlossener App wird separat getestet.</p>
+              <span id="daisy-push-status-pill" class="inline-block text-[11px] px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">Nicht geprüft</span>
+              <div><button onclick="requestPushPermissions()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs shadow">🔔 Push-Benachrichtigungen aktivieren</button></div>
+            </div>
+          </div>
+
           <div id="settings-panel-sicherheit" class="hidden space-y-5">
             <!-- Firebase Live-Sync -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
@@ -858,7 +911,7 @@
 
   <!-- Bottom Navigation Bar (7 Main Tabs) -->
   <nav id="bottom-nav" class="hidden fixed bottom-0 inset-x-0 z-40 bg-[#171a24]/95 backdrop-blur-lg border-t border-slate-800 px-1 py-1.5">
-    <div class="max-w-4xl mx-auto grid grid-cols-7 gap-0.5">
+    <div class="max-w-4xl mx-auto grid grid-cols-9 gap-0.5">
       <button data-tab="dashboard" onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">🏠</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Dashboard</span>
@@ -879,6 +932,8 @@
         <span class="text-base sm:text-lg leading-none">⚖️</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Strafbuch</span>
       </button>
+      <button data-tab="aufgaben" onclick="switchTab('aufgaben')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition"><span class="text-base sm:text-lg leading-none">✅</span><span class="text-[9px] sm:text-[10px] mt-1 font-medium">Aufgaben</span></button>
+      <button data-tab="rewards" onclick="switchTab('rewards')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition"><span class="text-base sm:text-lg leading-none">🎯</span><span class="text-[9px] sm:text-[10px] mt-1 font-medium">Rewards</span></button>
       <button data-tab="verwaltung" onclick="switchTab('verwaltung')" class="nav-btn flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl text-slate-400 hover:text-white transition">
         <span class="text-base sm:text-lg leading-none">📦</span>
         <span class="text-[9px] sm:text-[10px] mt-1 font-medium truncate max-w-full">Verwaltung</span>
@@ -894,6 +949,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
   <script>
@@ -902,18 +959,13 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
-    // Release identifier: change this once for each new deployed app version.
-    // Do not confuse it with the persisted data/schema version in appState.
-    const APP_VERSION = '2.5';
-    document.title = 'Dominion App v' + APP_VERSION;
-    const currentVersionNews = document.getElementById('current-app-version-news');
-    if (currentVersionNews) currentVersionNews.textContent = 'v' + APP_VERSION;
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
     const DEFAULT_ROOM_CODE = 'D+W Connection';
     const FIREBASE_WEB_CONFIG = {"apiKey":"AIzaSyC3YyPJsXsX-u2EHKHcByPVj1Ru2Fn3YPo","authDomain":"dominionapp-45bfa.firebaseapp.com","databaseURL":"https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app","projectId":"dominionapp-45bfa","storageBucket":"dominionapp-45bfa.firebasestorage.app","messagingSenderId":"1047436704498","appId":"1:1047436704498:web:4b7f9b229b5ad7cc0fee6b"};
+    const APP_CHECK_SITE_KEY = '6Lf8qCEuAAAAAMZqG3IpnbUZJyKqeUppFurGChqL';
     const FCM_VAPID_KEY = 'BIjo1CgqJnE-B12MQNhsc-PBNigNW1JhuPz241wPvVnveqnlrPOxBblc0bVt5ZNBGuzODM1fj83ibkb_hgnGVaU';
     const MGMT_CATEGORIES = [
       { id: 'kleidung', label: '👗 Kleidung', singular: 'Kleidung' },
@@ -962,7 +1014,8 @@
       { id: 'strafen', label: '⛓️ Strafen' },
       { id: 'belohnungen', label: '🎁 Belohnungen' },
       { id: 'regeln', label: '📜 Regeln' },
-      { id: 'aufgaben', label: '✅ Aufgaben' }
+      { id: 'aufgaben', label: '✅ Aufgaben' },
+      { id: 'rewards', label: '🎯 Rewards' }
     ];
 
     function createDefaultPermissions() {
@@ -1016,6 +1069,8 @@
           aufgaben: []
         },
         activityFeed: [],
+        rewardLedger: [],
+        rewardRules: { kleidung: 0, toys: 0 },
         fcmToken: null
       };
     }
@@ -1025,24 +1080,26 @@
     let masterToDaisyBypass = false;
     let activeTab = 'dashboard';
     let activeMgmtCategory = 'kleidung';
-    let mgmtDraftImage = null;
-    let mgmtEditingItemId = null;
-    let mgmtImageRemoved = false;
+    let editingTaskId = null;
     let activeSettingsSubTab = 'basics';
     let calFilterRole = 'all'; // 'all' | 'Master' | 'Daisy'
     let calViewYear = new Date().getFullYear();
     let calViewMonth = new Date().getMonth();
     let calSelectedDate = null;
     let pendingChatImage = null;
+    let mgmtDraftImage = null;
+    let mgmtEditingItemId = null;
+    let mgmtImageRemoved = false;
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecordingAudio = false;
+    let recordingStartedAt = 0;
     let firebaseDbRef = null;
     let firebaseRoomPathPending = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
-    let productionAuthUser = null;
-    let productionAuthRole = null;
+    let testAuthUser = null;
+    let testAuthRole = null;
     let swRegistration = null;
 
     function loadState() {
@@ -1078,10 +1135,7 @@
         version: '2.3',
         pin: incoming.pin || def.pin,
         daisyPin: typeof incoming.daisyPin === 'string' && /^\d{4,8}$/.test(incoming.daisyPin) ? incoming.daisyPin : null,
-        firebase: {
-          url: (incoming.firebase && incoming.firebase.url) ? incoming.firebase.url : DEFAULT_FB_URL,
-          room: (incoming.firebase && incoming.firebase.room) ? incoming.firebase.room : DEFAULT_ROOM_CODE
-        },
+        firebase: { url: DEFAULT_FB_URL, room: DEFAULT_ROOM_CODE },
         basics: { ...def.basics, ...(incoming.basics || {}) },
         permissions: { ...def.permissions, ...(incoming.permissions || {}) },
         chat: Array.isArray(incoming.chat) ? incoming.chat : def.chat,
@@ -1090,6 +1144,8 @@
         strafbuch: Array.isArray(incoming.strafbuch) ? incoming.strafbuch : [],
         mgmt: { ...def.mgmt, ...(incoming.mgmt || {}) },
         activityFeed: Array.isArray(incoming.activityFeed) ? incoming.activityFeed : [],
+        rewardLedger: Array.isArray(incoming.rewardLedger) ? incoming.rewardLedger : [],
+        rewardRules: { ...def.rewardRules, ...(incoming.rewardRules || {}) },
         fcmToken: incoming.fcmToken || null
       };
       if (typeof merged.permissions.username !== 'boolean') {
@@ -1109,11 +1165,41 @@
     function persistState() {
       saveStateLocalOnly();
       if (firebaseDbRef && !isApplyingRemoteUpdate) {
-        firebaseDbRef.set(sanitizeForFirebase(appState)).catch(err => {
+        const stateWithoutChat = { ...appState };
+        delete stateWithoutChat.chat;
+        delete stateWithoutChat.fcmToken; // Never publish a push token in shared room state.
+        firebaseDbRef.update(sanitizeForFirebase(stateWithoutChat)).catch(err => {
           console.warn('Firebase Sync Fehler:', err);
           updateSyncIndicator(false);
         });
       }
+    }
+
+    function persistChat() {
+      saveStateLocalOnly();
+      if (firebaseDbRef && !isApplyingRemoteUpdate) {
+        firebaseDbRef.child('chat').transaction(remote => sanitizeForFirebase(mergeChatMessages(remote, appState.chat || [])), (error, committed, snapshot) => {
+          if (error || !committed) {
+            console.warn('Chat-Sync Fehler:', error || 'Transaktion abgebrochen');
+            updateSyncIndicator(false);
+            return;
+          }
+          appState.chat = mergeChatMessages(appState.chat, snapshot.val());
+          saveStateLocalOnly();
+          if (activeTab === 'chat') renderChat();
+        }, false);
+      }
+    }
+
+    function mergeChatMessages(localMessages, remoteMessages) {
+      const messagesById = new Map();
+      [...(Array.isArray(localMessages) ? localMessages : []), ...(Array.isArray(remoteMessages) ? remoteMessages : [])]
+        .forEach((message, index) => {
+          if (!message || typeof message !== 'object') return;
+          const fallbackId = 'legacy-' + (message.sender || '') + '-' + (message.timestamp || index) + '-' + JSON.stringify(message);
+          messagesById.set(message.id ? String(message.id) : fallbackId, message);
+        });
+      return Array.from(messagesById.values()).sort((a, b) => Number(a.timestamp || 0) - Number(b.timestamp || 0));
     }
 
     function sanitizeForFirebase(obj) {
@@ -1136,14 +1222,14 @@
           if (currentApp.options.databaseURL !== fbUrl) {
             currentApp.delete().then(() => {
               firebase.initializeApp({ ...FIREBASE_WEB_CONFIG, databaseURL: fbUrl });
-              firebaseRoomPathPending = safeRoomPath;
-              initProductionAuth();
+              attachFirebaseListener(safeRoomPath);
             });
             return;
           }
         }
+        initTestAppCheck();
         firebaseRoomPathPending = safeRoomPath;
-        initProductionAuth();
+        initTestAuth();
         initFCM(fbUrl);
       } catch (err) {
         console.warn('Firebase Init Fallback:', err);
@@ -1151,86 +1237,15 @@
       }
     }
 
-    // Authentication is additive: existing PIN and role selection remain unchanged.
-    function initProductionAuth() {
-      firebase.auth().onAuthStateChanged(async user => {
-        productionAuthUser = null;
-        productionAuthRole = null;
-        if (user) {
-          try {
-            const claims = (await user.getIdTokenResult()).claims;
-            if (['Master', 'Daisy'].includes(claims.dominionTestRole)) {
-              productionAuthUser = user;
-              productionAuthRole = claims.dominionTestRole;
-            }
-          } catch (error) {
-            console.warn('Firebase Auth role check failed:', error);
-          }
-        }
-        renderProductionAuthPanel();
-        updateAuthenticatedFirebaseSync();
-      });
-    }
-
-    function renderProductionAuthPanel() {
-      const panel = document.getElementById('production-firebase-auth-panel');
-      if (!panel || !currentRole) return;
-      const verified = productionAuthUser && productionAuthRole === currentRole;
-      const other = productionAuthUser && !verified;
-      panel.innerHTML = `
-        <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
-          <h3 class="font-semibold text-sm">🔐 Firebase-Anmeldung</h3>
-          <p class="text-xs text-slate-400">Zusätzliche Anmeldung für die künftige sichere Synchronisierung. Die bisherige Dominion-Anmeldung bleibt bestehen.</p>
-          <p class="text-xs ${verified ? 'text-emerald-300' : 'text-amber-300'}">${verified ? '✓ Firebase-Konto für ' + currentRole + ' bestätigt' : other ? 'Ein Firebase-Konto für ' + productionAuthRole + ' ist angemeldet. Bitte abmelden.' : 'Firebase-Anmeldung für ' + currentRole + ' ausstehend.'}</p>
-          ${productionAuthUser ? '<button type="button" onclick="signOutProductionFirebase()" class="px-3 py-2 text-xs rounded-lg bg-white/10">Firebase-Konto abmelden</button>' : `
-          <form onsubmit="signInProductionFirebase(event)" class="space-y-2">
-            <input id="production-auth-email" type="email" autocomplete="username" required placeholder="Firebase-E-Mail-Adresse" class="w-full rounded-lg bg-slate-800 border border-slate-600 px-3 py-2 text-sm text-white">
-            <input id="production-auth-password" type="password" autocomplete="current-password" required placeholder="Firebase-Passwort" class="w-full rounded-lg bg-slate-800 border border-slate-600 px-3 py-2 text-sm text-white">
-            <button type="submit" class="px-3 py-2 text-xs rounded-lg bg-amber-600 text-white">Bei Firebase anmelden</button>
-          </form>`}
-          <p class="text-[11px] text-slate-500">Die Datenbankregeln sind noch nicht umgestellt.</p>
-        </div>`;
-    }
-
-    async function signInProductionFirebase(event) {
-      event.preventDefault();
-      const role = currentRole;
-      const email = document.getElementById('production-auth-email')?.value.trim();
-      const password = document.getElementById('production-auth-password')?.value;
-      if (!role || !email || !password) return;
+    function initTestAppCheck() {
       try {
-        const result = await firebase.auth().signInWithEmailAndPassword(email, password);
-        const claims = (await result.user.getIdTokenResult(true)).claims;
-        if (claims.dominionTestRole !== role) {
-          await firebase.auth().signOut();
-          productionAuthUser = null;
-          productionAuthRole = null;
-          renderProductionAuthPanel();
-          showToast('Firebase-Konto gehört nicht zur gewählten Rolle.', 'error');
-          return;
-        }
-        productionAuthUser = result.user;
-        productionAuthRole = role;
-        renderProductionAuthPanel();
-        showToast('Firebase-Anmeldung erfolgreich!', 'success');
+        firebase.appCheck().activate(
+          new firebase.appCheck.ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
+          true
+        );
+        console.info('Dominion-Test App Check initialized.');
       } catch (error) {
-        console.warn('Firebase Auth error:', error.code || error.message);
-        showToast('Firebase-Anmeldung fehlgeschlagen. Zugangsdaten prüfen.', 'error');
-      } finally {
-        const field = document.getElementById('production-auth-password');
-        if (field) field.value = '';
-      }
-    }
-
-    async function signOutProductionFirebase() {
-      try {
-        await firebase.auth().signOut();
-        productionAuthUser = null;
-        productionAuthRole = null;
-        renderProductionAuthPanel();
-        showToast('Firebase-Konto abgemeldet.');
-      } catch (error) {
-        showToast('Firebase-Abmeldung fehlgeschlagen.', 'error');
+        console.warn('App Check initialization failed:', error);
       }
     }
 
@@ -1247,9 +1262,10 @@
                     vapidKey: FCM_VAPID_KEY,
                     serviceWorkerRegistration: registration
                   }).then((token) => {
-                    if (token && appState.fcmToken !== token) {
-                      appState.fcmToken = token;
-                      persistState();
+                    if (token) {
+                      const prefs = getDevicePrefs();
+                      prefs.fcmToken = token;
+                      saveDevicePrefs(prefs);
                     }
                   }).catch(e => console.warn('FCM silent token refresh warning:', e));
                 }
@@ -1262,46 +1278,172 @@
       }
     }
 
-    async function requestPushPermissions() {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          showToast('Push-Berechtigung erteilt!');
-          if (!swRegistration && 'serviceWorker' in navigator) {
-            swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js').catch(() => null);
-          }
-          if (messagingInstance) {
-            const tokenOptions = { vapidKey: FCM_VAPID_KEY };
-            if (swRegistration) {
-              tokenOptions.serviceWorkerRegistration = swRegistration;
+    // Firebase Auth is separate from the existing Dominion role/PIN UI.
+    // A verified custom claim, not the selected UI role, establishes identity.
+    function initTestAuth() {
+      firebase.auth().onAuthStateChanged(async (user) => {
+        testAuthUser = null;
+        testAuthRole = null;
+        if (user) {
+          try {
+            const result = await user.getIdTokenResult();
+            const role = result.claims.dominionTestRole;
+            if (role === 'Master' || role === 'Daisy') {
+              testAuthUser = user;
+              testAuthRole = role;
             }
-            const token = await messagingInstance.getToken(tokenOptions).catch((err) => {
-              console.warn('getToken Fehler:', err);
-              return null;
-            });
-            if (token) {
-              appState.fcmToken = token;
-              persistState();
-            }
+          } catch (error) {
+            console.warn('Firebase Auth claims could not be checked:', error);
           }
-          const pill = document.getElementById('push-status-pill');
-          if (pill) {
-            pill.textContent = 'Aktiviert';
-            pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-          }
-        } else {
-          showToast('Push-Berechtigung verweigert.', 'error');
         }
+        updateTestAuthPanel();
+        updateAuthenticatedFirebaseSync();
+        if (testAuthUser && testAuthRole === currentRole) registerTestPushToken().catch(e => console.warn("Push registration pending:", e.message));
+      });
+    }
+
+    function updateTestAuthPanel() {
+      const el = document.getElementById('test-firebase-auth-panel');
+      if (!el) return;
+      const matched = !!testAuthUser && testAuthRole === currentRole;
+      const otherRole = !!testAuthUser && !matched;
+      el.innerHTML = `
+        <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
+          <div class="font-semibold text-sm text-slate-100">🔐 Firebase-Anmeldung (Test)</div>
+          <p class="text-xs text-slate-400">Zusätzliche sichere Anmeldung für die spätere Push-Zustellung. Deine normale Dominion-Anmeldung bleibt unverändert.</p>
+          <p class="text-xs ${matched ? 'text-emerald-300' : 'text-amber-300'}">${matched ? '✓ Firebase-Konto für ' + currentRole + ' bestätigt' : otherRole ? 'Anderes Firebase-Konto angemeldet (' + testAuthRole + '). Bitte abmelden und das Konto für ' + currentRole + ' verwenden.' : 'Für ' + currentRole + ' noch nicht bei Firebase angemeldet.'}</p>
+          ${matched || otherRole ? '<button type="button" onclick="signOutTestFirebase()" class="px-3 py-2 text-xs rounded-lg bg-white/10 text-slate-100">Firebase-Konto abmelden</button>' : `
+            <form onsubmit="signInTestFirebase(event)" class="space-y-2">
+              <input id="test-auth-email" type="email" autocomplete="username" required placeholder="Firebase-E-Mail-Adresse" class="w-full rounded-lg bg-slate-800 border border-slate-600 text-white px-3 py-2 text-sm" />
+              <input id="test-auth-password" type="password" autocomplete="current-password" required placeholder="Firebase-Passwort" class="w-full rounded-lg bg-slate-800 border border-slate-600 text-white px-3 py-2 text-sm" />
+              <button type="submit" class="px-3 py-2 text-xs rounded-lg bg-amber-600 text-white">Bei Firebase anmelden</button>
+            </form>`}
+          <p id="test-push-registration-state" class="text-[11px] text-slate-500">Push-Registrierung: ${matched ? 'wird geprüft' : 'Firebase-Anmeldung erforderlich'}. Der automatische Versand wird erst nach Backend-Bereitstellung aktiviert.</p>
+        </div>`;
+    }
+
+    async function signInTestFirebase(event) {
+      event.preventDefault();
+      const email = document.getElementById('test-auth-email')?.value.trim();
+      const password = document.getElementById('test-auth-password')?.value;
+      if (!email || !password || !currentRole) return;
+      const intendedRole = currentRole;
+      try {
+        const credential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const claims = (await credential.user.getIdTokenResult(true)).claims;
+        if (claims.dominionTestRole !== intendedRole) {
+          await firebase.auth().signOut();
+          testAuthUser = null;
+          testAuthRole = null;
+          updateTestAuthPanel();
+          showToast('Dieses Firebase-Konto gehört nicht zur Rolle ' + intendedRole + '.', 'error');
+          return;
+        }
+        testAuthUser = credential.user;
+        testAuthRole = intendedRole;
+        updateTestAuthPanel();
+        showToast('Firebase-Anmeldung für ' + intendedRole + ' erfolgreich!', 'success');
+        registerTestPushToken().catch(e => console.warn('Push registration pending:', e.message));
+      } catch (error) {
+        console.warn('Firebase sign-in failed:', error.code || error.message);
+        showToast('Firebase-Anmeldung fehlgeschlagen. E-Mail und Passwort prüfen.', 'error');
+      } finally {
+        const passwordInput = document.getElementById('test-auth-password');
+        if (passwordInput) passwordInput.value = '';
+      }
+    }
+
+    async function signOutTestFirebase() {
+      try {
+        await firebase.auth().signOut();
+        testAuthUser = null;
+        testAuthRole = null;
+        updateTestAuthPanel();
+        showToast('Firebase-Konto abgemeldet.');
+      } catch (error) {
+        showToast('Firebase-Abmeldung fehlgeschlagen.', 'error');
+      }
+    }
+
+    async function registerTestPushToken() {
+      if (!testAuthUser || testAuthRole !== currentRole || !currentRole) return;
+      const prefs = getDevicePrefs();
+      if (!prefs.fcmToken || Notification.permission !== 'granted') return;
+      if (!prefs.pushDeviceId) {
+        prefs.pushDeviceId = Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2, '0')).join('');
+        saveDevicePrefs(prefs);
+      }
+      const status = document.getElementById('test-push-registration-state');
+      try {
+        const fn = firebase.app().functions('europe-west1').httpsCallable('registerTestPushDevice');
+        await fn({ token: prefs.fcmToken, deviceId: prefs.pushDeviceId });
+        if (status) status.textContent = '✓ Push-Gerät serverseitig registriert.';
+        showToast('Push-Gerät sicher registriert!', 'success');
+      } catch (error) {
+        if (status) status.textContent = 'Push-Server noch nicht erreichbar oder Registrierung fehlgeschlagen.';
+        console.warn('Secure push registration:', error.code || error.message);
+        throw error;
+      }
+    }
+
+    async function requestPushPermissions() {
+      let step = 'Browser-Unterstützung';
+      const setPushStatus = (message, ok) => {
+        for (const id of ['push-status-pill', 'daisy-push-status-pill']) {
+          const pill = document.getElementById(id);
+          if (pill) {
+            pill.textContent = message;
+            pill.className = 'inline-block text-[11px] px-2.5 py-1 rounded-full ' +
+              (ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' :
+                'bg-amber-500/15 text-amber-300 border border-amber-500/30');
+          }
+        }
+      };
+      try {
+        if (!('Notification' in window)) throw new Error('Dieser Browser unterstützt keine Web-Benachrichtigungen.');
+        if (!('serviceWorker' in navigator)) throw new Error('Service Worker werden nicht unterstützt.');
+        if (!('PushManager' in window)) throw new Error('Web Push wird von diesem Browser nicht unterstützt.');
+        step = 'Benachrichtigungsberechtigung';
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          setPushStatus('Berechtigung: ' + permission, false);
+          showToast('Push-Berechtigung: ' + permission, 'error');
+          return;
+        }
+        setPushStatus('Berechtigung erteilt – Registrierung läuft', false);
+        step = 'Service Worker';
+        swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+        step = 'Firebase Messaging';
+        if (!firebase.messaging.isSupported()) throw new Error('Firebase Messaging wird auf diesem Gerät nicht unterstützt.');
+        if (!messagingInstance) messagingInstance = firebase.messaging();
+        step = 'FCM-Token';
+        const token = await messagingInstance.getToken({
+          vapidKey: FCM_VAPID_KEY,
+          serviceWorkerRegistration: swRegistration
+        });
+        if (!token) throw new Error('Firebase hat kein Push-Token zurückgegeben.');
+        // Keep the token device-local; a shared room-level token can be overwritten by the other device.
+        const prefs = getDevicePrefs();
+        prefs.fcmToken = token;
+        saveDevicePrefs(prefs);
+        if (testAuthUser && testAuthRole === currentRole) {
+          await registerTestPushToken().catch(e => console.warn('Push backend not deployed yet:', e.message));
+        }
+        setPushStatus('Firebase-Registrierung erfolgreich', true);
+        showToast('Push-Gerät erfolgreich bei Firebase registriert!', 'success');
       } catch (err) {
-        console.error('Push error:', err);
-        showToast('Push konnte nicht aktiviert werden.', 'error');
+        console.error('Push-Aktivierung fehlgeschlagen bei ' + step + ':', err);
+        const details = err && err.message ? err.message : String(err);
+        setPushStatus('Fehler bei ' + step, false);
+        showToast('Push-Fehler (' + step + '): ' + details, 'error');
+        alert('Push-Diagnose – ' + step + '\\n' + details);
       }
     }
 
     // Database listeners start only after Firebase has restored a verified session.
     // This avoids permission errors when the database rules become restrictive.
     function updateAuthenticatedFirebaseSync() {
-      const verified = !!productionAuthUser && ['Master', 'Daisy'].includes(productionAuthRole);
+      const verified = !!testAuthUser && ['Master', 'Daisy'].includes(testAuthRole);
       if (!verified) {
         if (firebaseDbRef) firebaseDbRef.off();
         firebaseDbRef = null;
@@ -1321,19 +1463,36 @@
         updateSyncIndicator(true);
         const remoteData = snapshot.val();
         if (!remoteData) {
-          firebaseDbRef.set(sanitizeForFirebase(appState));
+          // This is a fixed, isolated test room. Initialize it only once atomically.
+          firebaseDbRef.transaction(existing => existing === null ? sanitizeForFirebase(createDefaultState()) : undefined, (error, committed) => {
+            if (error) { console.warn('Test-Raum Initialisierung:', error); updateSyncIndicator(false); }
+          }, false);
           return;
         }
 
+        let mergedChat = [];
+        let chatNeedsSync = false;
         isApplyingRemoteUpdate = true;
-        const localChatBackup = Array.isArray(appState.chat) ? [...appState.chat] : [];
-        appState = mergeWithDefaults(remoteData);
-        if (appState.chat.length === 0 && localChatBackup.length > 0) {
-          appState.chat = localChatBackup;
+        try {
+          const localChatBackup = Array.isArray(appState.chat) ? [...appState.chat] : [];
+          appState = mergeWithDefaults(remoteData);
+          delete appState.fcmToken;
+          const remoteChat = Array.isArray(appState.chat) ? appState.chat : [];
+          mergedChat = mergeChatMessages(localChatBackup, remoteChat);
+          chatNeedsSync = JSON.stringify(mergedChat) !== JSON.stringify(remoteChat);
+          appState.chat = mergedChat;
+          saveStateLocalOnly();
+          refreshAllUI();
+        } catch (err) {
+          console.error('Fehler beim Anwenden des Firebase-Status:', err);
+          updateSyncIndicator(false);
+          return;
+        } finally {
+          isApplyingRemoteUpdate = false;
         }
-        saveStateLocalOnly();
-        refreshAllUI();
-        isApplyingRemoteUpdate = false;
+        if (chatNeedsSync) {
+          persistChat();
+        }
       }, (error) => {
         console.warn('Firebase Listener Error:', error);
         updateSyncIndicator(false);
@@ -1450,7 +1609,7 @@
             showToast('Dieser Bereich ist aktuell durch den Master gesperrt.', 'error');
             return;
           }
-        } else if (['kalender', 'einkauf', 'strafbuch'].includes(tabId)) {
+        } else if (['kalender', 'einkauf', 'strafbuch', 'aufgaben', 'rewards'].includes(tabId)) {
           const perm = appState.permissions[tabId];
           if (perm && !perm.visible) {
             showToast('Dieser Bereich ist aktuell durch den Master gesperrt.', 'error');
@@ -1555,7 +1714,7 @@
 
       refreshAllUI();
       switchTab(startTab);
-      renderProductionAuthPanel();
+      updateTestAuthPanel();
     }
 
     function logoutRole() {
@@ -1566,6 +1725,7 @@
       document.getElementById('role-screen').classList.remove('hidden');
       cancelPinPrompt();
       updateLoginLabels();
+      updateTestAuthPanel();
     }
 
     function getDevicePrefs() {
@@ -1598,7 +1758,7 @@
 
       activeTab = tabId;
 
-      const allTabs = ['dashboard', 'chat', 'kalender', 'einkauf', 'strafbuch', 'verwaltung', 'einstellungen'];
+      const allTabs = ['dashboard', 'chat', 'kalender', 'einkauf', 'strafbuch', 'aufgaben', 'rewards', 'verwaltung', 'einstellungen'];
       allTabs.forEach(t => {
         const el = document.getElementById('tab-' + t);
         if (el) el.classList.toggle('hidden', t !== tabId);
@@ -1623,9 +1783,10 @@
 
     function updateLoginLabels() {
       document.getElementById('login-app-title').textContent = appState.basics.appTitle || 'DOMINION';
-      document.getElementById('login-app-subtitle').textContent = (appState.basics.appSubtitle || 'D+W Connection') + ' • v' + APP_VERSION;
+      document.getElementById('login-app-subtitle').textContent = (appState.basics.appSubtitle || 'D+W Connection') + ' • v2.3';
       document.getElementById('login-master-label').textContent = getDisplayName('Master');
       document.getElementById('login-daisy-label').textContent = getDisplayName('Daisy');
+      document.getElementById('daisy-pin-prompt-label').textContent = 'Bitte PIN eingeben';
     }
 
     function refreshAllUI() {
@@ -1639,24 +1800,27 @@
 
       document.querySelectorAll('.nav-btn').forEach(btn => {
         const tab = btn.getAttribute('data-tab');
-        if (currentRole === 'Daisy' && ['kalender', 'einkauf', 'strafbuch'].includes(tab)) {
+        if (currentRole === 'Daisy' && ['kalender', 'einkauf', 'strafbuch', 'aufgaben', 'rewards'].includes(tab)) {
           btn.classList.toggle('hidden', !hasPermission(tab, 'visible'));
         } else {
           btn.classList.remove('hidden');
         }
       });
 
+      processTaskDeadlines();
       renderDashboard();
       renderChat();
       renderKalender();
       renderEinkauf();
       renderStrafbuch();
       renderVerwaltung();
+      renderTasks();
+      renderRewards();
       renderEinstellungen();
     }
 
     // Dashboard layout is a per-browser preference, not shared room data.
-    const DASHBOARD_METRICS_PREF_KEY = 'dominion-dashboard-metrics-v1';
+    const DASHBOARD_METRICS_PREF_KEY = 'dominion-test-dashboard-metrics-v1';
     let dashboardMetricsPinned = false;
     let dashboardMetricsExpanded = true;
     try {
@@ -1710,7 +1874,7 @@
       saveDashboardMetricsPreference();
     }
 
-    const DASHBOARD_SECTION_PREF_KEY = 'dominion-dashboard-sections-v1';
+    const DASHBOARD_SECTION_PREF_KEY = 'dominion-test-dashboard-sections-v1';
     const dashboardSectionPreferences = { feed: { expanded: true, pinned: false }, events: { expanded: true, pinned: false } };
     try {
       const savedSections = JSON.parse(localStorage.getItem(DASHBOARD_SECTION_PREF_KEY) || '{}');
@@ -1775,7 +1939,9 @@
       { id: 'news', label: 'Update-News' },
       { id: 'metrics', label: 'Übersicht' },
       { id: 'feed', label: 'Aktivitäts-Stream' },
-      { id: 'events', label: 'Nächste Termine' }
+      { id: 'events', label: 'Nächste Termine' },
+      { id: 'today', label: 'Heute – Termine & Aufgaben' },
+      { id: 'rewards', label: 'Punktekonto / Rewards' }
     ];
     function getDashboardVisibility() {
       try {
@@ -1804,14 +1970,14 @@
       const prefs = getDashboardVisibility();
       for (const entry of DASHBOARD_VISIBLE_SECTIONS) {
         const el = document.getElementById('dashboard-section-' + entry.id);
-        if (el) el.classList.toggle('hidden', prefs[entry.id] === false);
+        if (el) el.classList.toggle('hidden', prefs[entry.id] === false || (entry.id === 'rewards' && currentRole === 'Daisy' && !hasPermission('rewards', 'visible')));
       }
     }
     function renderDashboardVisibilitySettings() {
       const box = document.getElementById('dashboard-visibility-options');
       if (!box) return;
       const prefs = getDashboardVisibility();
-      box.innerHTML = DASHBOARD_VISIBLE_SECTIONS.map(entry => `
+      box.innerHTML = DASHBOARD_VISIBLE_SECTIONS.filter(entry => entry.id !== 'rewards' || currentRole === 'Master' || hasPermission('rewards','visible')).map(entry => `
         <label class="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] border border-slate-800 px-3.5 py-3 cursor-pointer">
           <span class="text-sm text-slate-200">${entry.label}</span>
           <input type="checkbox" class="w-4 h-4 accent-amber-500" onchange="setDashboardSectionVisible('${entry.id}', this.checked)" ${prefs[entry.id] !== false ? 'checked' : ''} />
@@ -1822,13 +1988,16 @@
     function updateDashboardMetricPermissions() {
       document.querySelectorAll('#dashboard-metrics-grid [data-dashboard-permission]').forEach(tile => {
         const category = tile.getAttribute('data-dashboard-permission');
-        tile.classList.toggle('hidden', currentRole !== 'Master' && !hasPermission(category, 'visible'));
+        const permitted = currentRole === 'Master' || hasPermission(category, 'visible');
+        tile.classList.toggle('hidden', !permitted);
       });
     }
 
     function renderDashboard() {
       updateDashboardMetricPermissions();
       updateDashboardVisibilityUI();
+      renderDashboardRewards();
+      renderDashboardToday();
       updateDashboardMetricsUI();
       updateDashboardSectionsUI();
       document.getElementById('dash-greeting').textContent = `Hallo, ${getDisplayName(currentRole)}`;
@@ -1840,7 +2009,7 @@
       document.getElementById('stat-kalender').textContent = appState.kalender.length;
       document.getElementById('stat-einkauf').textContent = appState.einkauf.filter(i => !i.done).length;
       document.getElementById('stat-strafbuch').textContent = appState.strafbuch.filter(i => !i.resolved).length;
-      document.getElementById('stat-aufgaben').textContent = (appState.mgmt.aufgaben || []).filter(i => !i.done).length;
+      document.getElementById('stat-aufgaben').textContent = (appState.mgmt.aufgaben || []).filter(i => !['done','rejected'].includes(i.status)).length;
       document.getElementById('stat-toys').textContent = (appState.mgmt.toys || []).length;
       document.getElementById('stat-kleidung').textContent = (appState.mgmt.kleidung || []).length;
       document.getElementById('stat-regeln').textContent = (appState.mgmt.regeln || []).length;
@@ -1901,6 +2070,66 @@
       }
     }
 
+    function renderDashboardToday() {
+      const now = new Date();
+      const localDate = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+      document.getElementById('dash-today-date').textContent = now.toLocaleDateString('de-DE', { day: '2-digit', month: 'long' });
+      const eventsAllowed = currentRole === 'Master' || hasPermission('kalender', 'visible');
+      const tasksAllowed = currentRole === 'Master' || hasPermission('aufgaben', 'visible');
+      const entries = [];
+      if (eventsAllowed) for (const ev of appState.kalender || []) {
+        if (ev.date === localDate) entries.push({ type: 'event', title: ev.title, time: ev.time || '00:00', role: getEventOwnerRole(ev), status: '' });
+      }
+      if (tasksAllowed) for (const task of (appState.mgmt?.aufgaben || [])) {
+        if (task.deadline && task.deadline.slice(0, 10) === localDate) entries.push({ type: 'task', title: task.title, time: task.deadline.slice(11, 16) || '00:00', role: task.assignee || 'Master', status: taskStatus(task) });
+      }
+      entries.sort((a,b) => a.time.localeCompare(b.time) || (a.type === 'event' ? -1 : 1));
+      document.getElementById('dash-today-count').textContent = entries.length + (entries.length === 1 ? ' Eintrag' : ' Einträge');
+      document.getElementById('dash-today-items').innerHTML = entries.map(entry => {
+        const task = entry.type === 'task';
+        const done = entry.status === 'done';
+        const statusLabel = ({ done: 'Erledigt', review: 'Zur Prüfung', overdue: 'Frist überschritten', rejected: 'Nicht erfüllt', open: 'Offen' })[entry.status] || '';
+        const statusColor = done ? 'text-emerald-300' : entry.status === 'overdue' ? 'text-rose-300' : entry.status === 'review' ? 'text-amber-300' : 'text-slate-400';
+        return '<button type="button" onclick="switchTab(\'' + (task ? 'aufgaben' : 'kalender') + '\')" class="w-full text-left p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border ' + (done ? 'border-emerald-800/60' : 'border-slate-800') + ' transition"><div class="flex flex-wrap items-center gap-2"><span class="text-xs font-semibold text-[#e5b55c]">' + escapeHtml(entry.time) + '</span><span class="text-xs">' + (task ? '✅ Aufgabe' : '📅 Termin') + '</span><span class="text-sm font-medium ' + (done ? 'text-emerald-300 line-through' : 'text-slate-200') + '">' + escapeHtml(entry.title) + '</span></div><div class="flex flex-wrap gap-2 mt-1 text-[11px] text-slate-400"><span>Für: ' + escapeHtml(getDisplayName(entry.role)) + '</span>' + (task ? '<span class="' + statusColor + '">· ' + statusLabel + '</span>' : '') + '</div></button>';
+      }).join('') || '<p class="text-xs text-slate-500 py-2">Für heute sind keine Termine oder Aufgaben mit Frist eingetragen.</p>';
+    }
+
+    function formatAudioDuration(seconds) {
+      if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) return '';
+      const total = Math.floor(seconds);
+      return Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0');
+    }
+
+    // Audio in older backups was sometimes tagged as WebM even though its
+    // actual container is Ogg. Inspect the file signature before playback.
+    function correctedAudioDataUrl(value) {
+      if (typeof value !== 'string' || !value.startsWith('data:audio/')) return value;
+      const comma = value.indexOf(',');
+      if (comma < 0) return value;
+      const header = value.slice(0, comma);
+      const payload = value.slice(comma + 1);
+      if (!/;base64$/i.test(header)) return value;
+      // "OggS" = T2dnUw; EBML/WebM = GkXf; ftyp = MP4.
+      if (payload.startsWith('T2dnUw')) return 'data:audio/ogg;base64,' + payload;
+      if (payload.startsWith('GkXf')) return 'data:audio/webm;base64,' + payload;
+      return value;
+    }
+
+    let chatAudioObjectUrls = [];
+
+    function audioBlobUrl(dataUrl) {
+      const fixed = correctedAudioDataUrl(dataUrl);
+      if (typeof fixed !== 'string' || !fixed.startsWith('data:')) return fixed;
+      const match = /^data:([^;,]+);base64,(.*)$/s.exec(fixed);
+      if (!match) return fixed;
+      const binary = atob(match[2]);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type: match[1] }));
+      chatAudioObjectUrls.push(url);
+      return url;
+    }
+
     function renderChat() {
       const mName = getDisplayName('Master');
       const dName = getDisplayName('Daisy');
@@ -1915,10 +2144,13 @@
         return;
       }
 
+      chatAudioObjectUrls.forEach(url => URL.revokeObjectURL(url));
+      chatAudioObjectUrls = [];
       container.innerHTML = messages.map(msg => {
         const isMine = msg.sender === currentRole;
         const senderDisplay = getDisplayName(msg.sender);
         const timeStr = new Date(msg.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        const durationLabel = formatAudioDuration(msg.duration);
 
         return `
           <div class="flex flex-col ${isMine ? 'items-end' : 'items-start'}">
@@ -1929,12 +2161,36 @@
                 : 'bg-[#1e2230] text-slate-100 border border-slate-800 rounded-bl-sm'
             }">
               ${msg.image ? `<img src="${msg.image}" alt="Anhang" class="rounded-xl max-h-56 w-auto mb-2 border border-black/20" />` : ''}
-              ${msg.audio ? `<audio controls src="${msg.audio}" class="max-w-full h-9 mb-1"></audio>` : ''}
+              ${msg.audio ? `<audio controls preload="metadata" src="" data-audio-message-id="${escapeHtml(String(msg.id || ''))}" class="max-w-full h-9 mb-1"></audio><span class="block text-[10px] opacity-70" data-audio-duration>${durationLabel}</span>` : ''}
               ${msg.text ? `<p class="whitespace-pre-wrap break-words leading-relaxed">${escapeHtml(msg.text)}</p>` : ''}
             </div>
           </div>
         `;
       }).join('');
+
+      const audioMessages = messages.filter(msg => msg.audio);
+      container.querySelectorAll('audio').forEach((audio, index) => {
+        const msg = audioMessages[index];
+        try {
+          audio.src = audioBlobUrl(msg.audio);
+          audio.load();
+        } catch (error) {
+          console.warn('Audio-Blob konnte nicht geladen werden:', error);
+          const label = audio.parentElement.querySelector('[data-audio-duration]');
+          if (label) label.textContent = 'Audio konnte nicht geladen werden';
+        }
+        audio.addEventListener('error', () => {
+          const label = audio.parentElement.querySelector('[data-audio-duration]');
+          if (label) label.textContent = 'Audioformat nicht abspielbar (' + (audio.error?.code || '?') + ')';
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+          const label = audio.parentElement.querySelector('[data-audio-duration]');
+          if (label && Number.isFinite(audio.duration) && audio.duration > 0) {
+            label.textContent = formatAudioDuration(audio.duration);
+          }
+        }, { once: true });
+      });
     }
 
     function scrollChatToBottom() {
@@ -1942,16 +2198,50 @@
       if (container) container.scrollTop = container.scrollHeight;
     }
 
-    function handleChatImageSelect(event) {
-      const file = event.target.files[0];
+    async function handleChatImageSelect(event) {
+      const file = event.target.files && event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        pendingChatImage = e.target.result;
-        document.getElementById('chat-preview-img').src = pendingChatImage;
-        document.getElementById('chat-attachment-preview').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
+      pendingChatImage = null;
+      const preview = document.getElementById('chat-attachment-preview');
+      const previewImg = document.getElementById('chat-preview-img');
+      preview.classList.add('hidden');
+      try {
+        if (!file.type.startsWith('image/')) throw new Error('Die ausgewählte Datei ist kein Bild.');
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error('Das Bild konnte nicht eingelesen werden.'));
+          reader.readAsDataURL(file);
+        });
+        const img = await new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = () => reject(new Error('Dieses Bildformat kann der Browser nicht anzeigen.'));
+          image.src = dataUrl;
+        });
+        // Resize and convert to JPEG for reliable cross-device delivery and
+        // to avoid oversized Firebase room writes from phone camera photos.
+        const maxSide = 1280;
+        const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Bildverarbeitung wird nicht unterstützt.');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const converted = canvas.toDataURL('image/jpeg', 0.75);
+        if (!converted.startsWith('data:image/jpeg')) throw new Error('Bildumwandlung fehlgeschlagen.');
+        pendingChatImage = converted;
+        previewImg.src = converted;
+        preview.classList.remove('hidden');
+        showToast('Bild bereit zum Senden.', 'success');
+      } catch (error) {
+        console.warn('Bildauswahl fehlgeschlagen:', error);
+        clearChatAttachment();
+        showToast(error.message || 'Bild konnte nicht verarbeitet werden.', 'error');
+      }
     }
 
     function clearChatAttachment() {
@@ -1965,23 +2255,67 @@
       if (!isRecordingAudio) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
+          // Prefer WebM/Opus on Android/Chromium, but respect actual support.
+          const preferredTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
+          const chosenType = preferredTypes.find(type => MediaRecorder.isTypeSupported(type));
+          mediaRecorder = chosenType ? new MediaRecorder(stream, { mimeType: chosenType }) : new MediaRecorder(stream);
+          recordingStartedAt = Date.now();
           audioChunks = [];
-          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) audioChunks.push(e.data);
+          };
           mediaRecorder.onstop = () => {
-            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            if (!audioChunks.length) {
+              stream.getTracks().forEach(t => t.stop());
+              showToast('Keine Audiodaten aufgenommen.', 'error');
+              return;
+            }
+            const actualMimeType = (audioChunks[0] && audioChunks[0].type) || mediaRecorder.mimeType || 'application/octet-stream';
+            const blob = new Blob(audioChunks, { type: actualMimeType });
             const reader = new FileReader();
-            reader.onloadend = () => {
+            const audioProbe = new Audio();
+            const objectUrl = URL.createObjectURL(blob);
+            let duration = Math.max(1, Math.round((Date.now() - recordingStartedAt) / 1000));
+            let fileReady = false;
+            let metadataReady = false;
+            let audioDataUrl = null;
+            const finalizeMessage = () => {
+              if (!fileReady || !metadataReady) return;
+              if (typeof audioDataUrl !== 'string' || !audioDataUrl.startsWith('data:')) {
+                showToast('Die Audioaufnahme konnte nicht verarbeitet werden.', 'error');
+                return;
+              }
               appState.chat.push({
-                id: 'msg-' + Date.now(),
+                id: 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
                 sender: currentRole,
-                audio: reader.result,
+                audio: audioDataUrl,
+                audioMimeType: blob.type || actualMimeType,
+                duration: duration,
                 timestamp: Date.now()
               });
-              persistState();
+              persistChat();
               renderChat();
               scrollChatToBottom();
             };
+            audioProbe.preload = 'metadata';
+            audioProbe.onloadedmetadata = () => {
+              if (Number.isFinite(audioProbe.duration) && audioProbe.duration > 0) duration = audioProbe.duration;
+              metadataReady = true;
+              URL.revokeObjectURL(objectUrl);
+              finalizeMessage();
+            };
+            audioProbe.onerror = () => {
+              metadataReady = true;
+              URL.revokeObjectURL(objectUrl);
+              finalizeMessage();
+            };
+            audioProbe.src = objectUrl;
+            reader.onload = () => {
+              audioDataUrl = correctedAudioDataUrl(reader.result);
+              fileReady = true;
+              finalizeMessage();
+            };
+            reader.onerror = () => showToast('Die Audioaufnahme konnte nicht gelesen werden.', 'error');
             reader.readAsDataURL(blob);
             stream.getTracks().forEach(t => t.stop());
           };
@@ -2005,7 +2339,7 @@
       if (!text && !pendingChatImage) return;
 
       appState.chat.push({
-        id: 'msg-' + Date.now(),
+        id: 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
         sender: currentRole,
         text: text,
         image: pendingChatImage || null,
@@ -2014,7 +2348,7 @@
 
       input.value = '';
       clearChatAttachment();
-      persistState();
+      persistChat();
       renderChat();
       scrollChatToBottom();
     }
@@ -2449,8 +2783,214 @@
       if (cameraInput) cameraInput.value = '';
     }
 
+
+    // v2.6 preview: ledger entries use stable event keys to prevent duplicate local bookings.
+    function rewardBalance() {
+      return (appState.rewardLedger || []).reduce((sum, row) => sum + Number(row.amount || 0), 0);
+    }
+    function bookReward(key, amount, description) {
+      if (!Number.isFinite(Number(amount)) || !amount) return false;
+      if (!Array.isArray(appState.rewardLedger)) appState.rewardLedger = [];
+      if (appState.rewardLedger.some(row => row.id === key)) return false;
+      appState.rewardLedger.push({ id: key, amount: Number(amount), description, timestamp: Date.now() });
+      if (currentRole) showRewardToast(Number(amount));
+      return true;
+    }
+    function showRewardToast(amount) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const positive = amount > 0;
+      toast.className = 'px-4 py-3 rounded-xl border text-sm font-bold shadow-xl backdrop-blur-md animate-fade ' + (positive ? 'border-emerald-500/60 bg-emerald-950/95 text-emerald-200' : 'border-rose-500/60 bg-rose-950/95 text-rose-200');
+      toast.textContent = '🎯 ' + (positive ? '+' : '−') + Math.abs(amount) + ' ' + (Math.abs(amount) === 1 ? 'Punkt' : 'Punkte');
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .25s'; setTimeout(() => toast.remove(), 260); }, 3500);
+    }
+    function rewardAmount(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+    }
+    function taskStatus(task) {
+      if (task.status === 'done' || task.status === 'rejected') return task.status;
+      if (task.status === 'review') return 'review';
+      if (task.assignee === 'Daisy' && task.deadline && Date.now() > new Date(task.deadline).getTime()) return 'overdue';
+      if (task.assignee === 'Master' && task.deadline && Date.now() > new Date(task.deadline).getTime()) return 'overdue';
+      return 'open';
+    }
+    function migrateLegacyTasks() {
+      if (!Array.isArray(appState.mgmt.aufgaben)) appState.mgmt.aufgaben = [];
+      appState.mgmt.aufgaben.forEach(task => {
+        if (task.taskV26) return;
+        task.taskV26 = true;
+        task.assignee = 'Master';
+        task.taskKind = 'personal';
+        task.status = task.done ? 'done' : 'open';
+        task.plusPoints = 0;
+        task.minusPoints = 0;
+        task.cycle = 0;
+        task.deadline = '';
+        task.history = [];
+      });
+    }
+    function processTaskDeadlines() {
+      migrateLegacyTasks();
+      let changed = false;
+      for (const task of appState.mgmt.aufgaben) {
+        if (task.assignee !== 'Daisy' || task.taskKind === 'personal' || task.status !== 'open' || !task.deadline) continue;
+        const deadlineTime = new Date(task.deadline).getTime();
+        if (!Number.isFinite(deadlineTime) || Date.now() <= deadlineTime) continue;
+        const key = 'task:' + task.id + ':late:' + (task.cycle || 0);
+        bookReward(key, -rewardAmount(task.minusPoints), 'Frist überschritten: ' + task.title);
+        task.status = 'overdue';
+        (task.history ||= []).push({ event: 'Frist überschritten', at: Date.now() });
+        changed = true;
+      }
+      if (changed) persistState();
+      return changed;
+    }
+    function updateTaskForm() {
+      const assignee = document.getElementById('task-assignee').value;
+      const kind = document.getElementById('task-kind');
+      if (currentRole === 'Daisy') { kind.value = 'personal'; kind.disabled = true; } else kind.disabled = assignee !== 'Daisy';
+      document.getElementById('task-kind-wrap').classList.toggle('hidden', assignee !== 'Daisy');
+      document.getElementById('task-points-fields').classList.toggle('hidden', assignee !== 'Daisy' || kind.value !== 'reward');
+    }
+    function resetTaskForm() {
+      editingTaskId = null;
+      ['task-title', 'task-desc', 'task-deadline'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('task-assignee').value = 'Daisy';
+      document.getElementById('task-kind').value = currentRole === 'Daisy' ? 'personal' : 'reward';
+      document.getElementById('task-plus').value = 0;
+      document.getElementById('task-minus').value = 0;
+      updateTaskForm();
+    }
+    function saveTask() {
+      if (currentRole !== 'Master' && (!hasPermission('aufgaben', 'add') || document.getElementById('task-kind').value !== 'personal')) return;
+      const title = document.getElementById('task-title').value.trim();
+      const desc = document.getElementById('task-desc').value.trim();
+      const assignee = document.getElementById('task-assignee').value;
+      const kind = currentRole === 'Daisy' || assignee === 'Master' ? 'personal' : document.getElementById('task-kind').value;
+      const deadline = document.getElementById('task-deadline').value;
+      if (!title || !deadline || !Number.isFinite(new Date(deadline).getTime())) return showToast('Titel und gültige Deadline erforderlich.', 'error');
+      if (new Date(deadline).getTime() <= Date.now()) return showToast('Deadline muss in der Zukunft liegen.', 'error');
+      const tasks = appState.mgmt.aufgaben;
+      const task = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
+      if (editingTaskId && (!task || currentRole !== 'Master' || task.status !== 'open')) return;
+      const values = { title, desc, assignee, deadline, taskKind: kind, plusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-plus').value) : 0, minusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-minus').value) : 0 };
+      if (task) Object.assign(task, values);
+      else tasks.unshift({ id: 'task-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), taskV26: true, status: 'open', cycle: 0, history: [], done: false, ...values });
+      logActivity('hat Aufgabe angelegt/bearbeitet: „' + title + '“', 'aufgaben');
+      resetTaskForm(); persistState(); refreshAllUI(); showToast('Aufgabe gespeichert.');
+    }
+    function editTask(id) {
+      if (currentRole !== 'Master') return;
+      const t = appState.mgmt.aufgaben.find(t => t.id === id);
+      if (!t || t.status !== 'open') return;
+      editingTaskId = id;
+      document.getElementById('task-title').value = t.title;
+      document.getElementById('task-desc').value = t.desc || '';
+      document.getElementById('task-assignee').value = t.assignee;
+      document.getElementById('task-deadline').value = t.deadline || '';
+      document.getElementById('task-kind').value = t.taskKind || (t.assignee === 'Daisy' ? 'reward' : 'personal');
+      document.getElementById('task-plus').value = t.plusPoints || 0;
+      document.getElementById('task-minus').value = t.minusPoints || 0;
+      updateTaskForm();
+      document.getElementById('tasks-form').scrollIntoView({ behavior: 'smooth' });
+    }
+    function reportTask(id) {
+      const task = appState.mgmt.aufgaben.find(t => t.id === id);
+      if (!task || task.assignee !== 'Daisy' || task.taskKind === 'personal' || currentRole !== 'Daisy' || !hasPermission('aufgaben', 'visible') || !['open','overdue'].includes(task.status)) return;
+      processTaskDeadlines();
+      const timestamp = Date.now();
+      task.reportedAt = timestamp;
+      task.status = 'review';
+      (task.history ||= []).push({ event: 'Zur Prüfung eingereicht', at: timestamp });
+      persistState(); refreshAllUI(); showToast('Zur Prüfung eingereicht.');
+    }
+    function completeMasterTask(id) {
+      const task = appState.mgmt.aufgaben.find(t => t.id === id);
+      if (!task || (task.taskKind !== 'personal' && task.assignee !== 'Master') || task.status === 'done' || (currentRole !== 'Master' && (currentRole !== 'Daisy' || task.assignee !== 'Daisy' || !hasPermission('aufgaben', 'visible')))) return;
+      task.status = 'done'; task.done = true;
+      (task.history ||= []).push({ event: 'Erledigt', at: Date.now() });
+      persistState(); refreshAllUI();
+    }
+    function reviewTask(id, decision) {
+      if (currentRole !== 'Master') return;
+      const task = appState.mgmt.aufgaben.find(t => t.id === id);
+      if (!task || task.assignee !== 'Daisy' || task.taskKind === 'personal' || !['review','overdue'].includes(task.status)) return;
+      if (decision === 'extend') {
+        const deadline = prompt('Neue Deadline (JJJJ-MM-TTTHH:MM)', task.deadline || '');
+        if (!deadline) return;
+        if (!Number.isFinite(new Date(deadline).getTime()) || new Date(deadline).getTime() <= Date.now()) return showToast('Neue Deadline muss in der Zukunft liegen.', 'error');
+        task.cycle = (task.cycle || 0) + 1;
+        task.deadline = deadline;
+        task.status = 'open';
+        task.reportedAt = null;
+        (task.history ||= []).push({ event: 'Frist verlängert', at: Date.now(), deadline });
+      } else if (decision === 'accept') {
+        bookReward('task:' + task.id + ':completed', rewardAmount(task.plusPoints), 'Aufgabe erfüllt: ' + task.title);
+        task.status = 'done'; task.done = true;
+        (task.history ||= []).push({ event: 'Erfüllt bestätigt', at: Date.now() });
+      } else if (decision === 'reject') {
+        const lateKey = 'task:' + task.id + ':late:' + (task.cycle || 0);
+        if (!(appState.rewardLedger || []).some(row => row.id === lateKey)) {
+          bookReward('task:' + task.id + ':rejected:' + (task.cycle || 0), -rewardAmount(task.minusPoints), 'Nicht erfüllt: ' + task.title);
+        }
+        task.status = 'rejected'; task.done = false;
+        (task.history ||= []).push({ event: 'Endgültig nicht erfüllt', at: Date.now() });
+      } else return;
+      persistState(); refreshAllUI();
+    }
+    function renderTasks() {
+      migrateLegacyTasks();
+      const permitted = currentRole === 'Master' || hasPermission('aufgaben','visible');
+      const list = document.getElementById('task-list');
+      if (!permitted) { list.innerHTML = ''; return; }
+      const form = document.getElementById('tasks-form');
+      form.classList.toggle('hidden', currentRole !== 'Master' && !hasPermission('aufgaben','add'));
+      const assignee = document.getElementById('task-assignee');
+      if (currentRole === 'Daisy') { assignee.disabled = false; document.getElementById('task-kind').value = 'personal'; } else assignee.disabled = false;
+      updateTaskForm();
+      const labels = { open: ['Offen','text-sky-300','border-sky-800'], review: ['Zur Prüfung','text-amber-300','border-amber-800'], overdue: ['Frist überschritten','text-rose-300','border-rose-800'], done: ['Erfüllt','text-emerald-300','border-emerald-800'], rejected: ['Nicht erfüllt','text-slate-400','border-slate-700'] };
+      list.innerHTML = appState.mgmt.aufgaben.map(t => {
+        const status = taskStatus(t);
+        const style = labels[status];
+        const personal = t.taskKind === 'personal' || (t.assignee === 'Master' && t.taskKind !== 'reward');
+        const buttons = personal
+          ? ((currentRole === 'Master' || (currentRole === 'Daisy' && t.assignee === 'Daisy')) && status !== 'done' ? '<button onclick="completeMasterTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-emerald-900/40 text-emerald-200">Erledigt</button>' : '')
+          : (currentRole === 'Daisy' && ['open','overdue'].includes(status) ? '<button onclick="reportTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-amber-900/40 text-amber-200">Erledigt melden</button>' : '');
+        const reviewButtons = !personal && currentRole === 'Master' && t.assignee === 'Daisy' && ['review','overdue'].includes(status)
+          ? ['accept','reject','extend'].map((d,i) => '<button onclick="reviewTask(\'' + t.id + '\',\'' + d + '\')" class="px-3 py-1 rounded-lg bg-white/10">' + ['Erfüllt','Nicht erfüllt','Frist verlängern'][i] + '</button>').join('')
+          : '';
+        const edit = currentRole === 'Master' && status === 'open' ? '<button onclick="editTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-white/10">Bearbeiten</button>' : '';
+        return '<div class="rounded-xl border ' + style[2] + ' bg-white/[0.03] p-3 space-y-2"><div class="flex flex-wrap justify-between gap-2"><strong class="text-sm">' + escapeHtml(t.title) + '</strong><span class="text-xs ' + style[1] + '">' + style[0] + '</span></div><p class="text-xs text-slate-400">' + escapeHtml(t.desc || '') + '</p><div class="text-xs text-slate-400">Für: ' + escapeHtml(getDisplayName(t.assignee || 'Master')) + ' · Frist: ' + (t.deadline ? new Date(t.deadline).toLocaleString('de-DE') : 'Keine (Altbestand)') + '</div>' + (t.assignee === 'Daisy' ? '<div class="text-xs text-slate-400">+' + rewardAmount(t.plusPoints) + ' / −' + rewardAmount(t.minusPoints) + ' Punkte pro Fristversäumnis</div>' : '') + (t.reportedAt ? '<div class="text-xs text-amber-300">Gemeldet: ' + new Date(t.reportedAt).toLocaleString('de-DE') + '</div>' : '') + '<div class="flex flex-wrap gap-2 text-xs">' + buttons + reviewButtons + edit + '</div></div>';
+      }).join('') || '<p class="text-xs text-slate-400">Noch keine Aufgaben vorhanden.</p>';
+    }
+    function renderRewards() {
+      const allowed = currentRole === 'Master' || hasPermission('rewards','visible');
+      document.getElementById('rewards-balance').textContent = allowed ? rewardBalance() + ' Punkte' : '';
+      document.getElementById('reward-rule-editor').innerHTML = '';
+      document.getElementById('rewards-ledger').innerHTML = allowed
+        ? (appState.rewardLedger || []).slice().reverse().map(row => '<div class="flex justify-between gap-3 border-b border-slate-800 py-2 text-xs"><span>' + escapeHtml(row.description || '') + '<br><span class="text-slate-500">' + new Date(row.timestamp).toLocaleString('de-DE') + '</span></span><strong class="' + (row.amount >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (row.amount > 0 ? '+' : '') + row.amount + '</strong></div>').join('') || '<p class="text-xs text-slate-500">Noch keine Buchungen.</p>'
+        : '';
+    }
+    function saveRewardRule(cat, value) {
+      if (currentRole !== 'Master' || !['kleidung','toys'].includes(cat)) return;
+      appState.rewardRules[cat] = rewardAmount(value);
+      persistState(); refreshAllUI();
+      showToast('Punktevergabe aktualisiert.');
+    }
+    function renderDashboardRewards() {
+      const bal = rewardBalance();
+      document.getElementById('dashboard-reward-balance').textContent = (bal > 0 ? '+' : '') + bal;
+      const candidates = (appState.mgmt[bal >= 0 ? 'belohnungen' : 'strafen'] || []).filter(x => rewardAmount(x.rewardPoints) > 0 && rewardAmount(x.rewardPoints) <= Math.abs(bal)).sort((a,b) => rewardAmount(b.rewardPoints) - rewardAmount(a.rewardPoints));
+      document.getElementById('dashboard-reward-hint').textContent = candidates.length ? (bal >= 0 ? '🎁 Erreichbar: ' : '⚠️ Strafe möglich: ') + candidates[0].title + ' (' + rewardAmount(candidates[0].rewardPoints) + ' Punkte)' : (bal < 0 ? 'Noch keine passende Strafe hinterlegt' : 'Noch keine Belohnung erreichbar');
+    }
+
+    setInterval(() => { if (currentRole && processTaskDeadlines()) refreshAllUI(); }, 30000);
+
     function renderVerwaltung() {
-      const visibleCats = MGMT_CATEGORIES.filter(cat => hasPermission(cat.id, 'visible'));
+      const visibleCats = MGMT_CATEGORIES.filter(cat => cat.id !== 'aufgaben' && hasPermission(cat.id, 'visible'));
       const subTabsEl = document.getElementById('verwaltung-subtabs');
 
       if (visibleCats.length === 0) {
@@ -2489,6 +3029,7 @@
       numberMgmtItems(appState);
       const items = appState.mgmt[activeMgmtCategory] || [];
       const listEl = document.getElementById('mgmt-items-list');
+      const rewardCategory = ['belohnungen', 'strafen'].includes(activeMgmtCategory);
 
       if (items.length === 0) {
         listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Noch keine Einträge in dieser Kategorie.</p>`;
@@ -2507,6 +3048,7 @@
               ${item.itemNumber ? '<span class="text-xs font-mono text-amber-300">' + escapeHtml(item.itemNumber) + '</span>' : ''}
               <span class="font-semibold text-sm ${item.done ? 'line-through text-slate-500' : 'text-white'} truncate">${escapeHtml(item.title)}</span>
             </div>
+            ${rewardCategory ? `<p class="text-xs text-amber-300">Punktwert: ${Number(item.rewardPoints || 0)}</p>` : ''}
             ${item.desc ? `<p class="text-xs text-slate-400 mt-1 break-words">${escapeHtml(item.desc)}</p>` : ''}
             ${item.imgUrl ? `<img src="${escapeHtml(item.imgUrl)}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 w-auto mt-2 border border-slate-700" />` : ''}
           </div>
@@ -2564,6 +3106,7 @@
       const desc = document.getElementById('mgmt-desc').value.trim();
       if (!title) { showToast('Bitte eine Bezeichnung eingeben.', 'error'); return; }
       const oldTitle = item.title || ''; item.title = title; item.desc = desc;
+      if (['belohnungen','strafen'].includes(catId)) { const v = prompt('Punktwert (0 = nicht festgelegt)', item.rewardPoints || 0); if (v !== null) item.rewardPoints = Math.max(0, Number(v) || 0); }
       if (['kleidung', 'toys'].includes(catId)) { if (mgmtDraftImage) item.imgUrl = mgmtDraftImage; else if (mgmtImageRemoved) delete item.imgUrl; }
       const catObj = MGMT_CATEGORIES.find(category => category.id === catId);
       logActivity('hat ' + (catObj ? catObj.singular : 'Eintrag') + ' bearbeitet: „' + oldTitle + '“ → „' + title + '“', 'verwaltung', catId, item.id);
@@ -2585,11 +3128,13 @@
       const next = (appState.mgmtCounters[activeMgmtCategory] || 0) + 1;
       appState.mgmtCounters[activeMgmtCategory] = next;
       const newItem = { id: 'mgmt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), itemNumber: prefix + '-' + String(next).padStart(4, '0'), title, desc, done: false };
+      if (['belohnungen','strafen'].includes(activeMgmtCategory)) { const v = prompt('Punktwert für diesen Eintrag', '0'); if (v === null) return; newItem.rewardPoints = Math.max(0, Number(v) || 0); }
       if (['kleidung', 'toys'].includes(activeMgmtCategory) && mgmtDraftImage) newItem.imgUrl = mgmtDraftImage;
       if (!Array.isArray(appState.mgmt[activeMgmtCategory])) {
         appState.mgmt[activeMgmtCategory] = [];
       }
       appState.mgmt[activeMgmtCategory].unshift(newItem);
+      if (currentRole === 'Daisy' && ['kleidung','toys'].includes(activeMgmtCategory)) bookReward('item:' + newItem.id, rewardAmount(appState.rewardRules[activeMgmtCategory]), 'Neuer Eintrag: ' + title);
 
       logActivity(`hat ${catObj ? catObj.singular : 'Eintrag'} hinzugefügt: „${title}“`, 'verwaltung', activeMgmtCategory, newItem.id);
 
@@ -2643,14 +3188,17 @@
           </button>
         `;
       } else {
-        if (!['basics', 'ansicht', 'daisy-security'].includes(activeSettingsSubTab)) activeSettingsSubTab = 'basics';
+        if (!['basics', 'ansicht', 'benachrichtigungen', 'daisy-security'].includes(activeSettingsSubTab)) activeSettingsSubTab = 'basics';
         subTabsEl.innerHTML = `
           <button onclick="selectSettingsSubTab('basics')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'basics' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🎛️ Basics
           </button>
-          <button onclick="selectSettingsSubTab('daisy-security')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'daisy-security' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">🔐 Sicherheit</button>
           <button onclick="selectSettingsSubTab('ansicht')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'ansicht' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             👁️ Ansicht
+          </button>
+          <button onclick="selectSettingsSubTab('daisy-security')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'daisy-security' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">🔐 Sicherheit</button>
+          <button onclick="selectSettingsSubTab('benachrichtigungen')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'benachrichtigungen' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
+            🔔 Benachrichtigungen
           </button>
         `;
       }
@@ -2663,14 +3211,15 @@
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
-      const authParent = document.getElementById(isMaster ? 'settings-panel-sicherheit' : 'settings-panel-basics');
-      let authPanel = document.getElementById('production-firebase-auth-panel');
-      if (!authPanel) {
+      document.getElementById('settings-panel-benachrichtigungen').classList.toggle('hidden', isMaster || activeSettingsSubTab !== 'benachrichtigungen');
+      const authParent = document.getElementById(isMaster ? 'settings-panel-sicherheit' : 'settings-panel-benachrichtigungen');
+      let authPanel = document.getElementById('test-firebase-auth-panel');
+      if (authParent && !authPanel) {
         authPanel = document.createElement('div');
-        authPanel.id = 'production-firebase-auth-panel';
+        authPanel.id = 'test-firebase-auth-panel';
       }
-      if (authParent && authPanel.parentElement !== authParent) authParent.appendChild(authPanel);
-      renderProductionAuthPanel();
+      if (authParent && authPanel && authPanel.parentElement !== authParent) authParent.appendChild(authPanel);
+      updateTestAuthPanel();
 
       const masterNameInput = document.getElementById('basic-master-name');
       const daisyNameInput = document.getElementById('basic-daisy-name');
@@ -2718,7 +3267,7 @@
     }
 
     function selectSettingsSubTab(subTab) {
-      if (currentRole !== 'Master' && !['basics', 'ansicht', 'daisy-security'].includes(subTab)) return;
+      if (currentRole !== 'Master' && !['basics', 'ansicht', 'benachrichtigungen', 'daisy-security'].includes(subTab)) return;
       activeSettingsSubTab = subTab;
       renderEinstellungen();
     }
@@ -2774,6 +3323,9 @@
       document.getElementById('perm-username-toggle').checked = !!appState.permissions.username;
 
       const tbody = document.getElementById('permissions-matrix-body');
+      const table = tbody.closest('table');
+      const header = table?.querySelector('thead tr');
+      if (header && !header.querySelector('[data-points-heading]')) header.insertAdjacentHTML('beforeend', '<th data-points-heading class="p-2 text-center text-xs" title="Punkte je neuem Eintrag von Daisy">🎯 Punkte</th>');
       tbody.innerHTML = PERMISSION_CATEGORIES.map(cat => {
         const p = appState.permissions[cat.id] || { visible: true, add: false, edit: false, delete: false };
         return `
@@ -2786,6 +3338,7 @@
                        class="w-4 h-4 accent-[#c9973e] rounded cursor-pointer" />
               </td>
             `).join('')}
+            ${['kleidung', 'toys'].includes(cat.id) ? `<td class="p-2 text-center"><input aria-label="Punkte für ${cat.label}" title="Punkte pro neuem Eintrag durch Daisy" type="number" min="0" step="1" value="${rewardAmount(appState.rewardRules?.[cat.id])}" onchange="saveRewardRule('${cat.id}',this.value)" class="w-16 max-w-full px-2 py-1.5 text-xs rounded-lg" /></td>` : '<td class="p-2 text-center text-slate-600">–</td>'}
           </tr>
         `;
       }).join('');
@@ -2806,6 +3359,7 @@
       }
       appState.permissions[catId][action] = value;
       persistState();
+      refreshAllUI();
       showToast('Berechtigung aktualisiert.');
     }
 
