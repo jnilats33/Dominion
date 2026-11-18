@@ -268,7 +268,7 @@
           </div>
           <p class="text-[11px] text-slate-400">Veröffentlicht am 18.11.2026</p>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Neu in Dominion v2.6: Die Aufgabenverwaltung unterstützt Deadlines, Statusanzeigen und die Bestätigung durch Master. Daisy kann außerdem organisatorische Aufgaben ohne Punkte oder Prüfung anlegen und selbst erledigen. Das Rewards-System bietet ein Punktekonto mit Buchungshistorie, automatische Punktebuchungen und kurze Meldungen bei Punkteänderungen. In den Berechtigungen legt Master die Punkte für neue Kleidung, Toys, Belohnungen, Strafen und Regeln fest. Das Dashboard zeigt im neuen Bereich <strong>Heute</strong> die Termine und Aufgabenfristen des aktuellen Tages; <strong>Nächste Termine</strong> bleibt erhalten. Die Einlösung von Belohnungen und Durchführung von Strafen ist für einen späteren Schritt vorgesehen.
+            Neu in Dominion v2.7: Punktwerte für Belohnungen und Strafen lassen sich direkt im Formular anlegen und bearbeiten. Master kann falsche Punktebuchungen nach Sicherheitsabfrage löschen. Daisy sieht vor dem Hinzufügen berechtigter Einträge den Punktebonus; für Master gibt es keine automatische Gutschrift. „Heute“ steht jetzt direkt unter der Übersicht. „Nächste Termine &amp; Deadlines“ zeigt Kalendertermine und offene Aufgabenfristen gemeinsam mit Rollenfilter.
           </p>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
@@ -276,6 +276,7 @@
               <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
             </summary>
             <div class="mt-3 space-y-3 text-xs text-slate-300">
+              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1"><strong class="text-[#e5b55c]">Dominion v2.6 · 18.11.2026</strong><p>Aufgabenverwaltung, Rewards-Punktekonto und automatische Punktevergabe, Dashboard-Bereich „Heute“, neue Statistik- und Ansichtseinstellungen.</p></div>
               <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
                 <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.5 · Dashboard-Update</strong><span class="text-slate-500">17.11.2026</span></div>
                 <p>Das Dashboard wird persönlicher: sieben Statistik-Kacheln inklusive Toys, Kleidung und Regeln; einklappbare und festpinnbare Bereiche; einheitliche Kartenoptik sowie <strong>Einstellungen → Ansicht → Dashboard</strong> zum individuellen Ein- und Ausblenden für Master und Daisy. Außerdem erhältst du hier einen ausklappbaren Versionsverlauf.</p>
@@ -374,6 +375,13 @@
           <div id="dashboard-reward-hint" class="text-xs text-slate-400 mt-2"></div>
         </div>
         <!-- LIVE ACTIVITY STREAM / FEED -->
+        <div id="dashboard-section-today" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="font-semibold text-sm text-[#e5b55c]">☀️ Heute <span id="dash-today-date" class="text-xs text-slate-400 font-normal"></span></h3>
+            <span id="dash-today-count" class="text-[11px] text-slate-400"></span>
+          </div>
+          <div id="dash-today-items" class="space-y-2"></div>
+        </div>
         <div id="dashboard-section-feed" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
           <div class="flex items-center justify-between mb-4 gap-2">
             <button type="button" id="dashboard-feed-toggle" onclick="toggleDashboardSection('feed')" aria-expanded="true" aria-controls="dashboard-feed-content" class="flex items-center gap-2.5 text-left hover:opacity-80 transition">
@@ -397,18 +405,11 @@
         </div>
 
         <!-- Upcoming Events Preview -->
-        <div id="dashboard-section-today" class="glass-card rounded-2xl p-5 border border-[#c9973e]/25">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h3 class="font-semibold text-sm text-[#e5b55c]">☀️ Heute <span id="dash-today-date" class="text-xs text-slate-400 font-normal"></span></h3>
-            <span id="dash-today-count" class="text-[11px] text-slate-400"></span>
-          </div>
-          <div id="dash-today-items" class="space-y-2"></div>
-        </div>
         <div id="dashboard-section-events" class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3 gap-2">
             <button type="button" id="dashboard-events-toggle" onclick="toggleDashboardSection('events')" aria-expanded="true" aria-controls="dashboard-events-content" class="flex items-center gap-2 text-left font-semibold text-sm text-slate-200 hover:text-[#e5b55c] transition">
               <span id="dashboard-events-arrow" aria-hidden="true">▾</span>
-              <span>📅</span> Nächste Termine
+              <span>📅</span> Nächste Termine & Deadlines
             </button>
             <div class="flex items-center gap-2">
               <button onclick="switchTab('kalender')" class="text-xs text-[#c9973e] hover:underline">Alle ansehen →</button>
@@ -416,6 +417,7 @@
             </div>
           </div>
           <div id="dashboard-events-content">
+            <div class="mb-3 flex items-center gap-2"><label for="dash-role-filter" class="text-xs text-slate-400">Rolle:</label><select id="dash-role-filter" onchange="setUpcomingFilter(this.value)" class="rounded-lg bg-slate-900 border border-slate-700 px-2 py-1 text-xs text-white"><option value="Master">Master</option><option value="both">Beide</option><option value="Daisy">Daisy</option></select></div>
             <div id="dash-upcoming-events" class="space-y-2"></div>
           </div>
         </div>
@@ -2067,20 +2069,40 @@
         }).join('');
       }
 
-      const upcomingBox = document.getElementById('dash-upcoming-events');
-      const sortedEvents = [...appState.kalender].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).slice(0, 3);
-      if (sortedEvents.length === 0) {
-        upcomingBox.innerHTML = `<p class="text-xs text-slate-500">Keine anstehenden Termine eingetragen.</p>`;
-      } else {
-        upcomingBox.innerHTML = sortedEvents.map(ev => `
-          <div onclick="jumpToTarget('kalender', null, '${ev.id}')" class="p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-slate-800 flex items-center justify-between cursor-pointer transition">
-            <span class="text-xs font-medium text-slate-200">${escapeHtml(ev.title)}</span>
-            <span class="text-[11px] text-[#c9973e]">${formatDateDE(ev.date)} • ${escapeHtml(ev.time || '')}</span>
-          </div>
-        `).join('');
-      }
+      renderUpcomingDashboard();
+
     }
 
+    const UPCOMING_FILTER_KEY = STORAGE_KEY + '-upcoming-role-';
+    function setUpcomingFilter(role) {
+      if (!['Master','Daisy','both'].includes(role)) return;
+      try { localStorage.setItem(UPCOMING_FILTER_KEY + currentRole, role); } catch (_) {}
+      renderUpcomingDashboard();
+    }
+    function renderUpcomingDashboard() {
+      let filter = 'both';
+      try { filter = localStorage.getItem(UPCOMING_FILTER_KEY + currentRole) || 'both'; } catch (_) {}
+      if (!['Master','Daisy','both'].includes(filter)) filter = 'both';
+      const select = document.getElementById('dash-role-filter');
+      select.options[0].textContent = getDisplayName('Master');
+      select.options[2].textContent = getDisplayName('Daisy');
+      select.value = filter;
+      const now = Date.now(), entries = [];
+      if (currentRole === 'Master' || hasPermission('kalender','visible')) for (const ev of appState.kalender || []) {
+        const role = getEventOwnerRole(ev);
+        const when = new Date(ev.date + 'T' + (ev.time || '00:00')).getTime();
+        if (Number.isFinite(when) && when >= now && (filter === 'both' || filter === role)) entries.push({type:'kalender', title:ev.title, role, when});
+      }
+      if (currentRole === 'Master' || hasPermission('aufgaben','visible')) for (const task of appState.mgmt.aufgaben || []) {
+        const role = task.assignee || 'Master';
+        const when = new Date(task.deadline || '').getTime();
+        if (Number.isFinite(when) && when >= now && !['done','rejected','review'].includes(taskStatus(task)) && (filter === 'both' || filter === role)) entries.push({type:'aufgaben', title:task.title, role, when});
+      }
+      entries.sort((a,b) => a.when-b.when);
+      document.getElementById('dash-upcoming-events').innerHTML = entries.length ? entries.slice(0,5).map(entry =>
+        '<button type="button" onclick="switchTab(\'' + entry.type + '\')" class="w-full text-left p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-slate-800 flex justify-between gap-2"><span class="text-xs text-slate-200">' + (entry.type === 'kalender' ? '📅 ' : '⏳ ') + escapeHtml(entry.title) + '<span class="block text-[10px] text-slate-500">' + escapeHtml(getDisplayName(entry.role)) + '</span></span><span class="text-[11px] text-[#c9973e] whitespace-nowrap">' + new Date(entry.when).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + '</span></button>'
+      ).join('') : '<p class="text-xs text-slate-500">Keine bevorstehenden Termine oder offenen Deadlines.</p>';
+    }
     function renderDashboardToday() {
       const now = new Date();
       const localDate = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
