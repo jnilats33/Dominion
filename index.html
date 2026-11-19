@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.7</title>
+  <title>Dominion App v2.8</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -266,9 +266,9 @@
             </h3>
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Aktuelle Version</span>
           </div>
-          <p class="text-[11px] text-slate-400">Veröffentlicht am 18.11.2026</p>
+          <p class="text-[11px] text-slate-400">Veröffentlicht am 19.11.2026</p>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Neu in Dominion v2.7: Punktwerte für Belohnungen und Strafen lassen sich direkt im Formular anlegen und bearbeiten. Master kann falsche Punktebuchungen nach Sicherheitsabfrage löschen. Daisy sieht vor dem Hinzufügen berechtigter Einträge den Punktebonus; für Master gibt es keine automatische Gutschrift. „Heute“ steht jetzt direkt unter der Übersicht. „Nächste Termine &amp; Deadlines“ zeigt Kalendertermine und offene Aufgabenfristen gemeinsam mit Rollenfilter.
+            Neu in Dominion v2.8 (Test): Termine werden über ein übersichtliches Pop-up angelegt und bearbeitet. „Beide“ erzeugt zwei intern verknüpfte Einträge. Zeitspannen, Termine über Mitternacht und mehrtägige Zeiträume werden unterstützt. Getrennte Felder „Punkte bei Erfüllung“ und „Abzug für Nichterfüllung“ steuern die Buchung nach Masters Bestätigung (Erfüllt / Nicht erfüllt); sie erscheinen nur bei Daisy oder „Beide“. Der Papierkorb der Punktehistorie wurde repariert.
           </p>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
@@ -276,6 +276,7 @@
               <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
             </summary>
             <div class="mt-3 space-y-3 text-xs text-slate-300">
+              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1"><strong class="text-[#e5b55c]">Dominion v2.7 · 19.11.2026</strong><p>Punktewerte für Belohnungen und Strafen im Formular, Löschfunktion für Punktebuchungen (in v2.8 repariert), Bonus-Hinweise für Daisy, Dashboard „Heute“ und „Nächste Termine &amp; Deadlines“ mit Rollenfilter.</p></div>
               <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1"><strong class="text-[#e5b55c]">Dominion v2.6 · 18.11.2026</strong><p>Aufgabenverwaltung, Rewards-Punktekonto und automatische Punktevergabe, Dashboard-Bereich „Heute“, neue Statistik- und Ansichtseinstellungen.</p></div>
               <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
                 <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.5 · Dashboard-Update</strong><span class="text-slate-500">17.11.2026</span></div>
@@ -531,17 +532,23 @@
             </div>
           </div>
 
-          <!-- Add Event Form -->
-          <div id="kalender-add-box" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
-            <input id="cal-title" type="text" placeholder="Titel des Termins..." class="sm:col-span-5 px-3.5 py-2.5 text-sm" />
-            <input id="cal-date" type="date" class="sm:col-span-3 px-3 py-2.5 text-sm" />
-            <input id="cal-time" type="time" class="sm:col-span-2 px-3 py-2.5 text-sm" />
-            <div class="sm:col-span-2 flex gap-2">
-              <select id="cal-owner" title="Zuordnung" class="flex-1 px-2 py-2.5 text-xs">
-                <option value="Master">♛ Master</option>
-                <option value="Daisy">🌸 Daisy</option>
-              </select>
-              <button onclick="addCalendarEvent()" class="px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm shrink-0">+</button>
+          <div id="cal-new-trigger" class="flex justify-end"><button type="button" onclick="openCalendarDialog()" class="px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">＋ Neuer Termin</button></div>
+          <div id="cal-dialog" class="hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-8" role="dialog" aria-modal="true" aria-labelledby="cal-dialog-title" onclick="if(event.target===this)closeCalendarDialog()">
+            <div class="max-w-xl mx-auto my-4 sm:my-10 rounded-2xl border border-slate-700 bg-[#202331] shadow-2xl p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between gap-3"><h3 id="cal-dialog-title" class="text-lg font-semibold text-white">Neuen Termin anlegen</h3><button type="button" onclick="closeCalendarDialog()" aria-label="Schließen" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300">✕</button></div>
+              <div id="kalender-add-box" class="space-y-3">
+                <label class="block text-xs text-slate-300">Titel<input id="cal-title" type="text" placeholder="Titel des Termins..." class="w-full mt-1 px-3.5 py-2.5 text-sm" /></label>
+                <label class="block text-xs text-slate-300">Für wen?<select id="cal-owner" onchange="updateCalendarPointsVisibility()" class="w-full mt-1 px-3 py-2.5 text-sm"><option value="Master">♛ Master</option><option value="Daisy">🌸 Daisy</option><option value="both">♛🌸 Beide</option></select></label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label class="text-xs text-slate-300">Startdatum<input id="cal-date" type="date" class="w-full mt-1 px-3 py-2.5 text-sm" /></label>
+                  <label class="text-xs text-slate-300">Startzeit (optional)<input id="cal-time" type="time" class="w-full mt-1 px-3 py-2.5 text-sm" /></label>
+                  <label class="text-xs text-slate-300">Enddatum (optional)<input id="cal-end-date" type="date" class="w-full mt-1 px-3 py-2.5 text-sm" /></label>
+                  <label class="text-xs text-slate-300">Endzeit (optional)<input id="cal-end-time" type="time" class="w-full mt-1 px-3 py-2.5 text-sm" /></label>
+                </div>
+                <div id="cal-points-section" class="hidden rounded-xl border border-rose-500/20 bg-rose-500/5 p-3 space-y-2"><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><label class="block text-xs text-slate-300">Punkte bei Erfüllung<input id="cal-points-plus" type="number" min="0" step="1" value="0" class="w-full mt-1 px-3 py-2.5 text-sm" /></label><label class="block text-xs text-slate-300">Abzug für Nichterfüllung<input id="cal-points-minus" type="number" min="0" step="1" value="0" class="w-full mt-1 px-3 py-2.5 text-sm" /></label></div><p class="text-[11px] text-slate-400">Punkte werden erst nach Bestätigung durch Master gebucht.</p></div>
+                <div id="cal-edit-actions" class="hidden"><label class="text-xs text-slate-300 flex items-center gap-2"><input id="cal-edit-pair" type="checkbox" checked /> Beide verknüpften Termine ändern</label></div>
+              </div>
+              <div class="flex justify-end gap-2 pt-2 border-t border-slate-700"><button type="button" onclick="closeCalendarDialog()" class="px-4 py-2.5 rounded-lg bg-slate-700 text-slate-200 text-sm">Abbrechen</button><button id="cal-save-btn" type="button" onclick="submitCalendarDialog()" class="px-4 py-2.5 rounded-lg gold-gradient font-semibold text-sm">Termin anlegen</button></div>
             </div>
           </div>
 
@@ -966,7 +973,7 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
-    const APP_VERSION = '2.7';
+    const APP_VERSION = '2.8';
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
@@ -1095,6 +1102,7 @@
     let calViewYear = new Date().getFullYear();
     let calViewMonth = new Date().getMonth();
     let calSelectedDate = null;
+    let calendarEditingId = null;
     let pendingChatImage = null;
     let mgmtDraftImage = null;
     let mgmtEditingItemId = null;
@@ -2091,7 +2099,7 @@
       if (currentRole === 'Master' || hasPermission('kalender','visible')) for (const ev of appState.kalender || []) {
         const role = getEventOwnerRole(ev);
         const when = new Date(ev.date + 'T' + (ev.time || '00:00')).getTime();
-        if (Number.isFinite(when) && when >= now && (filter === 'both' || filter === role)) entries.push({type:'kalender', title:ev.title, role, when});
+        if (Number.isFinite(when) && (when >= now || !calendarHasEnded(ev)) && (filter === 'both' || filter === role)) entries.push({type:'kalender', title:ev.title, role, when:Math.max(when,now)});
       }
       if (currentRole === 'Master' || hasPermission('aufgaben','visible')) for (const task of appState.mgmt.aufgaben || []) {
         const role = task.assignee || 'Master';
@@ -2111,7 +2119,7 @@
       const tasksAllowed = currentRole === 'Master' || hasPermission('aufgaben', 'visible');
       const entries = [];
       if (eventsAllowed) for (const ev of appState.kalender || []) {
-        if (ev.date === localDate) entries.push({ type: 'event', title: ev.title, time: ev.time || '00:00', role: getEventOwnerRole(ev), status: '' });
+        if (calendarCoversDate(ev, localDate)) entries.push({ type: 'event', title: ev.title, time: ev.time || '00:00', role: getEventOwnerRole(ev), status: '' });
       }
       if (tasksAllowed) for (const task of (appState.mgmt?.aufgaben || [])) {
         if (task.deadline && task.deadline.slice(0, 10) === localDate) entries.push({ type: 'task', title: task.title, time: task.deadline.slice(11, 16) || '00:00', role: task.assignee || 'Master', status: taskStatus(task) });
@@ -2428,7 +2436,7 @@
     function renderKalender() {
       const canAdd = hasPermission('kalender', 'add');
       const canDelete = hasPermission('kalender', 'delete');
-      document.getElementById('kalender-add-box').classList.toggle('hidden', !canAdd);
+      document.getElementById('cal-new-trigger').classList.toggle('hidden', !canAdd);
 
       const mName = getDisplayName('Master');
       const dName = getDisplayName('Daisy');
@@ -2456,12 +2464,10 @@
       if (ownerSelect && ownerSelect.options.length >= 2) {
         ownerSelect.options[0].text = `♛ ${mName}`;
         ownerSelect.options[1].text = `🌸 ${dName}`;
+        if (ownerSelect.options[2]) ownerSelect.options[2].text = `♛🌸 Beide`;
       }
 
-      const timeInput = document.getElementById('cal-time');
-      if (timeInput && !timeInput.value) {
-        timeInput.value = appState.basics.defaultEventTime || '18:00';
-      }
+      // Dialog initializes time when opened.
 
       // Filter events according to role toggle
       const roleFilteredEvents = appState.kalender.filter(ev => {
@@ -2492,7 +2498,7 @@
           const mm = String(calViewMonth + 1).padStart(2, '0');
           const dd = String(day).padStart(2, '0');
           const iso = `${calViewYear}-${mm}-${dd}`;
-          const dayEvents = roleFilteredEvents.filter(ev => ev.date === iso);
+          const dayEvents = roleFilteredEvents.filter(ev => calendarCoversDate(ev, iso));
           const masterEvents = dayEvents.filter(ev => getEventOwnerRole(ev) === 'Master');
           const daisyEvents = dayEvents.filter(ev => getEventOwnerRole(ev) === 'Daisy');
 
@@ -2548,9 +2554,9 @@
       const list = document.getElementById('kalender-list');
       let listEvents = [...roleFilteredEvents];
       if (calSelectedDate) {
-        listEvents = listEvents.filter(ev => ev.date === calSelectedDate);
+        listEvents = listEvents.filter(ev => calendarCoversDate(ev, calSelectedDate));
       }
-      const sorted = listEvents.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+      const sorted = listEvents.sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
 
       if (sorted.length === 0) {
         list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Keine Termine für diese Auswahl vorhanden.</p>`;
@@ -2566,7 +2572,7 @@
           : 'bg-rose-500/15 text-rose-300 border-rose-500/30';
 
         return `
-          <div id="item-${ev.id}" class="p-3.5 rounded-xl bg-white/[0.03] border ${isMasterEv ? 'border-[#c9973e]/25' : 'border-rose-500/25'} flex items-center justify-between gap-3">
+          <div id="item-${ev.id}" class="p-3.5 rounded-xl ${ev.endDate || ev.endTime ? (isMasterEv ? 'bg-[#c9973e]/10' : 'bg-rose-500/10') : 'bg-white/[0.03]'} border ${isMasterEv ? 'border-[#c9973e]/25' : 'border-rose-500/25'} flex items-center justify-between gap-3">
             <div>
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md border ${pillClass}">
@@ -2574,46 +2580,160 @@
                 </span>
                 <span class="font-semibold text-sm text-white">${escapeHtml(ev.title)}</span>
               </div>
-              <div class="text-xs text-slate-400 mt-1">📅 ${formatDateDE(ev.date)} um ${escapeHtml(ev.time || '18:00')} Uhr</div>
+              <div class="text-xs text-slate-400 mt-1">📅 ${calendarRangeLabel(ev)}</div>${ownerRole === 'Daisy' && ((ev.pointsPlus != null ? Number(ev.pointsPlus) : Math.max(0, Number(ev.points || 0))) || (ev.pointsMinus != null ? Number(ev.pointsMinus) : Math.max(0,-Number(ev.points || 0)))) ? `<div class="text-xs mt-1 ${ev.confirmed ? 'text-emerald-300' : 'text-amber-300'}">${ev.confirmed ? ('✓ ' + (ev.confirmOutcome === 'unfulfilled' ? 'Nicht erfüllt' : 'Erfüllt')) : '⏳ Vorgemerkt'}: +${ev.pointsPlus != null ? ev.pointsPlus : Math.max(0,Number(ev.points || 0))} / −${ev.pointsMinus != null ? ev.pointsMinus : Math.max(0,-Number(ev.points || 0))} Punkte</div>` : ''}
             </div>
-            ${canDelete ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
+            <div class="flex gap-1 shrink-0">
+              ${currentRole === 'Master' && ownerRole === 'Daisy' && !ev.confirmed ? `<button onclick="confirmCalendarEvent('${ev.id}','fulfilled')" class="p-2 rounded-lg bg-emerald-500/15 text-emerald-300 text-xs" title="Termin erfüllt">✓ Erfüllt</button><button onclick="confirmCalendarEvent('${ev.id}','unfulfilled')" class="p-2 rounded-lg bg-rose-500/15 text-rose-300 text-xs" title="Termin nicht erfüllt">✕ Nicht erfüllt</button>` : ''}
+              ${hasPermission('kalender','edit') || currentRole === 'Master' ? `<button onclick="editCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-slate-700/50 text-slate-200 text-xs" title="Termin bearbeiten">✎</button>` : ''}
+              ${canDelete ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
+            </div>
+
           </div>
         `;
       }).join('');
     }
 
-    function addCalendarEvent() {
-      if (!hasPermission('kalender', 'add')) return;
+    function calendarEndDate(ev) { return ev.endDate || ev.date; }
+    function calendarCoversDate(ev, iso) { return ev.date <= iso && calendarEndDate(ev) >= iso; }
+    function calendarRangeLabel(ev) {
+      const start = formatDateDE(ev.date) + (ev.time ? ' ' + escapeHtml(ev.time) : '');
+      const end = ev.endDate || ev.endTime ? ' – ' + formatDateDE(ev.endDate || ev.date) + (ev.endTime ? ' ' + escapeHtml(ev.endTime) : '') : '';
+      return start + end;
+    }
+    function calendarHasEnded(ev) {
+      const end = ev.endDate || ev.date;
+      const time = ev.endTime || (ev.endDate ? '23:59' : ev.time || '23:59');
+      return Date.now() >= new Date(end + 'T' + time).getTime();
+    }
+    function calendarFormData() {
       const title = document.getElementById('cal-title').value.trim();
       const date = document.getElementById('cal-date').value;
-      const time = document.getElementById('cal-time').value || appState.basics.defaultEventTime || '18:00';
-      const ownerEl = document.getElementById('cal-owner');
-      const owner = ownerEl ? ownerEl.value : currentRole;
-
-      if (!title || !date) {
-        showToast('Bitte Titel und Datum angeben.', 'error');
-        return;
+      const time = document.getElementById('cal-time').value || '';
+      const endDate = document.getElementById('cal-end-date').value || '';
+      const endTime = document.getElementById('cal-end-time').value || '';
+      const owner = document.getElementById('cal-owner').value;
+      const pointsPlus = Number(document.getElementById('cal-points-plus').value || 0);
+      const pointsMinus = Number(document.getElementById('cal-points-minus').value || 0);
+      if (!title || !date) { showToast('Bitte Titel und Datum angeben.', 'error'); return null; }
+      if (![pointsPlus, pointsMinus].every(n => Number.isSafeInteger(n) && n >= 0)) { showToast('Bitte nichtnegative ganze Punkte angeben.', 'error'); return null; }
+      if (endDate && endDate < date || endDate === date && endTime && time && endTime < time || !endDate && endTime && time && endTime < time) {
+        showToast('Das Ende darf nicht vor dem Beginn liegen. Für Termine über Mitternacht bitte Enddatum angeben.', 'error'); return null;
       }
-
-      const newEv = { id: 'cal-' + Date.now(), title, date, time, owner, createdBy: currentRole };
-      appState.kalender.push(newEv);
-      logActivity(`hat neuen Termin angelegt (${getDisplayName(owner)}): „${title}“ (${formatDateDE(date)})`, 'kalender', null, newEv.id);
-
+      return {title,date,time,endDate,endTime,owner,pointsPlus,pointsMinus};
+    }
+    function addCalendarEvent() {
+      if (!hasPermission('kalender', 'add')) return;
+      const data = calendarFormData();
+      if (!data) return;
+      const groupId = 'calgroup-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+      const owners = data.owner === 'both' ? ['Master','Daisy'] : [data.owner];
+      for (const owner of owners) {
+        const ev = {id:'cal-' + Date.now() + '-' + Math.random().toString(36).slice(2,9),title:data.title,date:data.date,time:data.time,endDate:data.endDate,endTime:data.endTime,owner,createdBy:currentRole,groupId:data.owner === 'both' ? groupId : null,pointsPlus:owner === 'Daisy' && currentRole === 'Master' ? data.pointsPlus : 0,pointsMinus:owner === 'Daisy' && currentRole === 'Master' ? data.pointsMinus : 0,confirmed:false};
+        appState.kalender.push(ev);
+        logActivity('hat Termin angelegt: „' + data.title + '“', 'kalender', null, ev.id);
+      }
+      closeCalendarDialog();
+      persistState(); refreshAllUI(); showToast(owners.length === 2 ? 'Zwei verknüpfte Termine gespeichert.' : 'Termin gespeichert.');
+    }
+    function editCalendarEvent(id) {
+      if (currentRole !== 'Master' && !hasPermission('kalender','edit')) return;
+      const ev = appState.kalender.find(x => x.id === id);
+      if (!ev) return;
+      calendarEditingId = id;
+      document.getElementById('cal-title').value = ev.title;
+      document.getElementById('cal-date').value = ev.date;
+      document.getElementById('cal-time').value = ev.time || '';
+      document.getElementById('cal-end-date').value = ev.endDate || '';
+      document.getElementById('cal-end-time').value = ev.endTime || '';
+      document.getElementById('cal-owner').value = ev.owner;
+      document.getElementById('cal-points-plus').value = ev.pointsPlus != null ? ev.pointsPlus : Math.max(0,Number(ev.points || 0));
+      document.getElementById('cal-points-minus').value = ev.pointsMinus != null ? ev.pointsMinus : Math.max(0,-Number(ev.points || 0));
+      document.getElementById('cal-edit-actions').classList.remove('hidden');
+      document.getElementById('cal-owner').disabled = true;
+      document.getElementById('cal-points-plus').disabled = currentRole !== 'Master' || ev.confirmed || ev.owner !== 'Daisy';
+      document.getElementById('cal-points-minus').disabled = currentRole !== 'Master' || ev.confirmed || ev.owner !== 'Daisy';
+      document.getElementById('cal-edit-pair').checked = !!ev.groupId;
+      document.getElementById('cal-edit-pair').parentElement.classList.toggle('hidden', !ev.groupId);
+      document.getElementById('cal-dialog-title').textContent = 'Termin bearbeiten';
+      document.getElementById('cal-save-btn').textContent = 'Änderungen speichern';
+      updateCalendarPointsVisibility();
+      document.getElementById('cal-dialog').classList.remove('hidden');
+      document.getElementById('cal-title').focus();
+    }
+    function updateCalendarPointsVisibility() {
+      const owner = document.getElementById('cal-owner').value;
+      const canAward = currentRole === 'Master' && (owner === 'Daisy' || owner === 'both');
+      document.getElementById('cal-points-section').classList.toggle('hidden', !canAward);
+      const ev = calendarEditingId && appState.kalender.find(x => x.id === calendarEditingId);
+      document.getElementById('cal-points-plus').disabled = !canAward || !!(ev && ev.confirmed);
+      document.getElementById('cal-points-minus').disabled = !canAward || !!(ev && ev.confirmed);
+    }
+    function openCalendarDialog() {
+      if (!hasPermission('kalender','add')) return;
+      calendarEditingId = null;
       document.getElementById('cal-title').value = '';
-      persistState();
-      refreshAllUI();
-      showToast('Termin gespeichert.');
+      document.getElementById('cal-date').value = calSelectedDate || '';
+      document.getElementById('cal-time').value = appState.basics.defaultEventTime || '18:00';
+      document.getElementById('cal-end-date').value = '';
+      document.getElementById('cal-end-time').value = '';
+      document.getElementById('cal-owner').value = currentRole === 'Daisy' ? 'Daisy' : 'Master';
+      document.getElementById('cal-owner').disabled = false;
+      document.getElementById('cal-points-plus').value = '0';
+      document.getElementById('cal-points-minus').value = '0';
+      document.getElementById('cal-edit-actions').classList.add('hidden');
+      document.getElementById('cal-dialog-title').textContent = 'Neuen Termin anlegen';
+      document.getElementById('cal-save-btn').textContent = 'Termin anlegen';
+      updateCalendarPointsVisibility();
+      document.getElementById('cal-dialog').classList.remove('hidden');
+      document.getElementById('cal-title').focus();
+    }
+    function closeCalendarDialog() {
+      calendarEditingId = null;
+      document.getElementById('cal-dialog').classList.add('hidden');
+      document.getElementById('cal-owner').disabled = false;
+    }
+    function cancelCalendarEdit() { closeCalendarDialog(); }
+    function submitCalendarDialog() { if (calendarEditingId) saveCalendarEdit(); else addCalendarEvent(); }
+    function saveCalendarEdit() {
+      if (!calendarEditingId || currentRole !== 'Master' && !hasPermission('kalender','edit')) return;
+      const ev = appState.kalender.find(x => x.id === calendarEditingId);
+      const data = calendarFormData();
+      if (!ev || !data) return;
+      const pair = !!ev.groupId && document.getElementById('cal-edit-pair').checked;
+      const targets = pair ? appState.kalender.filter(x => x.groupId === ev.groupId) : [ev];
+      targets.forEach(x => {
+        x.title=data.title; x.date=data.date; x.time=data.time; x.endDate=data.endDate; x.endTime=data.endTime;
+        if (x.owner === 'Daisy' && currentRole === 'Master' && !x.confirmed && x.id === ev.id) { x.pointsPlus=data.pointsPlus; x.pointsMinus=data.pointsMinus; delete x.points; }
+      });
+      closeCalendarDialog(); persistState(); refreshAllUI(); showToast('Termin aktualisiert.');
+    }
+    function confirmCalendarEvent(id, outcome) {
+      if (currentRole !== 'Master' || !['fulfilled','unfulfilled'].includes(outcome)) return;
+      const ev = appState.kalender.find(x => x.id === id);
+      if (!ev || ev.owner !== 'Daisy' || ev.confirmed) return;
+      if (!calendarHasEnded(ev)) { showToast('Der Termin ist noch nicht beendet.', 'error'); return; }
+      const plus = ev.pointsPlus != null ? Number(ev.pointsPlus) : Math.max(0, Number(ev.points || 0));
+      const minus = ev.pointsMinus != null ? Number(ev.pointsMinus) : Math.max(0, -Number(ev.points || 0));
+      const amount = outcome === 'fulfilled' ? plus : -minus;
+      const label = outcome === 'fulfilled' ? 'Erfüllt' : 'Nicht erfüllt';
+      if (!confirm('Termin als „' + label + '“ bestätigen? ' + (amount ? (amount > 0 ? '+' : '') + amount + ' Punkte für Daisy.' : 'Keine Punktebuchung.'))) return;
+      const key = 'calendar-confirm-' + ev.id;
+      if (amount && !bookReward(key, amount, 'Kalender (' + label + '): ' + ev.title)) { showToast('Buchung bereits vorhanden oder entfernt.', 'error'); return; }
+      ev.confirmed = true;
+      ev.confirmOutcome = outcome;
+      persistState(); refreshAllUI(); showToast(amount ? 'Termin bestätigt. Punkte gebucht.' : 'Termin ohne Punkte bestätigt.');
     }
 
     function deleteCalendarEvent(id) {
       if (!hasPermission('kalender', 'delete')) return;
       const ev = appState.kalender.find(e => e.id === id);
-      appState.kalender = appState.kalender.filter(e => e.id !== id);
-      if (ev) {
-        logActivity(`hat Termin gelöscht: „${ev.title}“`, 'kalender');
-      }
-      persistState();
-      refreshAllUI();
+      if (!ev) return;
+      const pair = !!ev.groupId && confirm('Auch den verknüpften Termin löschen?\nOK = beide, Abbrechen = nur diesen Termin');
+      const ids = appState.kalender.filter(e => e.id === id || pair && e.groupId === ev.groupId).map(e => e.id);
+      if (!confirm('Wirklich ' + ids.length + ' Termin(e) löschen? Bereits gebuchte Punkte bleiben in der Historie.')) return;
+      appState.kalender = appState.kalender.filter(e => !ids.includes(e.id));
+      logActivity('hat Termin gelöscht: „' + ev.title + '“', 'kalender');
+      persistState(); refreshAllUI();
     }
 
     function renderEinkauf() {
@@ -3004,7 +3124,7 @@
       document.getElementById('rewards-balance').textContent = allowed ? rewardBalance() + ' Punkte' : '';
       document.getElementById('reward-rule-editor').innerHTML = '';
       document.getElementById('rewards-ledger').innerHTML = allowed
-        ? (appState.rewardLedger || []).slice().reverse().map(row => '<div class="flex justify-between gap-3 border-b border-slate-800 py-2 text-xs"><span>' + escapeHtml(row.description || '') + '<br><span class="text-slate-500">' + new Date(row.timestamp).toLocaleString('de-DE') + '</span></span><strong class="' + (row.amount >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (row.amount > 0 ? '+' : '') + row.amount + '</strong>' + (currentRole === 'Master' ? '<button class="ml-2 text-rose-300" title="Buchung löschen" onclick="deleteRewardBooking(' + JSON.stringify(String(row.id)) + ',' + JSON.stringify(String(row.timestamp)) + ')">🗑️</button>' : '') + '</div>').join('') || '<p class="text-xs text-slate-500">Noch keine Buchungen.</p>'
+        ? (appState.rewardLedger || []).slice().reverse().map(row => '<div class="flex justify-between gap-3 border-b border-slate-800 py-2 text-xs"><span>' + escapeHtml(row.description || '') + '<br><span class="text-slate-500">' + new Date(row.timestamp).toLocaleString('de-DE') + '</span></span><strong class="' + (row.amount >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (row.amount > 0 ? '+' : '') + row.amount + '</strong>' + (currentRole === 'Master' ? '<button class="ml-2 text-rose-300" title="Buchung löschen" onclick="deleteRewardBooking(' + JSON.stringify(String(row.id)).replace(/\"/g, '&quot;') + ',' + JSON.stringify(String(row.timestamp)).replace(/\"/g, '&quot;') + ')">🗑️</button>' : '') + '</div>').join('') || '<p class="text-xs text-slate-500">Noch keine Buchungen.</p>'
         : '';
     }
     function deleteRewardBooking(id, timestamp) {
