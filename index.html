@@ -1635,7 +1635,15 @@
               appState[key] = localBeforeSnapshot[key];
             }
           }
-          if (productionSyncConflict) restoreSyncConflictLock();
+          if (productionSyncConflict) {
+            // Keep current unsaved edits, including edits made after the original
+            // conflict draft. Replaying the older draft on each snapshot would
+            // silently discard those newer changes.
+            for (const [key, value] of Object.entries(localBeforeSnapshot)) {
+              if (key !== 'chat' && key !== 'chatV2' && key !== 'firebase' &&
+                  key !== 'fcmToken' && key !== 'version') appState[key] = value;
+            }
+          }
           delete appState.fcmToken;
           appState.chat = liveChat;
           lastRemoteState = sanitizeForFirebase(stateWithoutChats);
