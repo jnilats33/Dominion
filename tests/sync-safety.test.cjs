@@ -283,3 +283,35 @@ test('edits after conflict update recovery draft and survive simulated restart',
   assert.equal(fresh.pending.length,0);
   draftStorage.clear();
 });
+
+test('read-only conflict review compares server and local without writing',()=>{
+  draftStorage.clear();
+  const h=delayedHarness({kalender:[{id:'server'}],einkauf:[{id:'same'}]},
+    {kalender:[{id:'local'}],einkauf:[{id:'same'}]});
+  draftStorage.set('dominion_sync_conflict_draft_v1',JSON.stringify({
+    createdAt:'2026-11-21T00:00:00.000Z',drafts:{
+      kalender:[{id:'local'}],einkauf:[{id:'same'}]
+    }
+  }));
+  const review=vm.runInContext('buildSyncConflictReview()',h.sandbox);
+  assert.equal(review.status,'ready');
+  assert.deepEqual(JSON.parse(JSON.stringify(review.collections.map(x=>[x.key,x.matchesServer]))),
+    [['einkauf',true],['kalender',false]]);
+  assert.deepEqual(h.pending,[]);
+  assert.deepEqual(h.state.kalender,[{id:'server'}]);
+  draftStorage.clear();
+});
+
+test('read-only conflict review fails safely when draft is corrupt or server unavailable',()=>{
+  draftStorage.clear();
+  const h=delayedHarness({kalender:[]},{kalender:[]});
+  draftStorage.set('dominion_sync_conflict_draft_v1','{invalid');
+  assert.equal(vm.runInContext('buildSyncConflictReview().status',h.sandbox),'unreadable');
+  draftStorage.set('dominion_sync_conflict_draft_v1',JSON.stringify({drafts:{kalender:[{id:'local'}]}}));
+  h.sandbox.lastRemoteState=null;
+  const review=vm.runInContext('buildSyncConflictReview()',h.sandbox);
+  assert.equal(review.status,'server-unavailable');
+  assert.equal(review.collections[0].matchesServer,null);
+  assert.equal(h.pending.length,0);
+  draftStorage.clear();
+});
