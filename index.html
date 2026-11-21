@@ -1201,7 +1201,7 @@
       delete stateWithoutChat.chatV2;
       delete stateWithoutChat.fcmToken;
       for (const [key, value] of Object.entries(stateWithoutChat)) {
-        if (key === 'firebase' || key === 'version' || key === 'pin') continue;
+        if (key === 'firebase' || key === 'version') continue;
         const baseline = lastRemoteState[key] === undefined ? null : lastRemoteState[key];
         if (sameRemoteValue(value, baseline)) continue;
         const desired = sanitizeForFirebase(value);
