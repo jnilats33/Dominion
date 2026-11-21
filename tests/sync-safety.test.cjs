@@ -114,3 +114,13 @@ test('delayed external conflict does not retry and overwrite remote changes',()=
   assert.equal(h.pending.length,0);
   assert.equal(h.sandbox.productionRoomLoaded,false);
 });
+
+test('room listener must preserve unsaved local edits during pending transaction (source guard)',()=>{
+  const listenerStart=html.indexOf("firebaseDbRef.on('value'");
+  const listenerEnd=html.indexOf('    function updateSyncIndicator(',listenerStart);
+  assert.ok(listenerStart>=0 && listenerEnd>listenerStart);
+  const listener=html.slice(listenerStart,listenerEnd);
+  // An unconditional full-state replacement is unsafe while writes are pending.
+  // This guard deliberately fails until the listener reconciles pending edits.
+  assert.match(listener,/pendingCollectionWrites/, 'listener must account for pending writes');
+});
