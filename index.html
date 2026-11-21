@@ -3679,7 +3679,7 @@
       }
       const chosen = redemptionCatalog(mode).filter(item => redemptionSelection[String(item.id)] > 0)
         .map(item => ({id:String(item.id),title:String(item.title || ''),
-          count:Math.floor(Number(redemptionSelection[String(item.id)])),
+          count:Number(redemptionSelection[String(item.id)]),
           cost:rewardAmount(item.rewardPoints)}));
       const total = chosen.reduce((sum,item)=>sum+item.cost*item.count,0);
       if (!chosen.length || chosen.some(item=>!Number.isSafeInteger(item.count) || item.count <= 0) ||
