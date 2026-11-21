@@ -9,6 +9,8 @@ const start = html.indexOf('    function sameRemoteValue(');
 const end = html.indexOf('    // Production chat v2:',start);
 assert.ok(start >= 0 && end > start, 'Sync functions found');
 const source = html.slice(start,end);
+const draftStorage = new Map();
+const localStorageMock = {getItem:key=>draftStorage.get(key)??null,setItem:(key,value)=>draftStorage.set(key,value)};
 function harness(remote, local) {
   let state = structuredClone(remote);
   const notifications = [];
@@ -24,7 +26,7 @@ function harness(remote, local) {
     productionRoomLoaded:true, productionSyncConflict:false, isApplyingRemoteUpdate:false,
     saveStateLocalOnly(){}, sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
     updateSyncIndicator(){}, showToast:(message)=>notifications.push(message),
-    console
+    console,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1',localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
   };
   vm.createContext(sandbox);
   vm.runInContext(source+'\nthis.runPersist = persistState; this.same = sameRemoteValue;',sandbox);
@@ -81,7 +83,7 @@ function delayedHarness(remote,local) {
     firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
     productionRoomLoaded:true,productionSyncConflict:false,isApplyingRemoteUpdate:false,
     saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
-    updateSyncIndicator(){},showToast:m=>notifications.push(m),console
+    updateSyncIndicator(){},showToast:m=>notifications.push(m),console,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
   };
   vm.createContext(sandbox);
   vm.runInContext(source+'\nthis.runPersist=persistState;',sandbox);
@@ -132,7 +134,7 @@ function listenerHarness(remote,local) {
     productionRoomLoaded:true,productionSyncConflict:false,isApplyingRemoteUpdate:false,
     firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
     saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
-    updateSyncIndicator(){},showToast(){},refreshAllUI(){},
+    updateSyncIndicator(){},showToast(){},refreshAllUI(){},localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1',
     mergeWithDefaults:x=>structuredClone(x),console
   };
   const start=html.indexOf("firebaseDbRef.on('value', (snapshot) => {");
@@ -192,4 +194,22 @@ test('incoming snapshot cannot unlock writes after a transaction conflict',()=>{
   h.sandbox.appState.kalender.push({id:'another'});
   h.sandbox.runPersist();
   assert.equal(h.pending.length,0);
+});
+
+test('conflict draft persists and prevents writes after reload',()=>{
+  draftStorage.clear();
+  const h=delayedHarness({kalender:[{id:'a'}]},{kalender:[{id:'a'},{id:'unsaved'}]});
+  h.sandbox.runPersist();
+  h.mutateRemote('kalender',[{id:'a'},{id:'remote'}]);
+  h.flush();
+  const draft=JSON.parse(draftStorage.get('dominion_sync_conflict_draft_v1'));
+  assert.deepEqual(draft.drafts.kalender,[{id:'a'},{id:'unsaved'}]);
+  const fresh=delayedHarness({kalender:[{id:'a'},{id:'remote'}]},{kalender:[{id:'a'},{id:'remote'}]});
+  vm.runInContext('restoreSyncConflictLock()',fresh.sandbox);
+  assert.equal(fresh.sandbox.productionSyncConflict,true);
+  assert.equal(fresh.sandbox.productionRoomLoaded,false);
+  assert.deepEqual(fresh.sandbox.appState.kalender,[{id:'a'},{id:'unsaved'}]);
+  fresh.sandbox.runPersist();
+  assert.equal(fresh.pending.length,0);
+  draftStorage.clear();
 });
