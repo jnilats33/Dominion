@@ -1,0 +1,180 @@
+{
+  "schema": "dominion-test-fixtures-v1",
+  "warning": "Nur isolierte Testumgebung. Nicht in Produktivraum importieren.",
+  "mgmt": {
+    "belohnungen": [
+      {
+        "id": "test-reward-1",
+        "itemNumber": "B-TEST-01",
+        "title": "Wunschfilmabend",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 20,
+        "done": false
+      },
+      {
+        "id": "test-reward-2",
+        "itemNumber": "B-TEST-02",
+        "title": "Frühstück nach Wunsch",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 35,
+        "done": false
+      },
+      {
+        "id": "test-reward-3",
+        "itemNumber": "B-TEST-03",
+        "title": "Besonderer Ausflug",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 60,
+        "done": false
+      },
+      {
+        "id": "test-reward-4",
+        "itemNumber": "B-TEST-04",
+        "title": "Exklusiver Wunsch",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 150,
+        "done": false
+      }
+    ],
+    "strafen": [
+      {
+        "id": "test-penalty-1",
+        "itemNumber": "S-TEST-01",
+        "title": "Zusätzliche Haushaltsaufgabe",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 15,
+        "done": false
+      },
+      {
+        "id": "test-penalty-2",
+        "itemNumber": "S-TEST-02",
+        "title": "Schriftliche Reflexion",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 25,
+        "done": false
+      },
+      {
+        "id": "test-penalty-3",
+        "itemNumber": "S-TEST-03",
+        "title": "Zusätzliche Wochenaufgabe",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 50,
+        "done": false
+      },
+      {
+        "id": "test-penalty-4",
+        "itemNumber": "S-TEST-04",
+        "title": "Umfangreiches Zusatzprojekt",
+        "desc": "TESTDATENSATZ – nicht produktiv",
+        "rewardPoints": 120,
+        "done": false
+      }
+    ],
+    "aufgaben": [
+      {
+        "id": "test-task-1",
+        "title": "Küche aufräumen",
+        "desc": "TESTDATENSATZ – positive Buchung prüfen",
+        "assignee": "Daisy",
+        "createdBy": "Master",
+        "taskKind": "reward",
+        "taskV26": true,
+        "status": "open",
+        "cycle": 0,
+        "history": [],
+        "done": false,
+        "plusPoints": 15,
+        "minusPoints": 5,
+        "deadline": "2026-12-15T18:00:00"
+      },
+      {
+        "id": "test-task-2",
+        "title": "Einkaufsliste erstellen",
+        "desc": "TESTDATENSATZ – Fristversäumnis prüfen",
+        "assignee": "Daisy",
+        "createdBy": "Master",
+        "taskKind": "reward",
+        "taskV26": true,
+        "status": "open",
+        "cycle": 0,
+        "history": [],
+        "done": false,
+        "plusPoints": 10,
+        "minusPoints": 5,
+        "deadline": "2026-12-16T18:00:00"
+      }
+    ]
+  },
+  "kalender": [
+    {
+      "id": "test-calendar-1",
+      "title": "Gemeinsamer Testtermin",
+      "date": "2026-12-17",
+      "time": "18:00",
+      "endDate": "2026-12-17",
+      "endTime": "19:00",
+      "owner": "Master",
+      "createdBy": "Master",
+      "groupId": "test-calendar-group-1",
+      "pointsPlus": 0,
+      "pointsMinus": 0,
+      "confirmed": false
+    },
+    {
+      "id": "test-calendar-2",
+      "title": "Gemeinsamer Testtermin",
+      "date": "2026-12-17",
+      "time": "18:00",
+      "endDate": "2026-12-17",
+      "endTime": "19:00",
+      "owner": "Daisy",
+      "createdBy": "Master",
+      "groupId": "test-calendar-group-1",
+      "pointsPlus": 0,
+      "pointsMinus": 0,
+      "confirmed": false
+    },
+    {
+      "id": "test-calendar-3",
+      "title": "Testtermin mit Bestätigung",
+      "date": "2026-12-18",
+      "time": "16:00",
+      "endDate": "2026-12-18",
+      "endTime": "17:00",
+      "owner": "Daisy",
+      "createdBy": "Master",
+      "groupId": null,
+      "pointsPlus": 10,
+      "pointsMinus": 5,
+      "confirmed": false
+    }
+  ],
+  "ledgerScenarios": {
+    "positive": {
+      "description": "Testfall: 100 Punkte Guthaben",
+      "rewardLedger": [
+        {
+          "id": "test-seed-positive-100",
+          "amount": 100,
+          "description": "TEST – Startguthaben",
+          "timestamp": 1795262400000
+        }
+      ]
+    },
+    "negative": {
+      "description": "Testfall: -80 Punkte Schulden",
+      "rewardLedger": [
+        {
+          "id": "test-seed-negative-80",
+          "amount": -80,
+          "description": "TEST – Startschuld",
+          "timestamp": 1795262400000
+        }
+      ]
+    },
+    "zero": {
+      "description": "Testfall: 0 Punkte",
+      "rewardLedger": []
+    }
+  }
+}
