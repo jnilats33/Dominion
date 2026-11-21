@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion App v2.8</title>
+  <title>Dominion TEST – v2.8</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -219,6 +219,9 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 <span id="sync-status-label">Live</span>
               </span>
+              <button id="sync-conflict-review-button" type="button" onclick="openSyncConflictReview()" hidden
+                class="px-2 py-0.5 rounded-lg border border-rose-500/50 text-rose-200 bg-rose-950/50 text-[10px] font-semibold"
+                title="Ungespeicherte Änderungen ansehen">Konflikt prüfen</button>
             </div>
             <p id="header-subtitle" class="text-[11px] text-slate-400 truncate">D+W Connection</p>
           </div>
@@ -264,11 +267,11 @@
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
               <span>🚀</span> Update-News: Dominion <span id="dashboard-version-news"></span>
             </h3>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Aktuelle Version</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Version 2.9</span>
           </div>
-          <p class="text-[11px] text-slate-400">Veröffentlicht am 19.11.2026</p>
+          <p class="text-[11px] text-slate-400">Stand: 21.11.2026 · Dieses Update enthält die bisherigen Verbesserungen und zusätzliche Stabilitätsmaßnahmen.</p>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Neu in Dominion v2.8 (Test): Termine werden über ein übersichtliches Pop-up angelegt und bearbeitet. „Beide“ erzeugt zwei intern verknüpfte Einträge. Zeitspannen, Termine über Mitternacht und mehrtägige Zeiträume werden unterstützt. Getrennte Felder „Punkte bei Erfüllung“ und „Abzug für Nichterfüllung“ steuern die Buchung nach Masters Bestätigung (Erfüllt / Nicht erfüllt); sie erscheinen nur bei Daisy oder „Beide“. Der Papierkorb der Punktehistorie wurde repariert. Die Kalenderaktionen sind für kleine Displays optimiert; Bestätigungen erscheinen nur bei Terminen mit Punkten.
+            Neu in Dominion v2.9: Der Kalender unterstützt komfortable Termin-Pop-ups, Zeitspannen, mehrtägige Termine und getrennte Punkte für Erfüllung oder Nichterfüllung. Dashboard-Bereiche lassen sich unter Einstellungen → Ansicht individuell sortieren. Neue Inhalte werden über Menüzähler kenntlich gemacht. Chat und Audionachrichten wurden überarbeitet; die Push-Benachrichtigungen wurden technisch vorbereitet. Der Bilder-Upload für Toys und Kleidung ist wieder verfügbar. Außerdem schützen zusätzliche Prüfungen die Synchronisation vor unbeabsichtigtem Überschreiben. Die erweiterte Konfliktauflösung folgt in einem späteren Update.
           </p>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
@@ -973,10 +976,11 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
-    const APP_VERSION = '2.8';
+    const APP_VERSION = '2.9';
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
+    const SYNC_CONFLICT_DRAFT_KEY = 'dominion_sync_conflict_draft_v1';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
     const DEFAULT_ROOM_CODE = 'D+W Connection';
     const FIREBASE_WEB_CONFIG = {"apiKey":"AIzaSyC3YyPJsXsX-u2EHKHcByPVj1Ru2Fn3YPo","authDomain":"dominionapp-45bfa.firebaseapp.com","databaseURL":"https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app","projectId":"dominionapp-45bfa","storageBucket":"dominionapp-45bfa.firebasestorage.app","messagingSenderId":"1047436704498","appId":"1:1047436704498:web:4b7f9b229b5ad7cc0fee6b"};
@@ -1113,6 +1117,9 @@
     let recordingStartedAt = 0;
     let firebaseDbRef = null;
     let firebaseRoomPathPending = null;
+    let productionRoomLoaded = false;
+    let productionSyncConflict = false; // Latch: a later snapshot must not silently unlock writes.
+    let lastRemoteState = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
     let testAuthUser = null;
@@ -1141,6 +1148,7 @@
         console.error('Fehler beim Laden des Status:', e);
         appState = createDefaultState();
       }
+      restoreSyncConflictLock();
       saveStateLocalOnly();
     }
 
@@ -1173,6 +1181,12 @@
     }
 
     function saveStateLocalOnly() {
+      // While locked, the separate recovery draft must follow subsequent edits.
+      // Never send these drafts to Firebase automatically.
+      if (productionSyncConflict && !isApplyingRemoteUpdate) {
+        const saved = saveSyncConflictDraft(null, null, true);
+        if (!saved) console.error('Konfliktentwurf nicht aktualisiert: lokale Daten zusätzlich exportieren.');
+      }
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       } catch (e) {
@@ -1180,33 +1194,203 @@
       }
     }
 
-    function persistState() {
-      saveStateLocalOnly();
-      if (firebaseDbRef && !isApplyingRemoteUpdate) {
-        const stateWithoutChat = { ...appState };
-        delete stateWithoutChat.chat;
-        delete stateWithoutChat.fcmToken; // Never publish a push token in shared room state.
-        firebaseDbRef.update(sanitizeForFirebase(stateWithoutChat)).catch(err => {
-          console.warn('Firebase Sync Fehler:', err);
-          updateSyncIndicator(false);
-        });
+    // Keep a separate local recovery copy. Never upload this draft automatically.
+    function saveSyncConflictDraft(key, error, refreshAll = false) {
+      try {
+        const previous = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || '{}');
+        const drafts = previous && typeof previous.drafts === 'object' && previous.drafts ? previous.drafts : {};
+        if (refreshAll) {
+          // Preserve existing conflict keys and only newly edited collections.
+          // Unrelated server collections must not become local recovery drafts.
+          for (const [draftKey, value] of Object.entries(appState)) {
+            if (draftKey === 'chat' || draftKey === 'chatV2' || draftKey === 'firebase' ||
+                draftKey === 'fcmToken' || draftKey === 'version') continue;
+            if (Object.prototype.hasOwnProperty.call(drafts, draftKey) ||
+                (lastRemoteState && !sameRemoteValue(value, lastRemoteState[draftKey]))) {
+              drafts[draftKey] = sanitizeForFirebase(value);
+            }
+          }
+        } else if (key != null) {
+          drafts[key] = sanitizeForFirebase(appState[key]);
+        }
+        localStorage.setItem(SYNC_CONFLICT_DRAFT_KEY, JSON.stringify({
+          createdAt: previous.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          reason: error ? 'write-error' : 'write-conflict',
+          drafts
+        }));
+        return true;
+      } catch (draftError) {
+        console.error('Konfliktentwurf konnte nicht separat gesichert werden:', draftError);
+        return false;
       }
     }
 
-    function persistChat() {
+    function restoreSyncConflictLock() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+        if (!saved || !saved.drafts || !Object.keys(saved.drafts).length) return;
+        productionSyncConflict = true;
+        productionRoomLoaded = false;
+        updateSyncConflictReviewButton();
+        // Preserve the saved edits locally, without writing them to Firebase.
+        for (const [key, value] of Object.entries(saved.drafts)) {
+          if (key !== 'chat' && key !== 'chatV2' && key !== 'firebase' &&
+              key !== 'fcmToken' && key !== 'version') appState[key] = value;
+        }
+        console.warn('Ungespeicherter Konfliktentwurf gefunden; Synchronisation bleibt gesperrt.');
+      } catch (error) {
+        productionSyncConflict = true; // unreadable draft: fail closed
+        productionRoomLoaded = false;
+        updateSyncConflictReviewButton();
+        console.error('Konfliktentwurf nicht lesbar; Synchronisation gesperrt.', error);
+      }
+    }
+
+    // Read-only conflict review. No writes, no automatic resolution.
+    function buildSyncConflictReview() {
+      const raw = localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY);
+      if (!raw) return {status:'none', collections:[]};
+      let saved;
+      try { saved = JSON.parse(raw); }
+      catch (_) { return {status:'unreadable', collections:[]}; }
+      if (!saved || !saved.drafts || typeof saved.drafts !== 'object' ||
+          Array.isArray(saved.drafts)) return {status:'unreadable', collections:[]};
+      const forbidden = new Set(['chat','chatV2','firebase','fcmToken','version']);
+      const collections = Object.keys(saved.drafts).filter(key=>!forbidden.has(key)).sort().map(key=>{
+        const local = saved.drafts[key];
+        const server = lastRemoteState && Object.prototype.hasOwnProperty.call(lastRemoteState,key)
+          ? lastRemoteState[key] : null;
+        return {key, matchesServer:lastRemoteState ? sameRemoteValue(local,server) : null,
+          local:JSON.parse(JSON.stringify(local === undefined ? null : local)),
+          server:lastRemoteState ? JSON.parse(JSON.stringify(server)) : null};
+      });
+      return {status:lastRemoteState ? 'ready' : 'server-unavailable',
+        createdAt:saved.createdAt || null, updatedAt:saved.updatedAt || null,
+        collections};
+    }
+
+    function updateSyncConflictReviewButton() {
+      const button = document.getElementById('sync-conflict-review-button');
+      if (button) button.hidden = !productionSyncConflict;
+    }
+
+    // Intentionally read-only: the review does not delete drafts, unlock
+    // synchronization, or write anything to Firebase.
+    function openSyncConflictReview() {
+      const review = buildSyncConflictReview();
+      const backdrop = document.createElement('div');
+      backdrop.id = 'sync-conflict-review-overlay';
+      backdrop.className = 'fixed inset-0 z-[100] bg-black/85 flex items-center justify-center p-3';
+      const panel = document.createElement('section');
+      panel.className = 'bg-[#151923] border border-amber-500/40 rounded-2xl p-5 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-slate-100 shadow-2xl';
+      const heading = document.createElement('h2');
+      heading.className = 'text-lg font-bold text-amber-200 mb-2';
+      heading.textContent = 'Synchronisationskonflikt – nur Ansicht';
+      panel.appendChild(heading);
+      const info = document.createElement('p');
+      info.className = 'text-xs text-slate-300 mb-4';
+      info.textContent = review.status === 'ready'
+        ? 'Lokale Entwürfe und zuletzt empfangene Serverdaten. Es wird nichts übertragen, gelöscht oder freigegeben.'
+        : review.status === 'server-unavailable'
+          ? 'Kein Serverdatenstand verfügbar. Lokale Entwürfe bleiben geschützt; kein Vergleich möglich.'
+          : review.status === 'unreadable'
+            ? 'Der lokale Konfliktentwurf ist nicht lesbar. Keine Änderungen vornehmen; Datenbestand sichern.'
+            : 'Kein Konfliktentwurf gefunden.';
+      panel.appendChild(info);
+      for (const item of review.collections) {
+        const section = document.createElement('section');
+        section.className = 'border border-slate-700 rounded-xl p-3 mb-3';
+        const label = document.createElement('h3');
+        label.className = 'font-semibold text-sm mb-2';
+        label.textContent = item.key + ' – ' + (item.matchesServer === null
+          ? 'Serverstand unbekannt' : item.matchesServer ? 'identisch' : 'unterschiedlich');
+        section.appendChild(label);
+        for (const [title, value] of [['Lokal (Entwurf)',item.local],['Server (letzter Snapshot)',item.server]]) {
+          const caption = document.createElement('p');
+          caption.className = 'text-xs text-slate-400 mt-2';
+          caption.textContent = title;
+          const pre = document.createElement('pre');
+          pre.className = 'text-[11px] whitespace-pre-wrap break-all max-h-44 overflow-auto bg-black/30 p-2 rounded-lg';
+          pre.textContent = JSON.stringify(value,null,2);
+          section.append(caption,pre);
+        }
+        panel.appendChild(section);
+      }
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'mt-2 px-4 py-2 rounded-lg border border-slate-600 text-sm';
+      close.textContent = 'Schließen (keine Änderungen)';
+      close.addEventListener('click',()=>backdrop.remove());
+      panel.appendChild(close);
+      backdrop.appendChild(panel);
+      document.getElementById('sync-conflict-review-overlay')?.remove();
+      document.body.appendChild(backdrop);
+    }
+
+    // Firebase represents empty arrays as null. Compare equivalent empty values
+    // without treating them as a user edit.
+    function sameRemoteValue(a, b) {
+      const normalize = value => value == null ? null :
+        Array.isArray(value) && value.length === 0 ? null : value;
+      return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
+    }
+
+    // Queue each collection's writes; never launch two transactions against
+    // the same stale baseline. Preserve a local edit made during an in-flight
+    // transaction and submit it after the first commit.
+    const pendingCollectionWrites = new Map();
+    function persistState() {
       saveStateLocalOnly();
-      if (firebaseDbRef && !isApplyingRemoteUpdate) {
-        firebaseDbRef.child('chat').transaction(remote => sanitizeForFirebase(mergeChatMessages(remote, appState.chat || [])), (error, committed, snapshot) => {
+      if (!firebaseDbRef || !productionRoomLoaded || productionSyncConflict || isApplyingRemoteUpdate || !lastRemoteState) return;
+      const stateWithoutChat = { ...appState };
+      delete stateWithoutChat.chat;
+      delete stateWithoutChat.chatV2;
+      delete stateWithoutChat.fcmToken;
+      for (const [key, value] of Object.entries(stateWithoutChat)) {
+        if (key === 'firebase' || key === 'version') continue;
+        const baseline = lastRemoteState[key] === undefined ? null : lastRemoteState[key];
+        if (sameRemoteValue(value, baseline) || pendingCollectionWrites.has(key)) continue;
+        const desired = sanitizeForFirebase(value);
+        const expected = sanitizeForFirebase(baseline);
+        const roomRef = firebaseDbRef;
+        pendingCollectionWrites.set(key, {roomRef, desired});
+        roomRef.child(key).transaction(current => {
+          if (!sameRemoteValue(current, expected)) return;
+          return desired;
+        }, (error, committed) => {
+          pendingCollectionWrites.delete(key);
           if (error || !committed) {
-            console.warn('Chat-Sync Fehler:', error || 'Transaktion abgebrochen');
+            console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
+            const draftSaved = saveSyncConflictDraft(key, error);
+            productionSyncConflict = true;
+            updateSyncConflictReviewButton();
+            productionRoomLoaded = false; // fail closed; snapshots must not auto-unlock
             updateSyncIndicator(false);
+            showToast('Synchronisation gesperrt: ' + key + ' nicht gespeichert. ' +
+              (draftSaved ? 'Lokaler Konfliktentwurf gesichert.' : 'Lokale Sicherung fehlgeschlagen – bitte Daten sofort exportieren!'), 'error');
             return;
           }
-          appState.chat = mergeChatMessages(appState.chat, snapshot.val());
-          saveStateLocalOnly();
-          if (activeTab === 'chat') renderChat();
+          if (roomRef !== firebaseDbRef) return;
+          if (lastRemoteState) lastRemoteState[key] = sanitizeForFirebase(desired);
+          // The local state may have changed while this write was in flight.
+          // Never retry an external conflict automatically.
+          if (!sameRemoteValue(appState[key], desired)) persistState();
         }, false);
       }
+    }
+
+    // Production chat v2: write only the new message, never the whole history.
+    function persistChat(message) {
+      saveStateLocalOnly();
+      if (!message || !firebaseDbRef || !productionRoomLoaded || isApplyingRemoteUpdate) return;
+      firebaseDbRef.child('chatV2').child(message.id).set(sanitizeForFirebase(message))
+        .catch(error => {
+          console.warn('Chat-v2 Sync Fehler:', error);
+          updateSyncIndicator(false);
+          alert('Dominion – Chat-Diagnose\n\nFirebase-Code: ' +
+            (error.code || 'unbekannt') + '\nMeldung: ' + (error.message || 'Keine Details'));
+        });
     }
 
     function mergeChatMessages(localMessages, remoteMessages) {
@@ -1228,8 +1412,8 @@
      * Firebase Realtime Database & FCM Push Setup
      */
     function initFirebaseSync() {
-      const fbUrl = (appState.firebase.url || DEFAULT_FB_URL).trim();
-      const roomRaw = (appState.firebase.room || DEFAULT_ROOM_CODE).trim();
+      const fbUrl = DEFAULT_FB_URL; // Production: fixed Firebase database
+      const roomRaw = DEFAULT_ROOM_CODE; // Production: fixed existing room
       const safeRoomPath = roomRaw.replace(/[.#$\[\]\/]/g, '_');
 
       try {
@@ -1261,7 +1445,7 @@
           new firebase.appCheck.ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
           true
         );
-        console.info('Dominion-Test App Check initialized.');
+        console.info('Dominion App Check initialized.');
       } catch (error) {
         console.warn('App Check initialization failed:', error);
       }
@@ -1284,6 +1468,9 @@
                       const prefs = getDevicePrefs();
                       prefs.fcmToken = token;
                       saveDevicePrefs(prefs);
+                      // Authentication and FCM initialization can finish in either order.
+                      // Register after token refresh as well as after auth restoration.
+                      registerTestPushToken().catch(e => console.warn('Automatic push registration pending:', e.message));
                     }
                   }).catch(e => console.warn('FCM silent token refresh warning:', e));
                 }
@@ -1327,7 +1514,7 @@
       const otherRole = !!testAuthUser && !matched;
       el.innerHTML = `
         <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
-          <div class="font-semibold text-sm text-slate-100">🔐 Firebase-Anmeldung (Test)</div>
+          <div class="font-semibold text-sm text-slate-100">🔐 Firebase-Anmeldung</div>
           <p class="text-xs text-slate-400">Zusätzliche sichere Anmeldung für die spätere Push-Zustellung. Deine normale Dominion-Anmeldung bleibt unverändert.</p>
           <p class="text-xs ${matched ? 'text-emerald-300' : 'text-amber-300'}">${matched ? '✓ Firebase-Konto für ' + currentRole + ' bestätigt' : otherRole ? 'Anderes Firebase-Konto angemeldet (' + testAuthRole + '). Bitte abmelden und das Konto für ' + currentRole + ' verwenden.' : 'Für ' + currentRole + ' noch nicht bei Firebase angemeldet.'}</p>
           ${matched || otherRole ? '<button type="button" onclick="signOutTestFirebase()" class="px-3 py-2 text-xs rounded-lg bg-white/10 text-slate-100">Firebase-Konto abmelden</button>' : `
@@ -1336,7 +1523,7 @@
               <input id="test-auth-password" type="password" autocomplete="current-password" required placeholder="Firebase-Passwort" class="w-full rounded-lg bg-slate-800 border border-slate-600 text-white px-3 py-2 text-sm" />
               <button type="submit" class="px-3 py-2 text-xs rounded-lg bg-amber-600 text-white">Bei Firebase anmelden</button>
             </form>`}
-          <p id="test-push-registration-state" class="text-[11px] text-slate-500">Push-Registrierung: ${matched ? 'wird geprüft' : 'Firebase-Anmeldung erforderlich'}. Der automatische Versand wird erst nach Backend-Bereitstellung aktiviert.</p>
+          <p id="test-push-registration-state" class="text-[11px] text-slate-500">Push-Registrierung: ${matched ? 'wird geprüft' : 'Firebase-Anmeldung erforderlich'}. Automatische Push-Zustellung erfordert die Produktiv-Backend-Funktionen.</p>
         </div>`;
     }
 
@@ -1393,30 +1580,34 @@
       }
       const status = document.getElementById('test-push-registration-state');
       try {
-        const fn = firebase.app().functions('europe-west1').httpsCallable('registerTestPushDevice');
-        await fn({ token: prefs.fcmToken, deviceId: prefs.pushDeviceId });
+        const fn = firebase.app().functions('europe-west1').httpsCallable('registerProductionPushDevice');
+        const result = await fn({ token: prefs.fcmToken, deviceId: prefs.pushDeviceId });
+        if (result.data?.registered !== true) throw new Error('Push-Server hat die Registrierung nicht bestätigt.');
         if (status) status.textContent = '✓ Push-Gerät serverseitig registriert.';
-        showToast('Push-Gerät sicher registriert!', 'success');
+        setPushPermissionStatus('Push aktiv – serverseitig registriert', true);
       } catch (error) {
         if (status) status.textContent = 'Push-Server noch nicht erreichbar oder Registrierung fehlgeschlagen.';
+        setPushPermissionStatus('Push-Registrierung fehlgeschlagen', false);
         console.warn('Secure push registration:', error.code || error.message);
         throw error;
       }
     }
 
+    function setPushPermissionStatus(message, ok) {
+      for (const id of ['push-status-pill', 'daisy-push-status-pill']) {
+        const pill = document.getElementById(id);
+        if (pill) {
+          pill.textContent = message;
+          pill.className = 'inline-block text-[11px] px-2.5 py-1 rounded-full ' +
+            (ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-300/30' :
+              'bg-amber-500/15 text-amber-300 border border-amber-500/30');
+        }
+      }
+    }
+
     async function requestPushPermissions() {
       let step = 'Browser-Unterstützung';
-      const setPushStatus = (message, ok) => {
-        for (const id of ['push-status-pill', 'daisy-push-status-pill']) {
-          const pill = document.getElementById(id);
-          if (pill) {
-            pill.textContent = message;
-            pill.className = 'inline-block text-[11px] px-2.5 py-1 rounded-full ' +
-              (ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' :
-                'bg-amber-500/15 text-amber-300 border border-amber-500/30');
-          }
-        }
-      };
+      const setPushStatus = setPushPermissionStatus;
       try {
         if (!('Notification' in window)) throw new Error('Dieser Browser unterstützt keine Web-Benachrichtigungen.');
         if (!('serviceWorker' in navigator)) throw new Error('Service Worker werden nicht unterstützt.');
@@ -1445,10 +1636,13 @@
         prefs.fcmToken = token;
         saveDevicePrefs(prefs);
         if (testAuthUser && testAuthRole === currentRole) {
-          await registerTestPushToken().catch(e => console.warn('Push backend not deployed yet:', e.message));
+          step = 'Serverregistrierung';
+          await registerTestPushToken();
+          showToast('Push-Gerät erfolgreich bei Firebase registriert!', 'success');
+        } else {
+          setPushStatus('Berechtigung erteilt – Firebase-Anmeldung erforderlich', false);
+          showToast('Push-Berechtigung erteilt. Firebase-Anmeldung noch erforderlich.', 'success');
         }
-        setPushStatus('Firebase-Registrierung erfolgreich', true);
-        showToast('Push-Gerät erfolgreich bei Firebase registriert!', 'success');
       } catch (err) {
         console.error('Push-Aktivierung fehlgeschlagen bei ' + step + ':', err);
         const details = err && err.message ? err.message : String(err);
@@ -1463,7 +1657,9 @@
     function updateAuthenticatedFirebaseSync() {
       const verified = !!testAuthUser && ['Master', 'Daisy'].includes(testAuthRole);
       if (!verified) {
-        if (firebaseDbRef) firebaseDbRef.off();
+        productionRoomLoaded = false;
+        lastRemoteState = null;
+        if (firebaseDbRef) { firebaseDbRef.off(); firebaseDbRef.child('chatV2').off(); }
         firebaseDbRef = null;
         updateSyncIndicator(false);
         return;
@@ -1474,42 +1670,109 @@
     function attachFirebaseListener(safeRoomPath) {
       if (firebaseDbRef) {
         firebaseDbRef.off();
+        firebaseDbRef.child('chatV2').off();
       }
       firebaseDbRef = firebase.database().ref('rooms/' + safeRoomPath);
+      productionRoomLoaded = false;
+      lastRemoteState = null;
+      appState.chat = []; // The previous chat is explicitly excluded from this release.
+      saveStateLocalOnly();
+      firebaseDbRef.child('chatV2').on('child_added', snapshot => {
+        const message = snapshot.val();
+        if (!message || !message.id) return;
+        appState.chat = mergeChatMessages(appState.chat, [message]);
+        saveStateLocalOnly();
+        if (activeTab === 'chat') renderChat();
+        badgeRefresh();
+      }, error => {
+        console.warn('Chat-v2 Listener Fehler:', error);
+        updateSyncIndicator(false);
+      });
 
       firebaseDbRef.on('value', (snapshot) => {
-        updateSyncIndicator(true);
         const remoteData = snapshot.val();
         if (!remoteData) {
-          // This is a fixed, isolated test room. Initialize it only once atomically.
-          firebaseDbRef.transaction(existing => existing === null ? sanitizeForFirebase(createDefaultState()) : undefined, (error, committed) => {
-            if (error) { console.warn('Test-Raum Initialisierung:', error); updateSyncIndicator(false); }
-          }, false);
+          // Fail closed: NEVER initialize an absent production room with default data.
+          console.error('Produktivraum fehlt: Keine automatische Initialisierung oder Schreibzugriffe.');
+          productionRoomLoaded = false;
+          updateSyncIndicator(false);
+          return;
+        }
+        // Do not turn a partial/incorrect remote snapshot into default-filled data
+        // that could later overwrite real production records.
+        // RTDB omits empty arrays, so absent optional collections are valid.
+        // Existing collections must still be arrays; never accept malformed data.
+        const optionalCollections = ['kalender', 'einkauf', 'strafbuch', 'activityFeed', 'rewardLedger', 'deletedRewardKeys'];
+        const validCollections = optionalCollections.every(key =>
+          remoteData[key] == null || Array.isArray(remoteData[key]));
+        const validMgmt = remoteData.mgmt && typeof remoteData.mgmt === 'object' &&
+          ['kleidung', 'toys', 'strafen', 'belohnungen', 'regeln', 'aufgaben']
+            .every(key => remoteData.mgmt[key] == null || Array.isArray(remoteData.mgmt[key]));
+        if (!validCollections || !validMgmt || !remoteData.basics || !remoteData.permissions) {
+          console.error('Produktiv-Snapshot unvollständig: Schreibzugriffe aus Sicherheitsgründen gesperrt.');
+          productionRoomLoaded = false;
+          lastRemoteState = null;
+          updateSyncIndicator(false);
           return;
         }
 
-        let mergedChat = [];
-        let chatNeedsSync = false;
         isApplyingRemoteUpdate = true;
         try {
-          const localChatBackup = Array.isArray(appState.chat) ? [...appState.chat] : [];
-          appState = mergeWithDefaults(remoteData);
+          const liveChat = appState.chat || [];
+          // Do not import old /chat or /chatV2 into shared app state.
+          const { chat: ignoredOldChat, chatV2: ignoredChatV2, ...stateWithoutChats } = remoteData;
+          // Preserve unsaved local changes whenever a remote snapshot arrives.
+          // A pending write may have been acknowledged locally by Firebase
+          // before its server transaction callback runs.
+          const localBeforeSnapshot = appState;
+          const remoteBeforeSnapshot = lastRemoteState;
+          const pendingKeys = new Set(pendingCollectionWrites.keys());
+          const localDirtyKeys = new Set();
+          if (productionRoomLoaded && remoteBeforeSnapshot) {
+            for (const [key, value] of Object.entries(localBeforeSnapshot)) {
+              if (key === 'chat' || key === 'chatV2' || key === 'firebase' ||
+                  key === 'version' || key === 'fcmToken') continue;
+              if (!sameRemoteValue(value, remoteBeforeSnapshot[key])) localDirtyKeys.add(key);
+            }
+          }
+          appState = mergeWithDefaults(stateWithoutChats);
+          for (const key of new Set([...pendingKeys, ...localDirtyKeys])) {
+            if (Object.prototype.hasOwnProperty.call(localBeforeSnapshot, key)) {
+              appState[key] = localBeforeSnapshot[key];
+            }
+          }
+          if (productionSyncConflict) {
+            // Preserve only the collections in the recovery draft; unrelated
+            // collections must continue receiving remote updates while locked.
+            const review = buildSyncConflictReview();
+            if (review.status === 'unreadable') {
+              // Fail closed without silently discarding the current local state.
+              for (const [key, value] of Object.entries(localBeforeSnapshot)) {
+                if (key !== 'chat' && key !== 'chatV2' && key !== 'firebase' &&
+                    key !== 'fcmToken' && key !== 'version') appState[key] = value;
+              }
+            } else {
+              for (const item of review.collections) {
+                if (Object.prototype.hasOwnProperty.call(localBeforeSnapshot, item.key)) {
+                  appState[item.key] = localBeforeSnapshot[item.key];
+                }
+              }
+            }
+          }
           delete appState.fcmToken;
-          const remoteChat = Array.isArray(appState.chat) ? appState.chat : [];
-          mergedChat = mergeChatMessages(localChatBackup, remoteChat);
-          chatNeedsSync = JSON.stringify(mergedChat) !== JSON.stringify(remoteChat);
-          appState.chat = mergedChat;
+          appState.chat = liveChat;
+          lastRemoteState = sanitizeForFirebase(stateWithoutChats);
+          productionRoomLoaded = !productionSyncConflict;
+          updateSyncIndicator(!productionSyncConflict);
           saveStateLocalOnly();
           refreshAllUI();
         } catch (err) {
           console.error('Fehler beim Anwenden des Firebase-Status:', err);
+          productionRoomLoaded = false;
           updateSyncIndicator(false);
           return;
         } finally {
           isApplyingRemoteUpdate = false;
-        }
-        if (chatNeedsSync) {
-          persistChat();
         }
       }, (error) => {
         console.warn('Firebase Listener Error:', error);
@@ -1766,6 +2029,76 @@
       return !!catPerm[action];
     }
 
+    // Local, role-specific read receipts: never written to Firebase room data.
+    const MENU_BADGE_KEY = 'dominion_prod_menu_badges_v1';
+    let menuNewHighlights = {chat:new Set(), kalender:new Set(), aufgaben:new Set()};
+    let menuLastRole = null;
+    function badgeItems(tab) {
+      if (tab === 'chat') return (appState.chat || []).filter(x => x && x.id && x.sender !== currentRole);
+      if (tab === 'kalender') return (appState.kalender || []).filter(x => x && x.id && getEventOwnerRole(x) === currentRole && x.createdBy && x.createdBy !== currentRole);
+      if (tab === 'aufgaben') return ((appState.mgmt || {}).aufgaben || []).filter(x => x && x.id && x.assignee === currentRole && x.createdBy && x.createdBy !== currentRole);
+      return [];
+    }
+    function badgeStore() {
+      try { return JSON.parse(localStorage.getItem(MENU_BADGE_KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function badgeSeen(tab) {
+      const all = badgeStore(), role = all[currentRole] || {};
+      return Array.isArray(role[tab]) ? role[tab] : null;
+    }
+    function badgeSave(tab, ids) {
+      try {
+        const all = badgeStore();
+        if (!all[currentRole]) all[currentRole] = {};
+        all[currentRole][tab] = [...new Set(ids)];
+        localStorage.setItem(MENU_BADGE_KEY, JSON.stringify(all));
+      } catch(e) { console.warn('Menü-Lesestand konnte nicht gespeichert werden:',e); }
+    }
+    function badgeNewIds(tab) {
+      const items = badgeItems(tab), saved = badgeSeen(tab);
+      if (saved === null) {
+        // Existing content is the baseline; only subsequent additions count as new.
+        badgeSave(tab, items.map(x => String(x.id)));
+        return [];
+      }
+      const seen = new Set(saved);
+      return items.filter(x => !seen.has(String(x.id))).map(x => String(x.id));
+    }
+    function badgeEnter(tab) {
+      const ids = badgeNewIds(tab);
+      menuNewHighlights[tab] = new Set(ids);
+      badgeSave(tab, badgeItems(tab).map(x => String(x.id)));
+    }
+    function badgeRefresh() {
+      if (!currentRole) return;
+      if (menuLastRole !== currentRole) {
+        menuLastRole = currentRole;
+        menuNewHighlights = {chat:new Set(), kalender:new Set(), aufgaben:new Set()};
+      }
+      for (const tab of ['chat','kalender','aufgaben']) {
+        let ids = badgeNewIds(tab);
+        if (activeTab === tab && ids.length) {
+          for (const id of ids) menuNewHighlights[tab].add(id);
+          badgeSave(tab, badgeItems(tab).map(x => String(x.id)));
+          ids = [];
+        }
+        const button = document.querySelector('.nav-btn[data-tab="' + tab + '"]');
+        if (!button) continue;
+        let badge = button.querySelector('.dominion-menu-count');
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'dominion-menu-count absolute top-0 right-0 min-w-[17px] h-[17px] px-1 rounded-full bg-rose-600 text-white text-[10px] leading-[17px] text-center font-bold shadow pointer-events-none hidden';
+          button.appendChild(badge);
+        }
+        badge.textContent = ids.length > 99 ? '99+' : String(ids.length);
+        badge.classList.toggle('hidden', ids.length === 0);
+      }
+    }
+    function badgeMark(tab, id) {
+      return menuNewHighlights[tab] && menuNewHighlights[tab].has(String(id))
+        ? '<span class="inline-flex items-center rounded bg-sky-500/20 text-sky-200 border border-sky-500/40 px-1.5 py-0.5 text-[9px] font-bold ml-2">NEU</span>' : '';
+    }
     function switchTab(tabId) {
       if (currentRole === 'Daisy' && ['kalender', 'einkauf', 'strafbuch'].includes(tabId)) {
         if (!hasPermission(tabId, 'visible')) {
@@ -1774,7 +2107,9 @@
         }
       }
 
+      if (activeTab !== tabId && menuNewHighlights[activeTab]) menuNewHighlights[activeTab].clear();
       activeTab = tabId;
+      if (menuNewHighlights[tabId]) badgeEnter(tabId);
 
       const allTabs = ['dashboard', 'chat', 'kalender', 'einkauf', 'strafbuch', 'aufgaben', 'rewards', 'verwaltung', 'einstellungen'];
       allTabs.forEach(t => {
@@ -1829,6 +2164,7 @@
       });
 
       processTaskDeadlines();
+      badgeRefresh();
       renderDashboard();
       renderChat();
       renderKalender();
@@ -1838,10 +2174,11 @@
       renderTasks();
       renderRewards();
       renderEinstellungen();
+      badgeRefresh();
     }
 
     // Dashboard layout is a per-browser preference, not shared room data.
-    const DASHBOARD_METRICS_PREF_KEY = 'dominion-test-dashboard-metrics-v1';
+    const DASHBOARD_METRICS_PREF_KEY = 'dominion-prod-dashboard-metrics-v1';
     let dashboardMetricsPinned = false;
     let dashboardMetricsExpanded = true;
     try {
@@ -1895,7 +2232,7 @@
       saveDashboardMetricsPreference();
     }
 
-    const DASHBOARD_SECTION_PREF_KEY = 'dominion-test-dashboard-sections-v1';
+    const DASHBOARD_SECTION_PREF_KEY = 'dominion-prod-dashboard-sections-v1';
     const dashboardSectionPreferences = { feed: { expanded: true, pinned: false }, events: { expanded: true, pinned: false } };
     try {
       const savedSections = JSON.parse(localStorage.getItem(DASHBOARD_SECTION_PREF_KEY) || '{}');
@@ -1954,7 +2291,7 @@
       saveDashboardSectionPreferences();
     }
 
-    const DASHBOARD_VISIBILITY_KEY = 'dominion-dashboard-visibility-v1';
+    const DASHBOARD_VISIBILITY_KEY = 'dominion-prod-dashboard-visibility-v1';
     const DASHBOARD_VISIBLE_SECTIONS = [
       { id: 'welcome', label: 'Willkommen' },
       { id: 'news', label: 'Update-News' },
@@ -1994,15 +2331,85 @@
         if (el) el.classList.toggle('hidden', prefs[entry.id] === false || (entry.id === 'rewards' && currentRole === 'Daisy' && !hasPermission('rewards', 'visible')));
       }
     }
+    const DASHBOARD_ORDER_KEY = 'dominion_prod_dashboard_order_v1';
+    function getDashboardOrder() {
+      const defaults = DASHBOARD_VISIBLE_SECTIONS.map(x => x.id);
+      try {
+        const all = JSON.parse(localStorage.getItem(DASHBOARD_ORDER_KEY) || '{}');
+        const saved = Array.isArray(all[currentRole]) ? all[currentRole] : [];
+        return [...new Set([...saved.filter(id => defaults.includes(id)), ...defaults])];
+      } catch (err) { return defaults; }
+    }
+    function saveDashboardOrder(order) {
+      try {
+        const all = JSON.parse(localStorage.getItem(DASHBOARD_ORDER_KEY) || '{}');
+        all[currentRole] = order;
+        localStorage.setItem(DASHBOARD_ORDER_KEY, JSON.stringify(all));
+      } catch (err) { console.warn('Dashboard-Reihenfolge konnte nicht gespeichert werden:', err); }
+      applyDashboardOrder();
+      renderDashboardVisibilitySettings();
+    }
+    function moveDashboardSection(id, direction) {
+      const order = getDashboardOrder(), i = order.indexOf(id), j = i + direction;
+      if (i < 0 || j < 0 || j >= order.length) return;
+      [order[i], order[j]] = [order[j], order[i]];
+      saveDashboardOrder(order);
+    }
+    function applyDashboardOrder() {
+      const dashboard = document.getElementById('tab-dashboard');
+      if (!dashboard) return;
+      for (const id of getDashboardOrder()) {
+        const el = document.getElementById('dashboard-section-' + id);
+        if (el && el.parentElement === dashboard) dashboard.appendChild(el);
+      }
+    }
+    let dashboardDragId = null;
+    function dashboardDragStart(event, id) {
+      dashboardDragId = id;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', id);
+    }
+    function dashboardDrop(event, target) {
+      event.preventDefault();
+      const source = dashboardDragId || event.dataTransfer.getData('text/plain');
+      dashboardDragId = null;
+      if (!source || source === target) return;
+      const order = getDashboardOrder().filter(id => id !== source);
+      order.splice(order.indexOf(target), 0, source);
+      saveDashboardOrder(order);
+    }
+    let dashboardTouchStart = null;
+    function dashboardHandlePointerDown(event, id) {
+      if (event.pointerType === 'mouse') return;
+      dashboardTouchStart = {id, x:event.clientX, y:event.clientY};
+    }
+    function dashboardHandlePointerUp(event) {
+      if (!dashboardTouchStart) return;
+      const source = dashboardTouchStart.id;
+      dashboardTouchStart = null;
+      const targetElement = document.elementFromPoint(event.clientX, event.clientY);
+      const target = targetElement && targetElement.closest('[data-dashboard-order-id]');
+      if (!target) return;
+      const dest = target.getAttribute('data-dashboard-order-id');
+      if (dest === source) return;
+      const order = getDashboardOrder().filter(id => id !== source);
+      order.splice(order.indexOf(dest), 0, source);
+      saveDashboardOrder(order);
+    }
+    document.addEventListener('pointerup', dashboardHandlePointerUp);
     function renderDashboardVisibilitySettings() {
       const box = document.getElementById('dashboard-visibility-options');
       if (!box) return;
       const prefs = getDashboardVisibility();
-      box.innerHTML = DASHBOARD_VISIBLE_SECTIONS.filter(entry => entry.id !== 'rewards' || currentRole === 'Master' || hasPermission('rewards','visible')).map(entry => `
-        <label class="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] border border-slate-800 px-3.5 py-3 cursor-pointer">
-          <span class="text-sm text-slate-200">${entry.label}</span>
-          <input type="checkbox" class="w-4 h-4 accent-amber-500" onchange="setDashboardSectionVisible('${entry.id}', this.checked)" ${prefs[entry.id] !== false ? 'checked' : ''} />
-        </label>
+      const entries = getDashboardOrder().map(id => DASHBOARD_VISIBLE_SECTIONS.find(x => x.id === id)).filter(entry => entry && (entry.id !== 'rewards' || currentRole === 'Master' || hasPermission('rewards','visible')));
+      box.innerHTML = '<p class="text-xs text-slate-400 mb-2">Reihenfolge am Griff ☰ verschieben oder die Pfeile verwenden. Die Häkchen steuern weiterhin die Sichtbarkeit.</p>' + entries.map((entry, index) => `
+        <div data-dashboard-order-id="${entry.id}" draggable="true" ondragstart="dashboardDragStart(event,'${entry.id}')" ondragover="event.preventDefault()" ondrop="dashboardDrop(event,'${entry.id}')" ondragend="dashboardDragId=null" class="flex items-center gap-2 rounded-xl bg-white/[0.03] border border-slate-800 px-2.5 py-2.5">
+          <span title="Ziehen zum Sortieren" onpointerdown="dashboardHandlePointerDown(event,'${entry.id}')" onpointercancel="dashboardTouchStart=null" class="text-slate-400 select-none cursor-grab touch-none px-1 text-lg" aria-hidden="true">☰</span>
+          <span class="text-sm text-slate-200 flex-1 min-w-0">${entry.label}</span>
+          <button type="button" onclick="moveDashboardSection('${entry.id}',-1)" ${index===0?'disabled':''} aria-label="${entry.label} nach oben" class="px-1.5 py-1 text-slate-300 disabled:opacity-25">↑</button>
+          <button type="button" onclick="moveDashboardSection('${entry.id}',1)" ${index===entries.length-1?'disabled':''} aria-label="${entry.label} nach unten" class="px-1.5 py-1 text-slate-300 disabled:opacity-25">↓</button>
+          <input type="checkbox" aria-label="${entry.label} sichtbar" class="w-4 h-4 accent-amber-500 shrink-0" onchange="setDashboardSectionVisible('${entry.id}', this.checked)" ${prefs[entry.id] !== false ? 'checked' : ''} />
+        </div>
       `).join('');
     }
 
@@ -2017,6 +2424,7 @@
     function renderDashboard() {
       updateDashboardMetricPermissions();
       updateDashboardVisibilityUI();
+      applyDashboardOrder();
       renderDashboardRewards();
       renderDashboardToday();
       updateDashboardMetricsUI();
@@ -2195,7 +2603,7 @@
 
         return `
           <div class="flex flex-col ${isMine ? 'items-end' : 'items-start'}">
-            <span class="text-[10px] text-slate-400 mb-1 px-1">${escapeHtml(senderDisplay)} • ${timeStr}</span>
+            <span class="text-[10px] text-slate-400 mb-1 px-1">${escapeHtml(senderDisplay)} • ${timeStr}${badgeMark("chat",msg.id)}</span>
             <div class="max-w-[82%] sm:max-w-[70%] rounded-2xl px-3.5 py-2.5 text-sm shadow ${
               isMine
                 ? 'gold-gradient text-[#0f1117] font-medium rounded-br-sm'
@@ -2334,7 +2742,7 @@
                 duration: duration,
                 timestamp: Date.now()
               });
-              persistChat();
+              persistChat(appState.chat[appState.chat.length - 1]);
               renderChat();
               scrollChatToBottom();
             };
@@ -2389,7 +2797,7 @@
 
       input.value = '';
       clearChatAttachment();
-      persistChat();
+      persistChat(appState.chat[appState.chat.length - 1]);
       renderChat();
       scrollChatToBottom();
     }
@@ -2578,7 +2986,7 @@
                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md border ${pillClass}">
                   ${isMasterEv ? '♛' : '🌸'} ${escapeHtml(ownerName)}
                 </span>
-                <span class="font-semibold text-sm text-white">${escapeHtml(ev.title)}</span>
+                <span class="font-semibold text-sm text-white">${escapeHtml(ev.title)}${badgeMark("kalender",ev.id)}</span>
               </div>
               <div class="text-xs text-slate-400 mt-1">📅 ${calendarRangeLabel(ev)}</div>${ownerRole === 'Daisy' && ((ev.pointsPlus != null ? Number(ev.pointsPlus) : Math.max(0, Number(ev.points || 0))) || (ev.pointsMinus != null ? Number(ev.pointsMinus) : Math.max(0,-Number(ev.points || 0)))) ? `<div class="text-xs mt-1 ${ev.confirmed ? 'text-emerald-300' : 'text-amber-300'}">${ev.confirmed ? ('✓ ' + (ev.confirmOutcome === 'unfulfilled' ? 'Nicht erfüllt' : 'Erfüllt')) : '⏳ Vorgemerkt'}: +${ev.pointsPlus != null ? ev.pointsPlus : Math.max(0,Number(ev.points || 0))} / −${ev.pointsMinus != null ? ev.pointsMinus : Math.max(0,-Number(ev.points || 0))} Punkte</div>` : ''}
             </div>
@@ -2587,7 +2995,6 @@
               ${hasPermission('kalender','edit') || currentRole === 'Master' ? `<button onclick="editCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-slate-700/50 text-slate-200 text-xs" title="Termin bearbeiten">✎</button>` : ''}
               ${canDelete ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
             </div>
-
           </div>
         `;
       }).join('');
@@ -2723,7 +3130,6 @@
       ev.confirmOutcome = outcome;
       persistState(); refreshAllUI(); showToast(amount ? 'Termin bestätigt. Punkte gebucht.' : 'Termin ohne Punkte bestätigt.');
     }
-
     function deleteCalendarEvent(id) {
       if (!hasPermission('kalender', 'delete')) return;
       const ev = appState.kalender.find(e => e.id === id);
@@ -3031,7 +3437,7 @@
       if (editingTaskId && (!task || currentRole !== 'Master' || task.status !== 'open')) return;
       const values = { title, desc, assignee, deadline, taskKind: kind, plusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-plus').value) : 0, minusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-minus').value) : 0 };
       if (task) Object.assign(task, values);
-      else tasks.unshift({ id: 'task-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), taskV26: true, status: 'open', cycle: 0, history: [], done: false, ...values });
+      else tasks.unshift({ id: 'task-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), taskV26: true, status: 'open', cycle: 0, history: [], done: false, createdBy: currentRole, ...values });
       logActivity('hat Aufgabe angelegt/bearbeitet: „' + title + '“', 'aufgaben');
       resetTaskForm(); persistState(); refreshAllUI(); showToast('Aufgabe gespeichert.');
     }
@@ -3116,7 +3522,7 @@
           ? ['accept','reject','extend'].map((d,i) => '<button onclick="reviewTask(\'' + t.id + '\',\'' + d + '\')" class="px-3 py-1 rounded-lg bg-white/10">' + ['Erfüllt','Nicht erfüllt','Frist verlängern'][i] + '</button>').join('')
           : '';
         const edit = currentRole === 'Master' && status === 'open' ? '<button onclick="editTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-white/10">Bearbeiten</button>' : '';
-        return '<div class="rounded-xl border ' + style[2] + ' bg-white/[0.03] p-3 space-y-2"><div class="flex flex-wrap justify-between gap-2"><strong class="text-sm">' + escapeHtml(t.title) + '</strong><span class="text-xs ' + style[1] + '">' + style[0] + '</span></div><p class="text-xs text-slate-400">' + escapeHtml(t.desc || '') + '</p><div class="text-xs text-slate-400">Für: ' + escapeHtml(getDisplayName(t.assignee || 'Master')) + ' · Frist: ' + (t.deadline ? new Date(t.deadline).toLocaleString('de-DE') : 'Keine (Altbestand)') + '</div>' + (t.assignee === 'Daisy' ? '<div class="text-xs text-slate-400">+' + rewardAmount(t.plusPoints) + ' / −' + rewardAmount(t.minusPoints) + ' Punkte pro Fristversäumnis</div>' : '') + (t.reportedAt ? '<div class="text-xs text-amber-300">Gemeldet: ' + new Date(t.reportedAt).toLocaleString('de-DE') + '</div>' : '') + '<div class="flex flex-wrap gap-2 text-xs">' + buttons + reviewButtons + edit + '</div></div>';
+        return '<div class="rounded-xl border ' + style[2] + ' bg-white/[0.03] p-3 space-y-2"><div class="flex flex-wrap justify-between gap-2"><strong class="text-sm">' + escapeHtml(t.title) + '</strong>' + badgeMark("aufgaben",t.id) + '<span class="text-xs ' + style[1] + '">' + style[0] + '</span></div><p class="text-xs text-slate-400">' + escapeHtml(t.desc || '') + '</p><div class="text-xs text-slate-400">Für: ' + escapeHtml(getDisplayName(t.assignee || 'Master')) + ' · Frist: ' + (t.deadline ? new Date(t.deadline).toLocaleString('de-DE') : 'Keine (Altbestand)') + '</div>' + (t.assignee === 'Daisy' ? '<div class="text-xs text-slate-400">+' + rewardAmount(t.plusPoints) + ' / −' + rewardAmount(t.minusPoints) + ' Punkte pro Fristversäumnis</div>' : '') + (t.reportedAt ? '<div class="text-xs text-amber-300">Gemeldet: ' + new Date(t.reportedAt).toLocaleString('de-DE') + '</div>' : '') + '<div class="flex flex-wrap gap-2 text-xs">' + buttons + reviewButtons + edit + '</div></div>';
       }).join('') || '<p class="text-xs text-slate-400">Noch keine Aufgaben vorhanden.</p>';
     }
     function renderRewards() {
@@ -3537,12 +3943,12 @@
     function saveFirebaseConfig() {
       if (currentRole !== 'Master') return;
       const url = document.getElementById('sec-fb-url').value.trim() || DEFAULT_FB_URL;
-      const room = document.getElementById('sec-fb-room').value.trim() || DEFAULT_ROOM_CODE;
-      appState.firebase.url = url;
-      appState.firebase.room = room;
+      const room = DEFAULT_ROOM_CODE; // Production room cannot be changed through settings.
+      appState.firebase.url = DEFAULT_FB_URL;
+      appState.firebase.room = DEFAULT_ROOM_CODE;
       saveStateLocalOnly();
       initFirebaseSync();
-      showToast('Firebase-Verbindung aktualisiert.');
+      showToast('TEST: Firebase-Raum bleibt fest isoliert.');
     }
 
     function changeDaisyPin() {
@@ -3585,35 +3991,15 @@
       showToast('Backup heruntergeladen.');
     }
 
+    // Production release safety: importing or resetting shared data is disabled
+    // until a separate, reviewed recovery workflow exists.
     function importBackupJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const imported = JSON.parse(e.target.result);
-          appState = mergeWithDefaults(imported);
-          persistState();
-          refreshAllUI();
-          showToast('Backup erfolgreich wiederhergestellt!');
-        } catch (err) {
-          showToast('Ungültige Backup-Datei.', 'error');
-        }
-      };
-      reader.readAsText(file);
+      if (event && event.target) event.target.value = '';
+      showToast('Backup-Import ist in dieser Produktivversion aus Sicherheitsgründen gesperrt.', 'error');
     }
 
     function confirmFactoryReset() {
-      openConfirmModal(
-        'Werksreset durchführen?',
-        'Möchtest du wirklich alle Daten, Termine, Einträge und den Chatverlauf unwiderruflich auf die Standardwerte zurücksetzen?',
-        () => {
-          appState = createDefaultState();
-          persistState();
-          refreshAllUI();
-          showToast('Alle Daten wurden zurückgesetzt.');
-        }
-      );
+      showToast('Werksreset ist in dieser Produktivversion aus Sicherheitsgründen gesperrt.', 'error');
     }
 
     function showToast(message, type = 'success') {
