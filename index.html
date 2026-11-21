@@ -1190,9 +1190,10 @@
       return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
     }
 
-    // Each modified top-level collection is guarded by a server-side RTDB
-    // transaction. If another device changed it since our snapshot, abort
-    // rather than silently replacing the other device's work.
+    // Queue each collection's writes; never launch two transactions against
+    // the same stale baseline. Preserve a local edit made during an in-flight
+    // transaction and submit it after the first commit.
+    const pendingCollectionWrites = new Map();
     function persistState() {
       saveStateLocalOnly();
       if (!firebaseDbRef || !productionRoomLoaded || isApplyingRemoteUpdate || !lastRemoteState) return;
@@ -1203,18 +1204,28 @@
       for (const [key, value] of Object.entries(stateWithoutChat)) {
         if (key === 'firebase' || key === 'version') continue;
         const baseline = lastRemoteState[key] === undefined ? null : lastRemoteState[key];
-        if (sameRemoteValue(value, baseline)) continue;
+        if (sameRemoteValue(value, baseline) || pendingCollectionWrites.has(key)) continue;
         const desired = sanitizeForFirebase(value);
         const expected = sanitizeForFirebase(baseline);
-        firebaseDbRef.child(key).transaction(current => {
-          if (!sameRemoteValue(current, expected)) return; // conflict: abort
+        const roomRef = firebaseDbRef;
+        pendingCollectionWrites.set(key, {roomRef, desired});
+        roomRef.child(key).transaction(current => {
+          if (!sameRemoteValue(current, expected)) return;
           return desired;
         }, (error, committed) => {
+          pendingCollectionWrites.delete(key);
           if (error || !committed) {
             console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
+            productionRoomLoaded = false; // fail closed until fresh snapshot
             updateSyncIndicator(false);
             showToast('Synchronisationskonflikt in ' + key + ': Änderung nicht gespeichert. Bitte Datenstand prüfen.', 'error');
+            return;
           }
+          if (roomRef !== firebaseDbRef) return;
+          if (lastRemoteState) lastRemoteState[key] = sanitizeForFirebase(desired);
+          // The local state may have changed while this write was in flight.
+          // Never retry an external conflict automatically.
+          if (!sameRemoteValue(appState[key], desired)) persistState();
         }, false);
       }
     }
