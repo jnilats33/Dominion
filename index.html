@@ -1513,11 +1513,14 @@
         }
         // Do not turn a partial/incorrect remote snapshot into default-filled data
         // that could later overwrite real production records.
-        const requiredCollections = ['kalender', 'einkauf', 'strafbuch', 'activityFeed', 'rewardLedger'];
-        const validCollections = requiredCollections.every(key => Array.isArray(remoteData[key]));
+        // RTDB omits empty arrays, so absent optional collections are valid.
+        // Existing collections must still be arrays; never accept malformed data.
+        const optionalCollections = ['kalender', 'einkauf', 'strafbuch', 'activityFeed', 'rewardLedger', 'deletedRewardKeys'];
+        const validCollections = optionalCollections.every(key =>
+          remoteData[key] == null || Array.isArray(remoteData[key]));
         const validMgmt = remoteData.mgmt && typeof remoteData.mgmt === 'object' &&
           ['kleidung', 'toys', 'strafen', 'belohnungen', 'regeln', 'aufgaben']
-            .every(key => Array.isArray(remoteData.mgmt[key]));
+            .every(key => remoteData.mgmt[key] == null || Array.isArray(remoteData.mgmt[key]));
         if (!validCollections || !validMgmt || !remoteData.basics || !remoteData.permissions) {
           console.error('Produktiv-Snapshot unvollständig: Schreibzugriffe aus Sicherheitsgründen gesperrt.');
           productionRoomLoaded = false;
