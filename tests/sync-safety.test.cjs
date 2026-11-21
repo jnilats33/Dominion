@@ -316,3 +316,37 @@ test('read-only conflict review fails safely when draft is corrupt or server una
   assert.equal(h.pending.length,0);
   draftStorage.clear();
 });
+
+test('locked conflict preserves local draft but accepts unrelated remote updates',()=>{
+  draftStorage.clear();
+  const remote={kalender:[{id:'server'}],einkauf:[{id:'old'}]};
+  const h=listenerHarness(remote,{kalender:[{id:'local'}],einkauf:[{id:'old'}]});
+  draftStorage.set('dominion_sync_conflict_draft_v1',JSON.stringify({
+    drafts:{kalender:[{id:'local'}]}
+  }));
+  h.sandbox.productionSyncConflict=true;
+  h.sandbox.productionRoomLoaded=false;
+  h.deliver({kalender:[{id:'server'}],einkauf:[{id:'remote-update'}]});
+  assert.deepEqual(h.sandbox.appState.kalender,[{id:'local'}]);
+  assert.deepEqual(h.sandbox.appState.einkauf,[{id:'remote-update'}]);
+  assert.equal(h.sandbox.productionRoomLoaded,false);
+  assert.equal(h.pending.length,0);
+  draftStorage.clear();
+});
+
+test('locked local save adds only edited collections to recovery draft',()=>{
+  draftStorage.clear();
+  const remote={kalender:[{id:'server'}],einkauf:[{id:'unchanged'}]};
+  const h=delayedHarness(remote,{kalender:[{id:'local'}],einkauf:[{id:'unchanged'}]});
+  h.sandbox.productionSyncConflict=true;
+  h.sandbox.productionRoomLoaded=false;
+  draftStorage.set('dominion_sync_conflict_draft_v1',JSON.stringify({drafts:{kalender:[{id:'local'}]}}));
+  vm.runInContext('saveSyncConflictDraft(null,null,true)',h.sandbox);
+  const draft=JSON.parse(draftStorage.get('dominion_sync_conflict_draft_v1'));
+  assert.deepEqual(Object.keys(draft.drafts),['kalender']);
+  h.sandbox.appState.einkauf.push({id:'new-local'});
+  vm.runInContext('saveSyncConflictDraft(null,null,true)',h.sandbox);
+  const updated=JSON.parse(draftStorage.get('dominion_sync_conflict_draft_v1'));
+  assert.deepEqual(Object.keys(updated.drafts).sort(),['einkauf','kalender']);
+  draftStorage.clear();
+});
