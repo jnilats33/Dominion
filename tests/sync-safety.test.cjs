@@ -153,3 +153,27 @@ test('incoming unrelated snapshot retains uncommitted local calendar edit',()=>{
   assert.deepEqual(h.sandbox.appState.kalender,[{id:'a'},{id:'local'}]);
   assert.deepEqual(h.sandbox.appState.einkauf,[{id:'other-device'}]);
 });
+
+test('same-collection remote edit during pending write must abort without overwrite',()=>{
+  const remote={kalender:[{id:'a'}]};
+  const h=listenerHarness(remote,{...remote,kalender:[{id:'a'},{id:'local'}]});
+  h.sandbox.runPersist();
+  assert.equal(h.pending.length,1);
+  h.deliver({kalender:[{id:'a'},{id:'daisy'}]});
+  const job=h.pending.shift();
+  const result=job.update([{id:'a'},{id:'daisy'}]);
+  assert.equal(result,undefined);
+  job.done(null,false);
+  assert.equal(h.sandbox.productionRoomLoaded,false);
+  assert.deepEqual(h.sandbox.appState.kalender,[{id:'a'},{id:'local'}]);
+});
+test('failed transaction disables subsequent writes until reconciliation',()=>{
+  const h=delayedHarness({kalender:[{id:'a'}]},{kalender:[{id:'a'},{id:'local'}]});
+  h.sandbox.runPersist();
+  h.mutateRemote('kalender',[{id:'a'},{id:'remote'}]);
+  h.flush();
+  h.sandbox.appState.kalender.push({id:'another'});
+  h.sandbox.runPersist();
+  assert.equal(h.pending.length,0);
+  assert.equal(h.sandbox.productionRoomLoaded,false);
+});
