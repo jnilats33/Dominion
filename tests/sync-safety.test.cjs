@@ -11,6 +11,7 @@ assert.ok(start >= 0 && end > start, 'Sync functions found');
 const source = html.slice(start,end);
 const draftStorage = new Map();
 const localStorageMock = {getItem:key=>draftStorage.get(key)??null,setItem:(key,value)=>draftStorage.set(key,value)};
+const documentMock = {getElementById(){return null;}};
 function harness(remote, local) {
   let state = structuredClone(remote);
   const notifications = [];
@@ -26,7 +27,7 @@ function harness(remote, local) {
     productionRoomLoaded:true, productionSyncConflict:false, isApplyingRemoteUpdate:false,
     saveStateLocalOnly(){}, sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
     updateSyncIndicator(){}, showToast:(message)=>notifications.push(message),
-    console,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
+    console,document:documentMock,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
   };
   vm.createContext(sandbox);
   vm.runInContext(source+'\nthis.runPersist = persistState; this.same = sameRemoteValue;',sandbox);
@@ -83,7 +84,7 @@ function delayedHarness(remote,local) {
     firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
     productionRoomLoaded:true,productionSyncConflict:false,isApplyingRemoteUpdate:false,
     saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
-    updateSyncIndicator(){},showToast:m=>notifications.push(m),console,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
+    updateSyncIndicator(){},showToast:m=>notifications.push(m),console,document:documentMock,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
   };
   vm.createContext(sandbox);
   vm.runInContext(source+'\nthis.runPersist=persistState;',sandbox);
