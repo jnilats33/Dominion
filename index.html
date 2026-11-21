@@ -219,6 +219,9 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 <span id="sync-status-label">Live</span>
               </span>
+              <button id="sync-conflict-review-button" type="button" onclick="openSyncConflictReview()" hidden
+                class="px-2 py-0.5 rounded-lg border border-rose-500/50 text-rose-200 bg-rose-950/50 text-[10px] font-semibold"
+                title="Ungespeicherte Änderungen ansehen">Konflikt prüfen</button>
             </div>
             <p id="header-subtitle" class="text-[11px] text-slate-400 truncate">D+W Connection</p>
           </div>
@@ -1225,6 +1228,7 @@
         if (!saved || !saved.drafts || !Object.keys(saved.drafts).length) return;
         productionSyncConflict = true;
         productionRoomLoaded = false;
+        updateSyncConflictReviewButton();
         // Preserve the saved edits locally, without writing them to Firebase.
         for (const [key, value] of Object.entries(saved.drafts)) {
           if (key !== 'chat' && key !== 'chatV2' && key !== 'firebase' &&
@@ -1234,6 +1238,7 @@
       } catch (error) {
         productionSyncConflict = true; // unreadable draft: fail closed
         productionRoomLoaded = false;
+        updateSyncConflictReviewButton();
         console.error('Konfliktentwurf nicht lesbar; Synchronisation gesperrt.', error);
       }
     }
@@ -1259,6 +1264,64 @@
       return {status:lastRemoteState ? 'ready' : 'server-unavailable',
         createdAt:saved.createdAt || null, updatedAt:saved.updatedAt || null,
         collections};
+    }
+
+    function updateSyncConflictReviewButton() {
+      const button = document.getElementById('sync-conflict-review-button');
+      if (button) button.hidden = !productionSyncConflict;
+    }
+
+    // Intentionally read-only: the review does not delete drafts, unlock
+    // synchronization, or write anything to Firebase.
+    function openSyncConflictReview() {
+      const review = buildSyncConflictReview();
+      const backdrop = document.createElement('div');
+      backdrop.id = 'sync-conflict-review-overlay';
+      backdrop.className = 'fixed inset-0 z-[100] bg-black/85 flex items-center justify-center p-3';
+      const panel = document.createElement('section');
+      panel.className = 'bg-[#151923] border border-amber-500/40 rounded-2xl p-5 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-slate-100 shadow-2xl';
+      const heading = document.createElement('h2');
+      heading.className = 'text-lg font-bold text-amber-200 mb-2';
+      heading.textContent = 'Synchronisationskonflikt – nur Ansicht';
+      panel.appendChild(heading);
+      const info = document.createElement('p');
+      info.className = 'text-xs text-slate-300 mb-4';
+      info.textContent = review.status === 'ready'
+        ? 'Lokale Entwürfe und zuletzt empfangene Serverdaten. Es wird nichts übertragen, gelöscht oder freigegeben.'
+        : review.status === 'server-unavailable'
+          ? 'Kein Serverdatenstand verfügbar. Lokale Entwürfe bleiben geschützt; kein Vergleich möglich.'
+          : review.status === 'unreadable'
+            ? 'Der lokale Konfliktentwurf ist nicht lesbar. Keine Änderungen vornehmen; Datenbestand sichern.'
+            : 'Kein Konfliktentwurf gefunden.';
+      panel.appendChild(info);
+      for (const item of review.collections) {
+        const section = document.createElement('section');
+        section.className = 'border border-slate-700 rounded-xl p-3 mb-3';
+        const label = document.createElement('h3');
+        label.className = 'font-semibold text-sm mb-2';
+        label.textContent = item.key + ' – ' + (item.matchesServer === null
+          ? 'Serverstand unbekannt' : item.matchesServer ? 'identisch' : 'unterschiedlich');
+        section.appendChild(label);
+        for (const [title, value] of [['Lokal (Entwurf)',item.local],['Server (letzter Snapshot)',item.server]]) {
+          const caption = document.createElement('p');
+          caption.className = 'text-xs text-slate-400 mt-2';
+          caption.textContent = title;
+          const pre = document.createElement('pre');
+          pre.className = 'text-[11px] whitespace-pre-wrap break-all max-h-44 overflow-auto bg-black/30 p-2 rounded-lg';
+          pre.textContent = JSON.stringify(value,null,2);
+          section.append(caption,pre);
+        }
+        panel.appendChild(section);
+      }
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'mt-2 px-4 py-2 rounded-lg border border-slate-600 text-sm';
+      close.textContent = 'Schließen (keine Änderungen)';
+      close.addEventListener('click',()=>backdrop.remove());
+      panel.appendChild(close);
+      backdrop.appendChild(panel);
+      document.getElementById('sync-conflict-review-overlay')?.remove();
+      document.body.appendChild(backdrop);
     }
 
     // Firebase represents empty arrays as null. Compare equivalent empty values
@@ -1297,6 +1360,7 @@
             console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
             const draftSaved = saveSyncConflictDraft(key, error);
             productionSyncConflict = true;
+            updateSyncConflictReviewButton();
             productionRoomLoaded = false; // fail closed; snapshots must not auto-unlock
             updateSyncIndicator(false);
             showToast('Synchronisation gesperrt: ' + key + ' nicht gespeichert. ' +
