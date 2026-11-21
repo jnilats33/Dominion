@@ -862,6 +862,15 @@
             </div>
           </div>
 
+          <div id="settings-panel-entwicklung" class="hidden space-y-5">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3">
+              <h3 class="font-semibold text-sm text-white">🧪 Entwicklung & Diagnose</h3>
+              <p class="text-xs text-slate-400">Testdaten und zukünftige Diagnosewerkzeuge. Nur im isolierten Testsystem aktiv.</p>
+              <div id="development-import-preview" class="text-xs text-slate-300"></div>
+              <button type="button" onclick="importDevelopmentFixtures()" id="development-import-button"
+                class="px-4 py-2 rounded-xl gold-gradient text-xs font-semibold disabled:opacity-40">Testdaten laden</button>
+            </div>
+          </div>
           <div id="settings-panel-sicherheit" class="hidden space-y-5">
             <!-- Firebase Live-Sync -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
@@ -3939,6 +3948,9 @@
           <button onclick="selectSettingsSubTab('sicherheit')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'sicherheit' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🛡️ Sicherheit & Push
           </button>
+          <button onclick="selectSettingsSubTab('entwicklung')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'entwicklung' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
+            🧪 Entwicklung
+          </button>
         `;
       } else {
         if (!['basics', 'ansicht', 'benachrichtigungen', 'daisy-security'].includes(activeSettingsSubTab)) activeSettingsSubTab = 'basics';
@@ -3965,6 +3977,8 @@
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
+      document.getElementById('settings-panel-entwicklung').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'entwicklung');
+      if (isMaster && activeSettingsSubTab === 'entwicklung') renderDevelopmentPanel();
       document.getElementById('settings-panel-benachrichtigungen').classList.toggle('hidden', isMaster || activeSettingsSubTab !== 'benachrichtigungen');
       const authParent = document.getElementById(isMaster ? 'settings-panel-sicherheit' : 'settings-panel-benachrichtigungen');
       let authPanel = document.getElementById('test-firebase-auth-panel');
@@ -4020,6 +4034,75 @@
       }
     }
 
+    // A hard guard on both hosting origin and database room keeps developer tools test-only.
+    const DEVELOPMENT_TEST_ROOM = 'dominion-test-20261114-isolated';
+    function developmentToolsAllowed() {
+      return currentRole === 'Master' &&
+        location.hostname === 'jnilats33.github.io' &&
+        location.pathname.startsWith('/Dominion-Test/') &&
+        firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM &&
+        !!firebaseDbRef && productionRoomLoaded && !productionSyncConflict &&
+        !!testAuthUser && testAuthRole === 'Master';
+    }
+    function renderDevelopmentPanel() {
+      const preview = document.getElementById('development-import-preview');
+      const button = document.getElementById('development-import-button');
+      if (!preview || !button) return;
+      const allowed = developmentToolsAllowed();
+      preview.textContent = allowed
+        ? 'Vorschau: 4 Belohnungen, 4 Strafen, 2 Aufgaben und 3 Termine. Vorhandene Einträge bleiben bestehen; gleiche Test-IDs werden übersprungen. Keine Punktegutschrift beim Import.'
+        : 'Import gesperrt. Erforderlich: Dominion-Test, isolierter Testraum und Firebase-Anmeldung als Master.';
+      button.disabled = !allowed || developmentImportPending;
+    }
+    let developmentImportPending = false;
+    async function importDevelopmentFixtures() {
+      if (!developmentToolsAllowed() || developmentImportPending) return;
+      if (!confirm('TESTDATEN IMPORTIEREN?\\n4 Belohnungen, 4 Strafen, 2 Aufgaben und 3 Termine.\\nBestehende Einträge bleiben erhalten. Fortfahren?')) return;
+      developmentImportPending = true;
+      renderDevelopmentPanel();
+      try {
+        const response = await fetch('tests/fixtures/reward-cycle.sample.json', {cache:'no-store'});
+        if (!response.ok) throw new Error('Testdatendatei fehlt ('+response.status+')');
+        const fixtures = await response.json();
+        if (fixtures.schema !== 'dominion-test-fixtures-v1' || !fixtures.mgmt ||
+            !Array.isArray(fixtures.kalender)) throw new Error('Ungültige Testdaten');
+        if (!developmentToolsAllowed()) throw new Error('Testumgebung nicht mehr aktiv');
+        const roomRef = firebaseDbRef;
+        const mergeUnique = (existing,additions) => {
+          if (existing != null && !Array.isArray(existing)) return;
+          const output = Array.isArray(existing) ? existing.slice() : [];
+          const ids = new Set(output.map(x=>String(x && x.id)));
+          for (const item of additions) {
+            if (!item || typeof item.id !== 'string' || !item.id.startsWith('test-')) continue;
+            if (!ids.has(item.id)) {output.push(item);ids.add(item.id);}
+          }
+          return output;
+        };
+        const mgmtResult = await roomRef.child('mgmt').transaction(current => {
+          if (!current || typeof current !== 'object' || Array.isArray(current)) return;
+          const next = {...current};
+          for (const category of ['belohnungen','strafen','aufgaben']) {
+            if (!Array.isArray(fixtures.mgmt[category])) return;
+            const merged = mergeUnique(next[category],fixtures.mgmt[category]);
+            if (!merged) return;
+            next[category] = merged;
+          }
+          return next;
+        },undefined,false);
+        if (!mgmtResult.committed) throw new Error('Verwaltungsdaten nicht übernommen');
+        if (!developmentToolsAllowed()) throw new Error('Testumgebung nach Teilimport nicht mehr aktiv');
+        const calendarResult = await roomRef.child('kalender').transaction(current =>
+          mergeUnique(current,fixtures.kalender),undefined,false);
+        if (!calendarResult.committed) throw new Error('Termine nicht übernommen');
+        showToast('Testdaten importiert. Bereits vorhandene Testeinträge wurden übersprungen.');
+      } catch(error) {
+        console.error('Testdatenimport:',error);
+        showToast('Testdatenimport fehlgeschlagen: '+error.message,'error');
+      } finally {
+        developmentImportPending = false;
+        renderDevelopmentPanel();
+      }
+    }
     function selectSettingsSubTab(subTab) {
       if (currentRole !== 'Master' && !['basics', 'ansicht', 'benachrichtigungen', 'daisy-security'].includes(subTab)) return;
       activeSettingsSubTab = subTab;
