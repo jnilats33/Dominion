@@ -140,7 +140,7 @@ function listenerHarness(remote,local) {
   assert.ok(start>=0&&end>start);
   const listenerBody=html.slice(start+"firebaseDbRef.on('value', (snapshot) => {".length,end);
   vm.createContext(sandbox);
-  vm.runInContext(source+'\\nthis.runPersist=persistState;this.deliver=function(snapshot){'+listenerBody+'};',sandbox);
+  vm.runInContext(source+'\nthis.runPersist=persistState;this.deliver=function(snapshot){'+listenerBody+'};',sandbox);
   const valid=data=>({mgmt:{aufgaben:[]},basics:{},permissions:{},...structuredClone(data)});
   return {sandbox,pending,deliver:data=>sandbox.deliver({val:()=>valid(data)})};
 }
