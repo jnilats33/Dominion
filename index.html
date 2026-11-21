@@ -1571,7 +1571,26 @@
           const liveChat = appState.chat || [];
           // Do not import old /chat or /chatV2 into shared app state.
           const { chat: ignoredOldChat, chatV2: ignoredChatV2, ...stateWithoutChats } = remoteData;
+          // Preserve unsaved local changes whenever a remote snapshot arrives.
+          // A pending write may have been acknowledged locally by Firebase
+          // before its server transaction callback runs.
+          const localBeforeSnapshot = appState;
+          const remoteBeforeSnapshot = lastRemoteState;
+          const pendingKeys = new Set(pendingCollectionWrites.keys());
+          const localDirtyKeys = new Set();
+          if (productionRoomLoaded && remoteBeforeSnapshot) {
+            for (const [key, value] of Object.entries(localBeforeSnapshot)) {
+              if (key === 'chat' || key === 'chatV2' || key === 'firebase' ||
+                  key === 'version' || key === 'fcmToken') continue;
+              if (!sameRemoteValue(value, remoteBeforeSnapshot[key])) localDirtyKeys.add(key);
+            }
+          }
           appState = mergeWithDefaults(stateWithoutChats);
+          for (const key of new Set([...pendingKeys, ...localDirtyKeys])) {
+            if (Object.prototype.hasOwnProperty.call(localBeforeSnapshot, key)) {
+              appState[key] = localBeforeSnapshot[key];
+            }
+          }
           delete appState.fcmToken;
           appState.chat = liveChat;
           lastRemoteState = sanitizeForFirebase(stateWithoutChats);
