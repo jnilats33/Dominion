@@ -1471,6 +1471,7 @@
     function updateAuthenticatedFirebaseSync() {
       const verified = !!testAuthUser && ['Master', 'Daisy'].includes(testAuthRole);
       if (!verified) {
+        productionRoomLoaded = false;
         if (firebaseDbRef) { firebaseDbRef.off(); firebaseDbRef.child('chatV2').off(); }
         firebaseDbRef = null;
         updateSyncIndicator(false);
