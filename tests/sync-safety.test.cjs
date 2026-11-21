@@ -79,7 +79,7 @@ function delayedHarness(remote,local) {
   const sandbox={
     appState:structuredClone(local),lastRemoteState:structuredClone(remote),
     firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
-    productionRoomLoaded:true,isApplyingRemoteUpdate:false,
+    productionRoomLoaded:true,productionSyncConflict:false,isApplyingRemoteUpdate:false,
     saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
     updateSyncIndicator(){},showToast:m=>notifications.push(m),console
   };
@@ -129,7 +129,7 @@ function listenerHarness(remote,local) {
   const pending=[];
   const sandbox={
     appState:structuredClone(local),lastRemoteState:structuredClone(remote),
-    productionRoomLoaded:true,isApplyingRemoteUpdate:false,
+    productionRoomLoaded:true,productionSyncConflict:false,isApplyingRemoteUpdate:false,
     firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
     saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
     updateSyncIndicator(){},showToast(){},refreshAllUI(){},
@@ -176,4 +176,20 @@ test('failed transaction disables subsequent writes until reconciliation',()=>{
   h.sandbox.runPersist();
   assert.equal(h.pending.length,0);
   assert.equal(h.sandbox.productionRoomLoaded,false);
+});
+
+test('incoming snapshot cannot unlock writes after a transaction conflict',()=>{
+  const remote={kalender:[{id:'a'}]};
+  const h=listenerHarness(remote,{...remote,kalender:[{id:'a'},{id:'local'}]});
+  h.sandbox.runPersist();
+  const job=h.pending.shift();
+  assert.ok(job);
+  assert.equal(job.update([{id:'a'},{id:'daisy'}]),undefined);
+  job.done(null,false);
+  assert.equal(h.sandbox.productionSyncConflict,true);
+  h.deliver({kalender:[{id:'a'},{id:'daisy'}]});
+  assert.equal(h.sandbox.productionRoomLoaded,false);
+  h.sandbox.appState.kalender.push({id:'another'});
+  h.sandbox.runPersist();
+  assert.equal(h.pending.length,0);
 });
