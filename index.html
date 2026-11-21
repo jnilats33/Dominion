@@ -1178,6 +1178,12 @@
     }
 
     function saveStateLocalOnly() {
+      // While locked, the separate recovery draft must follow subsequent edits.
+      // Never send these drafts to Firebase automatically.
+      if (productionSyncConflict && !isApplyingRemoteUpdate) {
+        const saved = saveSyncConflictDraft(null, null, true);
+        if (!saved) console.error('Konfliktentwurf nicht aktualisiert: lokale Daten zusätzlich exportieren.');
+      }
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       } catch (e) {
@@ -1186,11 +1192,20 @@
     }
 
     // Keep a separate local recovery copy. Never upload this draft automatically.
-    function saveSyncConflictDraft(key, error) {
+    function saveSyncConflictDraft(key, error, refreshAll = false) {
       try {
         const previous = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || '{}');
         const drafts = previous && typeof previous.drafts === 'object' && previous.drafts ? previous.drafts : {};
-        drafts[key] = sanitizeForFirebase(appState[key]);
+        if (refreshAll) {
+          // Capture every editable collection, including changes made after lock.
+          for (const [draftKey, value] of Object.entries(appState)) {
+            if (draftKey === 'chat' || draftKey === 'chatV2' || draftKey === 'firebase' ||
+                draftKey === 'fcmToken' || draftKey === 'version') continue;
+            drafts[draftKey] = sanitizeForFirebase(value);
+          }
+        } else if (key != null) {
+          drafts[key] = sanitizeForFirebase(appState[key]);
+        }
         localStorage.setItem(SYNC_CONFLICT_DRAFT_KEY, JSON.stringify({
           createdAt: previous.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
