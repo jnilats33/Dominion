@@ -1186,6 +1186,7 @@
       if (firebaseDbRef && productionRoomLoaded && !isApplyingRemoteUpdate) {
         const stateWithoutChat = { ...appState };
         delete stateWithoutChat.chat;
+        delete stateWithoutChat.chatV2; // Chat v2 is append-only and must never be overwritten by general state sync.
         delete stateWithoutChat.fcmToken; // Never publish a push token in shared room state.
         firebaseDbRef.update(sanitizeForFirebase(stateWithoutChat)).catch(err => {
           console.warn('Firebase Sync Fehler:', err);
