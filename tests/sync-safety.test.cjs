@@ -21,7 +21,7 @@ function harness(remote, local) {
       if (result === undefined) done(null,false);
       else {state[key] = structuredClone(result);done(null,true);}
     }};}},
-    productionRoomLoaded:true, isApplyingRemoteUpdate:false,
+    productionRoomLoaded:true, productionSyncConflict:false, isApplyingRemoteUpdate:false,
     saveStateLocalOnly(){}, sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
     updateSyncIndicator(){}, showToast:(message)=>notifications.push(message),
     console
