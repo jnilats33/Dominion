@@ -3597,6 +3597,7 @@
     }
     // Selection is local and provisional until an RTDB ledger transaction commits.
     let redemptionSelection = {};
+    let redemptionSelectionMode = null;
     let redemptionPending = false;
     function redemptionMode() {
       if (currentRole === 'Daisy' && !hasPermission('rewards','visible')) return null;
@@ -3633,9 +3634,11 @@
       const mode = redemptionMode();
       if (!mode) {
         redemptionSelection = {};
+        redemptionSelectionMode = null;
         panel.innerHTML = '<p class="text-xs text-slate-400">Bei positivem Punktestand wählt Daisy Belohnungen. Bei negativem Punktestand verrechnet Master Strafen.</p>';
         return;
       }
+      if (redemptionSelectionMode !== mode) { redemptionSelection = {}; redemptionSelectionMode = mode; }
       const catalog = redemptionCatalog(mode);
       const total = redemptionTotal(mode);
       const available = Math.abs(rewardBalance());
@@ -3667,43 +3670,63 @@
     async function confirmRedemption() {
       const mode = redemptionMode();
       if (!mode || redemptionPending || !firebaseDbRef || !productionRoomLoaded ||
-          productionSyncConflict || !lastRemoteState || pendingCollectionWrites.has('rewardLedger')) {
-        showToast('Synchronisation nicht bereit. Bitte später erneut versuchen.','error'); return;
+          productionSyncConflict || !lastRemoteState ||
+          pendingCollectionWrites.has('rewardLedger') || pendingCollectionWrites.has('mgmt') ||
+          !testAuthUser || testAuthRole !== currentRole) {
+        showToast('Synchronisation oder Rollenprüfung nicht bereit.','error'); return;
       }
       const chosen = redemptionCatalog(mode).filter(item => redemptionSelection[String(item.id)] > 0)
-        .map(item => ({id:String(item.id),title:String(item.title || ''),count:redemptionSelection[String(item.id)],
+        .map(item => ({id:String(item.id),title:String(item.title || ''),
+          count:Math.floor(Number(redemptionSelection[String(item.id)])),
           cost:rewardAmount(item.rewardPoints)}));
       const total = chosen.reduce((sum,item)=>sum+item.cost*item.count,0);
-      if (!total || total > Math.abs(rewardBalance())) return;
-      if (!confirm(chosen.map(item=>item.count+'× '+item.title+' ('+(item.count*item.cost)+' Punkte)').join('\n') +
-        '\n\nGesamt: '+total+' Punkte. Verbindlich einlösen?')) return;
+      if (!chosen.length || chosen.some(item=>!Number.isSafeInteger(item.count) || item.count <= 0) ||
+          !Number.isSafeInteger(total) || total <= 0 || total > Math.abs(rewardBalance())) return;
+      if (!confirm(chosen.map(item=>item.count+'× '+item.title+' ('+(item.count*item.cost)+' Punkte)').join('\\n') +
+        '\\n\\nGesamt: '+total+' Punkte. Verbindlich einlösen?')) return;
+      if (redemptionMode() !== mode || pendingCollectionWrites.has('rewardLedger') ||
+          pendingCollectionWrites.has('mgmt')) return;
       redemptionPending = true;
       renderRewards();
       const id = 'redemption:'+Date.now()+':'+Math.random().toString(36).slice(2,12);
       const amount = mode === 'belohnungen' ? -total : total;
       const description = (mode === 'belohnungen' ? 'Belohnung eingelöst: ' : 'Strafe verrechnet: ') +
         chosen.map(item=>item.count+'× '+item.title).join(', ');
-      let attempted = false;
+      const actorRole = currentRole;
+      const roomRef = firebaseDbRef;
       try {
-        const result = await firebaseDbRef.child('rewardLedger').transaction(current => {
-          if (current != null && !Array.isArray(current)) return;
-          const ledger = Array.isArray(current) ? current : [];
+        // The catalog and ledger must be checked in ONE RTDB transaction.
+        // A price change, deletion, or competing redemption forces a retry
+        // against the latest room state instead of charging stale prices.
+        const result = await roomRef.transaction(current => {
+          if (!current || !current.mgmt || typeof current.mgmt !== 'object') return;
+          if (current.rewardLedger != null && !Array.isArray(current.rewardLedger)) return;
+          const ledger = Array.isArray(current.rewardLedger) ? current.rewardLedger : [];
           if (ledger.some(row=>row && row.id === id)) return;
-          const balance = ledger.reduce((sum,row)=>sum+Number(row?.amount||0),0);
-          if (!Number.isFinite(balance) || (mode === 'belohnungen' ? balance < total : balance > -total)) return;
-          attempted = true;
-          return [...ledger,{id,amount,description,timestamp:Date.now(),actorRole:currentRole,
-            redemption:{mode,items:chosen}}];
+          const catalog = current.mgmt[mode];
+          if (!Array.isArray(catalog)) return;
+          for (const item of chosen) {
+            const live = catalog.find(entry=>entry && String(entry.id) === item.id);
+            if (!live || rewardAmount(live.rewardPoints) !== item.cost ||
+                String(live.title || '') !== item.title) return;
+          }
+          const balance = ledger.reduce((sum,row)=>sum+Number(row && row.amount || 0),0);
+          if (!Number.isSafeInteger(balance) ||
+              (mode === 'belohnungen' ? balance < total : balance > -total)) return;
+          return {...current,rewardLedger:[...ledger,{
+            id,amount,description,timestamp:Date.now(),actorRole,
+            redemption:{mode,items:chosen}
+          }]};
         },undefined,false);
         if (!result.committed) {
-          showToast('Einlösung nicht gebucht: Punktebestand hat sich möglicherweise geändert.','error');
+          showToast('Nicht gebucht: Punktestand oder Katalog hat sich geändert. Bitte Auswahl prüfen.','error');
         } else {
           redemptionSelection = {};
           showToast('Einlösung verbindlich gebucht.');
         }
       } catch(error) {
         console.error('Einlösung fehlgeschlagen',error);
-        showToast('Einlösung konnte nicht bestätigt werden. Bitte Punkteverlauf prüfen.','error');
+        showToast('Buchungsstatus unklar. Bitte Punkteverlauf vor erneutem Versuch prüfen.','error');
       } finally {
         redemptionPending = false;
         renderRewards();
