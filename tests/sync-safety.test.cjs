@@ -213,3 +213,42 @@ test('conflict draft persists and prevents writes after reload',()=>{
   assert.equal(fresh.pending.length,0);
   draftStorage.clear();
 });
+
+test('two independent conflicts preserve both recovery drafts',()=>{
+  draftStorage.clear();
+  const remote={kalender:[{id:'a'}],einkauf:[{id:'x'}]};
+  const local={kalender:[{id:'a'},{id:'local-k'}],einkauf:[{id:'x'},{id:'local-e'}]};
+  const h=delayedHarness(remote,local);
+  h.sandbox.runPersist();
+  h.mutateRemote('kalender',[{id:'a'},{id:'remote-k'}]);
+  h.mutateRemote('einkauf',[{id:'x'},{id:'remote-e'}]);
+  h.flush();
+  const draft=JSON.parse(draftStorage.get('dominion_sync_conflict_draft_v1'));
+  assert.deepEqual(Object.keys(draft.drafts).sort(),['einkauf','kalender']);
+  assert.deepEqual(draft.drafts.kalender,local.kalender);
+  assert.deepEqual(draft.drafts.einkauf,local.einkauf);
+  const fresh=delayedHarness(remote,remote);
+  vm.runInContext('restoreSyncConflictLock()',fresh.sandbox);
+  assert.equal(fresh.sandbox.productionRoomLoaded,false);
+  assert.deepEqual(JSON.parse(JSON.stringify(fresh.sandbox.appState.einkauf)),local.einkauf);
+  assert.deepEqual(JSON.parse(JSON.stringify(fresh.sandbox.appState.kalender)),local.kalender);
+  draftStorage.clear();
+});
+
+test('remote snapshots cannot revert edits made after conflict draft',()=>{
+  draftStorage.clear();
+  const remote={kalender:[{id:'a'}],einkauf:[{id:'x'}]};
+  const h=listenerHarness(remote,{...remote,kalender:[{id:'a'},{id:'local'}]});
+  h.sandbox.runPersist();
+  const job=h.pending.shift();
+  assert.equal(job.update([{id:'a'},{id:'remote'}]),undefined);
+  job.done(null,false);
+  h.sandbox.appState.kalender.push({id:'newer-local'});
+  h.deliver({...remote,kalender:[{id:'a'},{id:'remote'}],einkauf:[{id:'x'},{id:'other-device'}]});
+  assert.deepEqual(JSON.parse(JSON.stringify(h.sandbox.appState.kalender)),
+    [{id:'a'},{id:'local'},{id:'newer-local'}]);
+  assert.equal(h.sandbox.productionRoomLoaded,false);
+  h.sandbox.runPersist();
+  assert.equal(h.pending.length,0);
+  draftStorage.clear();
+});
