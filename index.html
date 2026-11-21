@@ -1383,7 +1383,9 @@
           pendingCollectionWrites.delete(key);
           if (error || !committed) {
             console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
-            const draftSaved = saveSyncConflictDraft(key, error);
+            // Capture every outstanding local collection edit before locking sync.
+            // Otherwise an unrelated unsent edit could be lost on restart.
+            const draftSaved = saveSyncConflictDraft(key, error, true);
             productionSyncConflict = true;
             updateSyncConflictReviewButton();
             productionRoomLoaded = false; // fail closed; snapshots must not auto-unlock
