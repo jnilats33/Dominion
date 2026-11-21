@@ -124,3 +124,32 @@ test('room listener must preserve unsaved local edits during pending transaction
   // This guard deliberately fails until the listener reconciles pending edits.
   assert.match(listener,/pendingCollectionWrites/, 'listener must account for pending writes');
 });
+
+function listenerHarness(remote,local) {
+  const pending=[];
+  const sandbox={
+    appState:structuredClone(local),lastRemoteState:structuredClone(remote),
+    productionRoomLoaded:true,isApplyingRemoteUpdate:false,
+    firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
+    saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
+    updateSyncIndicator(){},showToast(){},refreshAllUI(){},
+    mergeWithDefaults:x=>structuredClone(x),console
+  };
+  const start=html.indexOf("firebaseDbRef.on('value', (snapshot) => {");
+  const end=html.indexOf("}, (error) => {",start);
+  assert.ok(start>=0&&end>start);
+  const listenerBody=html.slice(start+"firebaseDbRef.on('value', (snapshot) => {".length,end);
+  vm.createContext(sandbox);
+  vm.runInContext(source+'\\nthis.runPersist=persistState;this.deliver=function(snapshot){'+listenerBody+'};',sandbox);
+  const valid=data=>({mgmt:{aufgaben:[]},basics:{},permissions:{},...structuredClone(data)});
+  return {sandbox,pending,deliver:data=>sandbox.deliver({val:()=>valid(data)})};
+}
+test('incoming unrelated snapshot retains uncommitted local calendar edit',()=>{
+  const remote={kalender:[{id:'a'}],einkauf:[]};
+  const h=listenerHarness(remote,{...remote,kalender:[{id:'a'},{id:'local'}]});
+  h.sandbox.runPersist();
+  assert.equal(h.pending.length,1);
+  h.deliver({...remote,einkauf:[{id:'other-device'}]});
+  assert.deepEqual(h.sandbox.appState.kalender,[{id:'a'},{id:'local'}]);
+  assert.deepEqual(h.sandbox.appState.einkauf,[{id:'other-device'}]);
+});
