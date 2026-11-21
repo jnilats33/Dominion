@@ -1200,11 +1200,15 @@
         const previous = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || '{}');
         const drafts = previous && typeof previous.drafts === 'object' && previous.drafts ? previous.drafts : {};
         if (refreshAll) {
-          // Capture every editable collection, including changes made after lock.
+          // Preserve existing conflict keys and only newly edited collections.
+          // Unrelated server collections must not become local recovery drafts.
           for (const [draftKey, value] of Object.entries(appState)) {
             if (draftKey === 'chat' || draftKey === 'chatV2' || draftKey === 'firebase' ||
                 draftKey === 'fcmToken' || draftKey === 'version') continue;
-            drafts[draftKey] = sanitizeForFirebase(value);
+            if (Object.prototype.hasOwnProperty.call(drafts, draftKey) ||
+                (lastRemoteState && !sameRemoteValue(value, lastRemoteState[draftKey]))) {
+              drafts[draftKey] = sanitizeForFirebase(value);
+            }
           }
         } else if (key != null) {
           drafts[key] = sanitizeForFirebase(appState[key]);
@@ -1738,12 +1742,21 @@
             }
           }
           if (productionSyncConflict) {
-            // Keep current unsaved edits, including edits made after the original
-            // conflict draft. Replaying the older draft on each snapshot would
-            // silently discard those newer changes.
-            for (const [key, value] of Object.entries(localBeforeSnapshot)) {
-              if (key !== 'chat' && key !== 'chatV2' && key !== 'firebase' &&
-                  key !== 'fcmToken' && key !== 'version') appState[key] = value;
+            // Preserve only the collections in the recovery draft; unrelated
+            // collections must continue receiving remote updates while locked.
+            const review = buildSyncConflictReview();
+            if (review.status === 'unreadable') {
+              // Fail closed without silently discarding the current local state.
+              for (const [key, value] of Object.entries(localBeforeSnapshot)) {
+                if (key !== 'chat' && key !== 'chatV2' && key !== 'firebase' &&
+                    key !== 'fcmToken' && key !== 'version') appState[key] = value;
+              }
+            } else {
+              for (const item of review.collections) {
+                if (Object.prototype.hasOwnProperty.call(localBeforeSnapshot, item.key)) {
+                  appState[item.key] = localBeforeSnapshot[item.key];
+                }
+              }
             }
           }
           delete appState.fcmToken;
