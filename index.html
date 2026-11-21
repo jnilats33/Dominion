@@ -1114,6 +1114,7 @@
     let firebaseDbRef = null;
     let firebaseRoomPathPending = null;
     let productionRoomLoaded = false;
+    let lastRemoteState = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
     let testAuthUser = null;
@@ -1188,7 +1189,18 @@
         delete stateWithoutChat.chat;
         delete stateWithoutChat.chatV2; // Chat v2 is append-only and must never be overwritten by general state sync.
         delete stateWithoutChat.fcmToken; // Never publish a push token in shared room state.
-        firebaseDbRef.update(sanitizeForFirebase(stateWithoutChat)).catch(err => {
+        // Only transmit top-level fields changed since the last server snapshot.
+        // Never send default-filled, unchanged fields back to production.
+        if (!lastRemoteState) return;
+        const changes = {};
+        for (const [key, value] of Object.entries(stateWithoutChat)) {
+          if (key === 'firebase' || key === 'version') continue;
+          if (JSON.stringify(value) !== JSON.stringify(lastRemoteState[key])) {
+            changes[key] = sanitizeForFirebase(value);
+          }
+        }
+        if (!Object.keys(changes).length) return;
+        firebaseDbRef.update(changes).catch(err => {
           console.warn('Firebase Sync Fehler:', err);
           updateSyncIndicator(false);
         });
@@ -1473,6 +1485,7 @@
       const verified = !!testAuthUser && ['Master', 'Daisy'].includes(testAuthRole);
       if (!verified) {
         productionRoomLoaded = false;
+        lastRemoteState = null;
         if (firebaseDbRef) { firebaseDbRef.off(); firebaseDbRef.child('chatV2').off(); }
         firebaseDbRef = null;
         updateSyncIndicator(false);
@@ -1488,6 +1501,7 @@
       }
       firebaseDbRef = firebase.database().ref('rooms/' + safeRoomPath);
       productionRoomLoaded = false;
+      lastRemoteState = null;
       appState.chat = []; // The previous chat is explicitly excluded from this release.
       saveStateLocalOnly();
       firebaseDbRef.child('chatV2').on('child_added', snapshot => {
@@ -1524,6 +1538,7 @@
         if (!validCollections || !validMgmt || !remoteData.basics || !remoteData.permissions) {
           console.error('Produktiv-Snapshot unvollständig: Schreibzugriffe aus Sicherheitsgründen gesperrt.');
           productionRoomLoaded = false;
+          lastRemoteState = null;
           updateSyncIndicator(false);
           return;
         }
@@ -1536,6 +1551,7 @@
           appState = mergeWithDefaults(stateWithoutChats);
           delete appState.fcmToken;
           appState.chat = liveChat;
+          lastRemoteState = sanitizeForFirebase(stateWithoutChats);
           productionRoomLoaded = true;
           updateSyncIndicator(true);
           saveStateLocalOnly();
