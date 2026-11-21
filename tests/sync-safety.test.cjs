@@ -208,7 +208,7 @@ test('conflict draft persists and prevents writes after reload',()=>{
   vm.runInContext('restoreSyncConflictLock()',fresh.sandbox);
   assert.equal(fresh.sandbox.productionSyncConflict,true);
   assert.equal(fresh.sandbox.productionRoomLoaded,false);
-  assert.deepEqual(fresh.sandbox.appState.kalender,[{id:'a'},{id:'unsaved'}]);
+  assert.deepEqual(JSON.parse(JSON.stringify(fresh.sandbox.appState.kalender)),[{id:'a'},{id:'unsaved'}]);
   fresh.sandbox.runPersist();
   assert.equal(fresh.pending.length,0);
   draftStorage.clear();
