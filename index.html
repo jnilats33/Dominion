@@ -1182,28 +1182,40 @@
       }
     }
 
+    // Firebase represents empty arrays as null. Compare equivalent empty values
+    // without treating them as a user edit.
+    function sameRemoteValue(a, b) {
+      const normalize = value => value == null ? null :
+        Array.isArray(value) && value.length === 0 ? null : value;
+      return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
+    }
+
+    // Each modified top-level collection is guarded by a server-side RTDB
+    // transaction. If another device changed it since our snapshot, abort
+    // rather than silently replacing the other device's work.
     function persistState() {
       saveStateLocalOnly();
-      if (firebaseDbRef && productionRoomLoaded && !isApplyingRemoteUpdate) {
-        const stateWithoutChat = { ...appState };
-        delete stateWithoutChat.chat;
-        delete stateWithoutChat.chatV2; // Chat v2 is append-only and must never be overwritten by general state sync.
-        delete stateWithoutChat.fcmToken; // Never publish a push token in shared room state.
-        // Only transmit top-level fields changed since the last server snapshot.
-        // Never send default-filled, unchanged fields back to production.
-        if (!lastRemoteState) return;
-        const changes = {};
-        for (const [key, value] of Object.entries(stateWithoutChat)) {
-          if (key === 'firebase' || key === 'version') continue;
-          if (JSON.stringify(value) !== JSON.stringify(lastRemoteState[key])) {
-            changes[key] = sanitizeForFirebase(value);
+      if (!firebaseDbRef || !productionRoomLoaded || isApplyingRemoteUpdate || !lastRemoteState) return;
+      const stateWithoutChat = { ...appState };
+      delete stateWithoutChat.chat;
+      delete stateWithoutChat.chatV2;
+      delete stateWithoutChat.fcmToken;
+      for (const [key, value] of Object.entries(stateWithoutChat)) {
+        if (key === 'firebase' || key === 'version' || key === 'pin') continue;
+        const baseline = lastRemoteState[key] === undefined ? null : lastRemoteState[key];
+        if (sameRemoteValue(value, baseline)) continue;
+        const desired = sanitizeForFirebase(value);
+        const expected = sanitizeForFirebase(baseline);
+        firebaseDbRef.child(key).transaction(current => {
+          if (!sameRemoteValue(current, expected)) return; // conflict: abort
+          return desired;
+        }, (error, committed) => {
+          if (error || !committed) {
+            console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
+            updateSyncIndicator(false);
+            showToast('Synchronisationskonflikt in ' + key + ': Änderung nicht gespeichert. Bitte Datenstand prüfen.', 'error');
           }
-        }
-        if (!Object.keys(changes).length) return;
-        firebaseDbRef.update(changes).catch(err => {
-          console.warn('Firebase Sync Fehler:', err);
-          updateSyncIndicator(false);
-        });
+        }, false);
       }
     }
 
