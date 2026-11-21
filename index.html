@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion TEST – v2.8</title>
+  <title>Dominion – v2.11</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -267,39 +267,36 @@
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
               <span>🚀</span> Update-News: Dominion <span id="dashboard-version-news"></span>
             </h3>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Version 2.9</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Version 2.11</span>
           </div>
-          <p class="text-[11px] text-slate-400">Stand: 21.11.2026 · Dieses Update enthält die bisherigen Verbesserungen und zusätzliche Stabilitätsmaßnahmen.</p>
-          <ul class="text-xs text-slate-300 leading-relaxed list-disc pl-5 space-y-1">
-            <li><strong>Kalender:</strong> Termin-Pop-ups, Zeitspannen, mehrtägige Termine und getrennte Punkte für Erfüllung oder Nichterfüllung.</li>
-            <li><strong>Dashboard:</strong> Bereiche sortieren und Übersichtskacheln separat ein- oder ausblenden.</li>
-            <li><strong>Neue Inhalte:</strong> Menüzähler für ungelesene Einträge.</li>
-            <li><strong>Chat:</strong> Nachrichten und Audionachrichten überarbeitet; Push-Benachrichtigungen vorbereitet.</li>
-            <li><strong>Bilder:</strong> Upload für Toys und Kleidung wiederhergestellt.</li>
-            <li><strong>Synchronisation:</strong> Zusätzliche Schutzprüfungen. Erweiterte Konfliktauflösung folgt.</li>
-          </ul>
+          <p class="text-[11px] text-slate-400">Stand: 22.11.2026 · Detaillierter Änderungsüberblick für die Test-App.</p>
+          <div class="text-xs text-slate-300"><h4 class="font-semibold text-[#e5b55c] mb-1">Aufgaben – neues Pop-up</h4><ul class="list-disc pl-4 space-y-1"><li>Aufgaben werden jetzt in einem Pop-up im Design des Kalenderdialogs angelegt.</li><li>Auch bestehende Aufgaben werden im selben Pop-up bearbeitet.</li><li>Deadline, Erinnerung, Zuständigkeit, Aufgabenart und Punkte bleiben erhalten.</li></ul></div>
+          <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+            <div><h4 class="font-semibold text-[#e5b55c] mb-1">Aufgaben – Erinnerungen</h4><ul class="list-disc pl-4 space-y-1"><li>Neues Dropdown zur Auswahl des Erinnerungs-Vorlaufs beim Anlegen von Aufgaben.</li><li>Auswahl: keine Erinnerung, 30 Minuten, 1 Stunde, 4 Stunden, 1 Tag, 3 Tage oder 2 Wochen vor der Deadline.</li><li>Gewählte Erinnerung wird mit der Aufgabe gespeichert und beim späteren Bearbeiten wieder angezeigt.</li></ul></div>
+            <div><h4 class="font-semibold text-[#e5b55c] mb-1">Kalender – Erinnerungen</h4><ul class="list-disc pl-4 space-y-1"><li>Dasselbe Erinnerungs-Dropdown beim Anlegen von Terminen ergänzt.</li><li>Erinnerungseinstellung wird bei gemeinsamen Terminen in den zugehörigen Einträgen gespeichert.</li><li>Beim Bearbeiten eines Termins kann die Erinnerungszeit geändert werden; bei verknüpften Terminen entsprechend der gewählten gemeinsamen Bearbeitung.</li></ul></div>
+            <div><h4 class="font-semibold text-[#e5b55c] mb-1">Benachrichtigungen – Vorbereitung</h4><ul class="list-disc pl-4 space-y-1"><li>Backend-Funktionen für neue Aufgaben an die andere Rolle und für neue beziehungsweise geänderte Termine vorbereitet.</li><li>Bei Terminänderungen wird die bearbeitende Rolle für die spätere Benachrichtigungslogik erfasst.</li><li>Diese neuen Firebase-Funktionen sind noch nicht deployt; auch der zeitgesteuerte Erinnerungs-Push ist noch nicht aktiv.</li><li>Bestehende Chat-Push-Benachrichtigungen bleiben unverändert.</li></ul></div>
+            <div><h4 class="font-semibold text-[#e5b55c] mb-1">Update-News &amp; Historie</h4><ul class="list-disc pl-4 space-y-1"><li>Historie in eine zweispaltige Versionen-Tabelle umgestellt.</li><li>Änderungen pro Version nach Funktionsbereichen und als einzelne Punkte aufgeführt.</li><li>Synchronisations- und Datensicherungsarbeiten sowie der Status nicht abgeschlossener Reparaturversuche dokumentiert.</li></ul></div>
+          </div>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
               <span>📚 Frühere Updates und Änderungen anzeigen</span>
               <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
             </summary>
-            <div class="mt-3 space-y-3 text-xs text-slate-300">
-              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1"><strong class="text-[#e5b55c]">Dominion v2.7 · 19.11.2026</strong><p>Punktewerte für Belohnungen und Strafen im Formular, Löschfunktion für Punktebuchungen (in v2.8 repariert), Bonus-Hinweise für Daisy, Dashboard „Heute“ und „Nächste Termine &amp; Deadlines“ mit Rollenfilter.</p></div>
-              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1"><strong class="text-[#e5b55c]">Dominion v2.6 · 18.11.2026</strong><p>Aufgabenverwaltung, Rewards-Punktekonto und automatische Punktevergabe, Dashboard-Bereich „Heute“, neue Statistik- und Ansichtseinstellungen.</p></div>
-              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
-                <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.5 · Dashboard-Update</strong><span class="text-slate-500">17.11.2026</span></div>
-                <p>Das Dashboard wird persönlicher: sieben Statistik-Kacheln inklusive Toys, Kleidung und Regeln; einklappbare und festpinnbare Bereiche; einheitliche Kartenoptik sowie <strong>Einstellungen → Ansicht → Dashboard</strong> zum individuellen Ein- und Ausblenden für Master und Daisy. Außerdem erhältst du hier einen ausklappbaren Versionsverlauf.</p>
+            <div class="mt-3 text-xs text-slate-300">
+              <div class="overflow-x-auto rounded-xl border border-slate-800">
+                <table class="w-full min-w-[340px] text-left border-collapse">
+                  <thead class="bg-white/[0.05] text-slate-400"><tr><th scope="col" class="px-3 py-2 w-28">Version / Datum</th><th scope="col" class="px-3 py-2">Änderungen im Einzelnen</th></tr></thead>
+                  <tbody>                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.10<div class="font-normal text-[10px] text-slate-500 mt-1">22.11.2026</div></th><td class="px-3 py-3"><ul class="list-disc pl-4 space-y-1"><li>Erinnerungsauswahl für Aufgaben und Kalendertermine.</li><li>Speicherung und nachträgliche Bearbeitung der Erinnerungszeiten.</li><li>Erweiterte Update-News und tabellarische Versionshistorie.</li><li>Push-Backend für neue Aufgaben und Terminänderungen vorbereitet, noch nicht deployt.</li></ul></td></tr>
+                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.9<div class="font-normal text-[10px] text-slate-500 mt-1">21.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Kalender</strong><ul class="list-disc pl-4 space-y-1"><li>Termin-Pop-ups zur Anlage und Bearbeitung eingeführt.</li><li>Termine mit Start- und Enddatum sowie Uhrzeiten, auch über mehrere Tage, unterstützt.</li><li>Gemeinsame Termine für Master und Daisy als verknüpfte Einträge angelegt.</li><li>Getrennte Plus- und Minuspunkte für Erfüllung und Nichterfüllung vorgesehen; Buchung erst nach Bestätigung.</li></ul></div><div><strong class="text-slate-200">Dashboard &amp; Ansicht</strong><ul class="list-disc pl-4 space-y-1"><li>Dashboard-Bereiche lassen sich in der gewünschten Reihenfolge sortieren.</li><li>Einzelne Statistik-Kacheln sind in den Ansichtseinstellungen ein- und ausblendbar.</li><li>Zwei neue Kacheln: eingelöste Belohnungen und zu erwartende Bestrafungen.</li></ul></div><div><strong class="text-slate-200">Neue Inhalte</strong><ul class="list-disc pl-4 space-y-1"><li>Menüzähler für neue beziehungsweise ungelesene Inhalte ergänzt.</li><li>Kennzeichnung neuer Inhalte in den betroffenen Bereichen überarbeitet.</li></ul></div><div><strong class="text-slate-200">Chat &amp; Medien</strong><ul class="list-disc pl-4 space-y-1"><li>Chat- und Audioverhalten überarbeitet.</li><li>Bilder-Upload für Toys und Kleidung wiederhergestellt beziehungsweise weiter abgesichert.</li></ul></div><div><strong class="text-slate-200">Synchronisation &amp; Datenbestand</strong><ul class="list-disc pl-4 space-y-1"><li>Abgleich von lokalem Zustand und Firebase-Serverbestand geprüft.</li><li>Schreibkonflikte werden gesperrt und ein lokaler Konfliktentwurf wird gesichert.</li><li>Konfliktprüfung ohne Schreibzugriff auf Serverdaten ergänzt.</li><li>Test-Strafennummern bleiben bei der lokalen Nummerierung erhalten, um unbeabsichtigte Abweichungen zu vermeiden.</li><li>Konflikt kann nach bewusster Bestätigung durch Übernahme des aktuellen Serverstands abgeschlossen werden.</li><li>Eine zwischenzeitlich geprüfte gezielte Strafennummern-Reparatur wurde wegen nicht erfüllter Sicherheitsbedingungen nicht durchgeführt.</li></ul></div></td></tr>
+                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.8<div class="font-normal text-[10px] text-slate-500 mt-1">20.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Punkte &amp; Verwaltung</strong><ul class="list-disc pl-4 space-y-1"><li>Punktebuchungen und Löschfunktion überarbeitet.</li><li>Verbesserungen an Dashboard und Benachrichtigungen.</li><li>Synchronisationsverhalten untersucht und verbessert.</li></ul></div></td></tr>
+                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.7<div class="font-normal text-[10px] text-slate-500 mt-1">19.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Belohnungen &amp; Strafen</strong><ul class="list-disc pl-4 space-y-1"><li>Punktewerte für Belohnungen und Strafen direkt im Formular.</li><li>Löschfunktion für Punktebuchungen eingeführt; Fehler später in v2.8 behoben.</li><li>Bonus-Hinweise für Daisy ergänzt.</li></ul></div><div><strong class="text-slate-200">Dashboard</strong><ul class="list-disc pl-4 space-y-1"><li>Bereiche „Heute“ und „Nächste Termine &amp; Deadlines“ mit Rollenfilter ergänzt.</li></ul></div></td></tr>
+                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.6<div class="font-normal text-[10px] text-slate-500 mt-1">18.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Aufgaben</strong><ul class="list-disc pl-4 space-y-1"><li>Aufgabenverwaltung ergänzt.</li><li>Automatische Punktevergabe für passende Aufgaben eingeführt.</li></ul></div><div><strong class="text-slate-200">Punktekonto &amp; Übersicht</strong><ul class="list-disc pl-4 space-y-1"><li>Rewards-Punktekonto ergänzt.</li><li>Dashboard-Bereich „Heute“ und weitere Statistik- und Ansichtseinstellungen ergänzt.</li></ul></div></td></tr>
+                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.5<div class="font-normal text-[10px] text-slate-500 mt-1">17.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Dashboard</strong><ul class="list-disc pl-4 space-y-1"><li>Sieben Statistik-Kacheln einschließlich Toys, Kleidung und Regeln.</li><li>Bereiche einklappbar und festpinnbar gestaltet.</li><li>Einheitliche Kartenoptik eingeführt.</li><li>Individuelle Dashboard-Sichtbarkeit in Einstellungen → Ansicht → Dashboard für Master und Daisy.</li><li>Ausklappbaren Versionsverlauf ergänzt.</li></ul></div></td></tr>
+                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">Produktivänderungen<div class="font-normal text-[10px] text-slate-500 mt-1">15.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Bilder &amp; Verwaltung</strong><ul class="list-disc pl-4 space-y-1"><li>Bilder-Upload und Bildbearbeitung für Toys und Kleidung wiederhergestellt.</li><li>Dauerhafte kategoriespezifische Artikelnummern ergänzt.</li></ul></div><div><strong class="text-slate-200">Technik</strong><ul class="list-disc pl-4 space-y-1"><li>Firebase-Authentifizierung und Datenbankanbindung angepasst.</li><li>Diese Änderungen sind keiner gesonderten Versionsnummer zugeordnet.</li></ul></div></td></tr>
+                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.3<div class="font-normal text-[10px] text-slate-500 mt-1">Datum nicht dokumentiert</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Kalender &amp; Berechtigungen</strong><ul class="list-disc pl-4 space-y-1"><li>Visueller Monatskalender mit Master-/Daisy-Overlay.</li><li>Rechtefilterung des Aktivitäts-Streams für Daisy.</li></ul></div><div><strong class="text-slate-200">Push-Grundlage</strong><ul class="list-disc pl-4 space-y-1"><li>Firebase Cloud Messaging integriert; die zuverlässige Zustellung war damals nicht bestätigt.</li></ul></div></td></tr></tbody>
+                </table>
               </div>
-              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
-                <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">15.11.2026 · Produktivänderungen</strong><span class="text-slate-500">GitHub-Änderungsdatum</span></div>
-                <p>Wiederherstellung des Bilder-Uploads und der Bildbearbeitung für Toys und Kleidung; dauerhafte, kategoriespezifische Artikelnummern. Außerdem Anpassungen an Firebase-Authentifizierung und Datenbankanbindung.</p>
-                <p class="text-slate-500">Keiner gesonderten Versionsnummer zugeordnet.</p>
-              </div>
-              <div class="rounded-xl bg-white/[0.03] border border-slate-800 p-3 space-y-1">
-                <div class="flex flex-wrap justify-between gap-1"><strong class="text-[#e5b55c]">Dominion v2.3</strong><span class="text-slate-500">Veröffentlichungsdatum nicht dokumentiert</span></div>
-                <p>Die bisherige Update-Meldung nennt einen visuellen Monatskalender mit Master-/Daisy-Overlay, die Rechtefilterung des Aktivitäts-Streams für Daisy und die Integration von Firebase Cloud Messaging (FCM). Die zuverlässige Push-Zustellung ist noch nicht bestätigt.</p>
-              </div>
-              <p class="text-[11px] text-slate-500">Hinweis: GitHub dokumentiert Codeänderungen, nicht zwingend den Zeitpunkt ihrer tatsächlichen Freischaltung. Ältere Versionen ergänzen wir nur mit überprüfbaren Angaben.</p>
+              <p class="text-[11px] text-slate-500 mt-3">Hinweis: GitHub dokumentiert Codeänderungen, nicht zwingend den Zeitpunkt ihrer tatsächlichen Freischaltung. Nicht abgeschlossene Reparaturversuche sind ausdrücklich als solche gekennzeichnet.</p>
             </div>
           </details>
         </div>
@@ -386,6 +383,16 @@
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Strafen</span><span>⚡</span></div>
             <div id="stat-strafen" class="text-2xl font-bold text-white">0</div>
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
+          </div>
+          <div onclick="switchTab('rewards')" data-dashboard-permission="belohnungen" data-dashboard-metric="eingeloeste-belohnungen" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Eingelöste Belohnungen</span><span>🎁</span></div>
+            <div id="stat-eingeloeste-belohnungen" class="text-2xl font-bold text-white">0</div>
+            <div class="text-[11px] text-emerald-300 mt-1">Bereits erfüllt</div>
+          </div>
+          <div onclick="switchTab('rewards')" data-dashboard-permission="strafen" data-dashboard-metric="erwartete-bestrafungen" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-rose-500/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Zu erwartende Bestrafungen</span><span>⚖️</span></div>
+            <div id="stat-erwartete-bestrafungen" class="text-2xl font-bold text-white">0</div>
+            <div class="text-[11px] text-rose-300 mt-1">Noch ausstehend</div>
           </div>
           </div>
         </section>
@@ -564,6 +571,7 @@
                   <label class="text-xs text-slate-300">Enddatum (optional)<input id="cal-end-date" type="date" class="w-full mt-1 px-3 py-2.5 text-sm" /></label>
                   <label class="text-xs text-slate-300">Endzeit (optional)<input id="cal-end-time" type="time" class="w-full mt-1 px-3 py-2.5 text-sm" /></label>
                 </div>
+                <label class="block text-xs text-slate-300">Erinnerung<select id="cal-reminder" class="w-full mt-1 px-3 py-2.5 text-sm"><option value="">Keine Erinnerung</option><option value="30">30 Minuten vorher</option><option value="60">1 Stunde vorher</option><option value="240">4 Stunden vorher</option><option value="1440">1 Tag vorher</option><option value="4320">3 Tage vorher</option><option value="20160">2 Wochen vorher</option></select></label>
                 <div id="cal-points-section" class="hidden rounded-xl border border-rose-500/20 bg-rose-500/5 p-3 space-y-2"><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><label class="block text-xs text-slate-300">Punkte bei Erfüllung<input id="cal-points-plus" type="number" min="0" step="1" value="0" class="w-full mt-1 px-3 py-2.5 text-sm" /></label><label class="block text-xs text-slate-300">Abzug für Nichterfüllung<input id="cal-points-minus" type="number" min="0" step="1" value="0" class="w-full mt-1 px-3 py-2.5 text-sm" /></label></div><p class="text-[11px] text-slate-400">Punkte werden erst nach Bestätigung durch Master gebucht.</p></div>
                 <div id="cal-edit-actions" class="hidden"><label class="text-xs text-slate-300 flex items-center gap-2"><input id="cal-edit-pair" type="checkbox" checked /> Beide verknüpften Termine ändern</label></div>
               </div>
@@ -644,6 +652,7 @@
               </div>
               <input id="mgmt-image-file" type="file" accept="image/*" class="hidden" onchange="handleMgmtImageSelect(event)" />
               <input id="mgmt-image-camera" type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMgmtImageSelect(event)" />
+              <div id="mgmt-gallery" class="hidden"></div>
               <div id="mgmt-image-preview" class="hidden">
                 <img id="mgmt-image-preview-img" alt="Bildvorschau" class="rounded-xl max-h-48 w-auto border border-slate-700" />
               </div>
@@ -658,7 +667,11 @@
       <section id="tab-aufgaben" class="hidden space-y-4 animate-fade">
         <div class="glass-card rounded-2xl p-5 space-y-4">
           <h2 class="font-display text-lg font-bold text-[#e5b55c]">✅ Aufgaben</h2>
-          <div id="tasks-form" class="space-y-3 p-3 rounded-xl border border-slate-800">
+          <div class="flex justify-end"><button type="button" onclick="openTaskDialog()" class="px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">＋ Neue Aufgabe</button></div>
+          <div id="task-dialog" class="hidden fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-8" role="dialog" aria-modal="true" aria-labelledby="task-dialog-title" onclick="if(event.target===this)closeTaskDialog()">
+            <div class="max-w-xl mx-auto my-4 sm:my-10 rounded-2xl border border-slate-700 bg-[#202331] shadow-2xl p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between gap-3"><h3 id="task-dialog-title" class="text-lg font-semibold text-white">Neue Aufgabe anlegen</h3><button type="button" onclick="closeTaskDialog()" aria-label="Schließen" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300">✕</button></div>
+              <div id="tasks-form" class="space-y-3">
             <input id="task-title" placeholder="Neue Aufgabe" class="w-full px-3 py-2.5"/>
             <textarea id="task-desc" placeholder="Beschreibung (optional)" class="w-full px-3 py-2.5"></textarea>
             <div class="grid grid-cols-2 gap-2">
@@ -669,15 +682,18 @@
                 <input id="task-deadline" type="datetime-local" class="w-full mt-1 px-2 py-2"/>
               </label>
             </div>
+            <label class="text-xs text-slate-300">Erinnerung<select id="task-reminder" class="w-full mt-1 px-2 py-2"><option value="">Keine Erinnerung</option><option value="30">30 Minuten vorher</option><option value="60">1 Stunde vorher</option><option value="240">4 Stunden vorher</option><option value="1440">1 Tag vorher</option><option value="4320">3 Tage vorher</option><option value="20160">2 Wochen vorher</option></select></label>
             <label id="task-kind-wrap" class="text-xs text-slate-300">Aufgabenart<select id="task-kind" onchange="updateTaskForm()" class="w-full mt-1 px-2 py-2"><option value="reward">Mit Punkten und Prüfung</option><option value="personal">Organisatorisch – ohne Punkte und Prüfung</option></select></label>
             <div id="task-points-fields" class="grid grid-cols-2 gap-2">
               <label class="text-xs text-slate-300">Punkte bei Erfüllung<input id="task-plus" type="number" min="0" value="0" class="w-full mt-1 px-2 py-2"/></label>
               <label class="text-xs text-slate-300">Abzug pro Fristverstoß<input id="task-minus" type="number" min="0" value="0" class="w-full mt-1 px-2 py-2"/></label>
             </div>
-            <div class="flex gap-2">
-              <button onclick="saveTask()" class="px-4 py-2 rounded-xl gold-gradient text-xs font-semibold">Aufgabe speichern</button>
-              <button onclick="resetTaskForm()" class="px-4 py-2 rounded-xl bg-white/10 text-xs">Abbrechen</button>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-700">
+              <button type="button" onclick="closeTaskDialog()" class="px-4 py-2 rounded-xl bg-white/10 text-sm">Abbrechen</button>
+              <button id="task-save-btn" type="button" onclick="saveTask()" class="px-4 py-2 rounded-xl gold-gradient text-sm font-semibold">Aufgabe anlegen</button>
             </div>
+            </div>
+          </div>
           </div>
           <div id="task-list" class="space-y-3"></div>
         </div>
@@ -685,8 +701,10 @@
       <section id="tab-rewards" class="hidden space-y-4 animate-fade">
         <div class="glass-card rounded-2xl p-5 space-y-4">
           <h2 class="font-display text-lg font-bold text-[#e5b55c]">🎯 Rewards</h2>
-          <div class="text-xs text-slate-400">Daisys Punktekonto · Einlösung von Belohnungen und Durchführung von Strafen folgen später.</div>
+          <div class="text-xs text-slate-400">Punkte verdienen, Belohnungen einlösen und Strafen verrechnen.</div>
+          <div id="reward-redemption-panel" class="space-y-3"></div>
           <div id="rewards-balance" class="text-3xl font-bold"></div>
+          <div id="rewards-pending" class="space-y-2"></div>
           <div id="reward-rule-editor" class="space-y-2"></div>
           <h3 class="text-sm font-semibold">Punkteverlauf</h3>
           <div id="rewards-ledger" class="space-y-2"></div>
@@ -861,6 +879,25 @@
             </div>
           </div>
 
+          <div id="settings-panel-entwicklung" class="hidden space-y-5">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3">
+              <h3 class="font-semibold text-sm text-white">🧪 Entwicklung & Diagnose</h3>
+              <p class="text-xs text-slate-400">Testdaten und zukünftige Diagnosewerkzeuge. Nur im isolierten Testsystem aktiv.</p>
+              <div id="development-import-preview" class="text-xs text-slate-300"></div>
+              <button type="button" onclick="importDevelopmentFixtures()" id="development-import-button"
+                class="px-4 py-2 rounded-xl gold-gradient text-xs font-semibold disabled:opacity-40">Testdaten laden</button>
+              <div class="border-t border-slate-700 pt-4 mt-3 space-y-2">
+                <h4 class="text-sm font-semibold text-white">🎯 Test-Punktestand</h4>
+                <p class="text-xs text-slate-400">Setzt den Gesamtpunktestand über eine zusätzliche Testbuchung auf einen definierten Wert. Bestehende Buchungen bleiben erhalten.</p>
+                <div id="development-balance-current" class="text-xs text-slate-300"></div>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" data-development-balance onclick="setDevelopmentBalance(100)" class="px-3 py-2 rounded-lg bg-emerald-500/20 text-emerald-200 text-xs disabled:opacity-40">+100 Punkte</button>
+                  <button type="button" data-development-balance onclick="setDevelopmentBalance(-80)" class="px-3 py-2 rounded-lg bg-rose-500/20 text-rose-200 text-xs disabled:opacity-40">−80 Punkte</button>
+                  <button type="button" data-development-balance onclick="setDevelopmentBalance(0)" class="px-3 py-2 rounded-lg bg-white/10 text-slate-200 text-xs disabled:opacity-40">0 Punkte</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div id="settings-panel-sicherheit" class="hidden space-y-5">
             <!-- Firebase Live-Sync -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
@@ -997,7 +1034,7 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
-    const APP_VERSION = '2.9';
+    const APP_VERSION = '2.11';
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
@@ -1026,9 +1063,10 @@
         for (const item of items) {
           const value = typeof item.itemNumber === 'string' ? item.itemNumber : '';
           const parts = value.split('-');
-          if (parts.length === 2 && parts[0] === prefix && /^[0-9]+$/.test(parts[1]) && !used.has(value)) {
+          if ((parts.length === 2 && parts[0] === prefix && /^[0-9]+$/.test(parts[1]) && !used.has(value)) ||
+              (category === 'strafen' && /^S-TEST-[0-9]+$/.test(value) && !used.has(value))) {
             used.add(value);
-            next = Math.max(next, Number(parts[1]));
+            if (/^[0-9]+$/.test(parts[1])) next = Math.max(next, Number(parts[1]));
           } else {
             delete item.itemNumber;
           }
@@ -1130,6 +1168,7 @@
     let calendarEditingId = null;
     let pendingChatImage = null;
     let mgmtDraftImage = null;
+    let mgmtDraftGalleryId = null;
     let mgmtEditingItemId = null;
     let mgmtImageRemoved = false;
     let mediaRecorder = null;
@@ -1344,17 +1383,357 @@
       close.textContent = 'Schließen (keine Änderungen)';
       close.addEventListener('click',()=>backdrop.remove());
       panel.appendChild(close);
+      if (recoveryCandidate()) {
+        const recover = document.createElement('button');
+        recover.type = 'button';
+        recover.className = 'ml-2 mt-2 px-4 py-2 rounded-lg border border-amber-500 text-amber-200 text-sm';
+        recover.textContent = 'Nur Strafe „Test“ wiederherstellen';
+        recover.addEventListener('click', () => { backdrop.remove(); recoverSingleTestPunishment(); });
+        panel.appendChild(recover);
+      }
+      if (penaltyNumberRepairAllowed()) {
+        const fix = document.createElement('button');
+        fix.type = 'button';
+        fix.className = 'ml-2 mt-2 px-4 py-2 rounded-lg border border-amber-500 text-amber-200 text-sm';
+        fix.textContent = 'Strafennummern prüfen (nur lesen)';
+        fix.addEventListener('click',()=>{backdrop.remove();inspectPenaltyNumbers();});
+        panel.appendChild(fix);
+      }
+      if (productionSyncConflict && lastRemoteState && firebaseDbRef &&
+          location.hostname === 'jnilats33.github.io' &&
+          location.pathname.startsWith('/Dominion-Test/') &&
+          firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM) {
+        const resolve = document.createElement('button');
+        resolve.type = 'button';
+        resolve.className = 'ml-2 mt-2 px-4 py-2 rounded-lg bg-emerald-700 text-white text-sm';
+        resolve.textContent = 'Konflikt abschließen – Serverdaten übernehmen';
+        resolve.addEventListener('click', async () => {
+          if (!confirm('Den lokalen Konfliktentwurf verwerfen und die vorhandenen Serverdaten übernehmen? Es werden KEINE Daten auf Firebase gelöscht oder geändert.')) return;
+          resolve.disabled = true;
+          try {
+            if (pendingCollectionWrites.size) throw new Error('Noch ausstehende Änderungen. Bitte später erneut versuchen.');
+            const snapshot = await firebaseDbRef.once('value');
+            const raw = snapshot.val();
+            if (!raw || !raw.mgmt || !raw.basics || !raw.permissions) throw new Error('Serverdaten nicht vollständig.');
+            const { chat: ignoredChat, chatV2: ignoredChatV2, ...remote } = raw;
+            const liveChat = appState.chat || [];
+            const nextState = mergeWithDefaults(remote);
+            nextState.chat = liveChat;
+            delete nextState.fcmToken;
+            // Resolve locally only. Never upload the conflict draft.
+            localStorage.removeItem(SYNC_CONFLICT_DRAFT_KEY);
+            productionSyncConflict = false;
+            productionRoomLoaded = true;
+            lastRemoteState = sanitizeForFirebase(remote);
+            appState = nextState;
+            saveStateLocalOnly();
+            updateSyncConflictReviewButton();
+            updateSyncIndicator(true);
+            backdrop.remove();
+            refreshAllUI();
+            showToast('Konflikt abgeschlossen. Serverdaten übernommen.', 'success');
+          } catch (error) {
+            resolve.disabled = false;
+            showToast('Konflikt nicht abgeschlossen: ' + error.message, 'error');
+          }
+        });
+        panel.appendChild(resolve);
+      }
       backdrop.appendChild(panel);
       document.getElementById('sync-conflict-review-overlay')?.remove();
       document.body.appendChild(backdrop);
     }
 
+    // Explicit, one-record recovery for the isolated test room. No automatic
+    // conflict resolution and no wholesale replacement of the mgmt collection.
+    let recoveryPending = false;
+    function recoveryCandidate() {
+      if (!productionSyncConflict || !lastRemoteState || !firebaseDbRef ||
+          !testAuthUser || testAuthRole !== 'Master' || currentRole !== 'Master' ||
+          location.hostname !== 'jnilats33.github.io' ||
+          !location.pathname.startsWith('/Dominion-Test/') ||
+          firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM ||
+          pendingCollectionWrites.size || recoveryPending) return null;
+      const review = buildSyncConflictReview();
+      if (review.status !== 'ready') return null;
+      const mgmt = review.collections.find(entry => entry.key === 'mgmt');
+      const counter = review.collections.find(entry => entry.key === 'mgmtCounters');
+      if (!mgmt || !counter) return null;
+      if (review.collections.some(entry => !['mgmt','mgmtCounters'].includes(entry.key) && !entry.matchesServer)) return null;
+      const local = mgmt.local, remote = mgmt.server;
+      if (!local || !remote || !Array.isArray(local.strafen) || !Array.isArray(remote.strafen)) return null;
+      for (const category of MGMT_CATEGORIES.map(c => c.id).filter(c => c !== 'strafen')) {
+        if (!sameRemoteValue(local[category],remote[category])) return null;
+      }
+      const remoteIds = new Set(remote.strafen.map(item => item.id));
+      const additions = local.strafen.filter(item => !remoteIds.has(item.id));
+      if (additions.length !== 1 || additions[0].title !== 'Test' ||
+          additions[0].id !== 'mgmt-1795301411644-3lb1t') return null;
+      const existingLocal = local.strafen.filter(item => remoteIds.has(item.id));
+      if (!sameRemoteValue(existingLocal,remote.strafen)) return null;
+      const localCounters = counter.local || {}, remoteCounters = counter.server || {};
+      for (const key of MGMT_CATEGORIES.map(c=>c.id).filter(c=>c!=='strafen')) {
+        if (!sameRemoteValue(localCounters[key],remoteCounters[key])) return null;
+      }
+      if (Number(localCounters.strafen) !== Number(remoteCounters.strafen)+1 ||
+          additions[0].itemNumber !== 'S-'+String(localCounters.strafen).padStart(4,'0')) return null;
+      return {item:sanitizeForFirebase(additions[0]),remoteMgmt:sanitizeForFirebase(remote),
+        remoteCounters:sanitizeForFirebase(remoteCounters)};
+    }
+    // One-time repair for four fixture numbers after the confirmed recovery.
+    // Exact IDs, current numbers and counter are checked atomically.
+    const PENALTY_NUMBER_REPAIR = [
+      ['mgmt-1795301411644-3lb1t','S-0005','S-0005'],
+      ['test-penalty-1','S-0009','S-0004'],
+      ['test-penalty-2','S-0008','S-0003'],
+      ['test-penalty-3','S-0007','S-0002'],
+      ['test-penalty-4','S-0006','S-0001']
+    ];
+    function penaltyNumberRepairAllowed() {
+      return productionSyncConflict && firebaseDbRef &&
+        testAuthUser && testAuthRole === 'Master' && currentRole === 'Master' &&
+        location.hostname === 'jnilats33.github.io' &&
+        location.pathname.startsWith('/Dominion-Test/') &&
+        firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM &&
+        !recoveryPending && pendingCollectionWrites.size === 0;
+    }
+    async function inspectPenaltyNumbers() {
+      if (!penaltyNumberRepairAllowed()) {
+        alert('Diagnose gesperrt: Test-Master oder isolierter Testraum nicht bestätigt.');
+        return;
+      }
+      try {
+        const snap = await firebaseDbRef.once('value');
+        const live = snap.val();
+        const items = live?.mgmt?.strafen;
+        const report = [
+          'Nur-Lese-Diagnose – keine Schreibzugriffe',
+          'Serverdaten vorhanden: '+Boolean(live),
+          'Strafenliste ist Array: '+Array.isArray(items),
+          'Strafenanzahl: '+(Array.isArray(items)?items.length:'unbekannt'),
+          'Strafenzähler: '+String(live?.mgmtCounters?.strafen??'fehlt'),
+          '--- ID / tatsächliche Nummer / erwartete aktuelle Nummer ---',
+          ...PENALTY_NUMBER_REPAIR.map(([id,oldNumber])=>{
+            const item = Array.isArray(items)?items.find(x=>x.id===id):null;
+            return id+' / '+(item?.itemNumber??'fehlt')+' / '+oldNumber;
+          }),
+          'Konfliktsperre bleibt bestehen.'
+        ].join(String.fromCharCode(10));
+        const overlay=document.createElement('div');
+        overlay.className='fixed inset-0 z-[120] bg-black/90 flex items-center justify-center p-4';
+        const panel=document.createElement('section');
+        panel.className='bg-[#151923] border border-amber-500 rounded-xl p-5 w-full max-w-2xl text-slate-100';
+        const title=document.createElement('h2');
+        title.textContent='Nummernprüfung – nur lesen';
+        title.className='font-bold mb-3';
+        const pre=document.createElement('pre');
+        pre.className='text-xs whitespace-pre-wrap break-all max-h-[60vh] overflow-auto bg-black/30 p-3 rounded';
+        pre.textContent=report;
+        const copy=document.createElement('button');
+        copy.textContent='Bericht kopieren';
+        copy.className='mt-3 mr-3 px-3 py-2 rounded bg-amber-700';
+        copy.onclick=()=>navigator.clipboard.writeText(report).then(()=>copy.textContent='Kopiert').catch(()=>copy.textContent='Bitte Text markieren');
+        const close=document.createElement('button');
+        close.textContent='Schließen';
+        close.className='mt-3 px-3 py-2 rounded border border-slate-600';
+        close.onclick=()=>overlay.remove();
+        panel.append(title,pre,copy,close);
+        overlay.appendChild(panel);
+        document.body.appendChild(overlay);
+      } catch(e) {alert('Lesediagnose fehlgeschlagen: '+(e.message||String(e)));}
+    }
+    async function repairPenaltyNumbers() {
+      if (!penaltyNumberRepairAllowed()) {
+        alert('Reparatur gesperrt: Master-Anmeldung, isolierter Testraum oder Konfliktsperre nicht bestätigt.');
+        return;
+      }
+      if (!confirm('Ausschließlich die vier alten Strafennummern auf S-0001 bis S-0004 und den Strafenzähler von 9 auf 5 korrigieren? Alle übrigen Felder bleiben unverändert.')) return;
+      recoveryPending = true;
+      let failureReason = 'Unbekannte Abweichung';
+      try {
+        const result = await new Promise((resolve,reject) => {
+          firebaseDbRef.transaction(current => {
+            if (!current || !Array.isArray(current.mgmt?.strafen) ||
+                Number(current.mgmtCounters?.strafen) !== 9) {
+              failureReason = 'Strafenliste oder Strafenzähler weicht ab'; return;
+            }
+            const items = current.mgmt.strafen;
+            if (items.length !== PENALTY_NUMBER_REPAIR.length) {
+              failureReason = 'Unerwartete Anzahl von Strafen'; return;
+            }
+            const byId = new Map(items.map(item => [item.id,item]));
+            if (byId.size !== items.length ||
+                PENALTY_NUMBER_REPAIR.some(([id,oldNumber]) =>
+                  !byId.has(id) || byId.get(id).itemNumber !== oldNumber)) {
+              failureReason = 'Strafen-IDs oder Nummern haben sich verändert'; return;
+            }
+            const next = sanitizeForFirebase(current);
+            const targetNumbers = new Map(PENALTY_NUMBER_REPAIR.map(([id,,newNumber])=>[id,newNumber]));
+            next.mgmt.strafen.forEach(item => { item.itemNumber = targetNumbers.get(item.id); });
+            next.mgmtCounters.strafen = 5;
+            return next;
+          },(error,committed,snapshot)=>{
+            if (error) reject(error);
+            else resolve({committed,snapshot});
+          },false);
+        });
+        if (!result.committed) {
+          alert('KEINE Reparatur durchgeführt. '+failureReason+
+            '\\nDie Konfliktsperre und Sicherung bleiben erhalten.');
+          return;
+        }
+        const saved = result.snapshot?.val();
+        if (!saved || Number(saved.mgmtCounters?.strafen)!==5 ||
+            PENALTY_NUMBER_REPAIR.some(([id,,number]) =>
+              saved.mgmt?.strafen?.find(item=>item.id===id)?.itemNumber!==number)) {
+          alert('Transaktion bestätigt, Ergebnisprüfung unklar. Bitte nichts weiter verändern und Bericht senden.');
+          return;
+        }
+        alert('Nummernreparatur bestätigt: fünf Strafen S-0001 bis S-0005, Strafenzähler 5. Konfliktsperre bleibt erhalten. Bitte Konfliktbericht erneut öffnen.');
+        openSyncConflictReview();
+      } catch(error) {
+        alert('Reparatur fehlgeschlagen: '+(error.code||'')+' '+(error.message||String(error))+
+          '\\nKonfliktsperre bleibt erhalten.');
+      } finally { recoveryPending = false; }
+    }
+    async function diagnoseTestRecovery() {
+      const candidate = recoveryCandidate();
+      if (!candidate) {
+        alert('Diagnose nicht möglich: Lokaler Entwurf, Master-Anmeldung oder Server-Snapshot fehlt.');
+        return;
+      }
+      try {
+        const snap = await firebaseDbRef.once('value');
+        const live = snap.val();
+        const liveMgmt = live?.mgmt || {};
+        const expectedMgmt = candidate.remoteMgmt || {};
+        const liveCounters = live?.mgmtCounters || {};
+        const expectedCounters = candidate.remoteCounters || {};
+        const categories = MGMT_CATEGORIES.map(c=>c.id);
+        const lines = [
+          'Nur-Lese-Diagnose: Keine Daten geschrieben.',
+          'Server vorhanden: '+!!live,
+          'Strafe Test bereits vorhanden: '+!!(liveMgmt.strafen||[]).some(i=>i.id===candidate.item.id),
+          'Verwaltung gleich: '+sameRemoteValue(liveMgmt,expectedMgmt),
+          'Zähler gleich: '+sameRemoteValue(liveCounters,expectedCounters),
+          '--- Kategorien: Server / Erwartet / Gleich ---'
+        ];
+        for (const category of categories) {
+          const actual = liveMgmt[category] || [], expected = expectedMgmt[category] || [];
+          lines.push(category+': '+actual.length+' / '+expected.length+' / '+sameRemoteValue(actual,expected));
+        }
+        // Display-only normalization mirrors mergeWithDefaults; never writes.
+        const normalized = mergeWithDefaults(sanitizeForFirebase(live));
+        lines.push('--- Nach lokaler Nummerierung (nur Vergleich) ---');
+        lines.push('Verwaltung gleich: '+sameRemoteValue(normalized.mgmt,expectedMgmt));
+        lines.push('Zähler gleich: '+sameRemoteValue(normalized.mgmtCounters,expectedCounters));
+        for (const category of categories) {
+          lines.push(category+': '+sameRemoteValue(normalized.mgmt[category],expectedMgmt[category]));
+        }
+        lines.push('--- Zähler: Server / Erwartet ---');
+        for (const category of categories) {
+          lines.push(category+': '+String(liveCounters[category]??'fehlt')+' / '+String(expectedCounters[category]??'fehlt'));
+        }
+        const actualIds = (liveMgmt.strafen||[]).map(i=>i.id);
+        const expectedIds = (expectedMgmt.strafen||[]).map(i=>i.id);
+        lines.push('Strafen nur Server: '+actualIds.filter(id=>!expectedIds.includes(id)).join(', '));
+        lines.push('Strafen nur Erwartung: '+expectedIds.filter(id=>!actualIds.includes(id)).join(', '));
+        lines.push('Konfliktsperre bleibt aktiv. Bitte Text kopieren.');
+        const report = lines.join(String.fromCharCode(10));
+        console.info('Dominion Test Recovery Read-Only',report);
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[110] bg-black/85 flex items-center justify-center p-4';
+        const panel = document.createElement('section');
+        panel.className = 'bg-[#151923] border border-amber-500 rounded-xl p-5 w-full max-w-2xl text-slate-100';
+        const heading = document.createElement('h2');
+        heading.className = 'font-bold mb-3';
+        heading.textContent = 'Serverdiagnose – nur lesen';
+        const pre = document.createElement('pre');
+        pre.className = 'text-xs whitespace-pre-wrap break-all max-h-[60vh] overflow-auto bg-black/30 p-3 rounded';
+        pre.textContent = report;
+        const copy = document.createElement('button');
+        copy.textContent = 'Diagnose kopieren';
+        copy.className = 'mt-3 mr-3 px-3 py-2 rounded bg-amber-700 text-white';
+        copy.onclick = () => { navigator.clipboard.writeText(report).then(()=>{copy.textContent='Kopiert';}).catch(()=>{copy.textContent='Bitte Text markieren';}); };
+        const close = document.createElement('button');
+        close.textContent = 'Schließen';
+        close.className = 'mt-3 px-3 py-2 rounded border border-slate-600';
+        close.onclick = () => overlay.remove();
+        panel.append(heading,pre,copy,close);
+        overlay.appendChild(panel);
+        document.body.appendChild(overlay);
+      } catch (error) {
+        alert('Nur-Lese-Diagnose fehlgeschlagen: '+(error.code||'')+' '+(error.message||String(error)));
+      }
+    }
+    function recoverSingleTestPunishment() {
+      const candidate = recoveryCandidate();
+      if (!candidate) {
+        showToast('Wiederherstellung gesperrt: Datenstand oder Berechtigung nicht eindeutig.', 'error');
+        return;
+      }
+      if (!confirm('Nur die lokale Strafe „Test“ (S-0005) in den isolierten Testraum übernehmen? Der gesamte Serverstand wird vor dem Schreiben erneut geprüft.')) return;
+      recoveryPending = true;
+      const ref = firebaseDbRef;
+      ref.transaction(current => {
+        if (!current) return;
+        // Compare the normalized live collections, not raw Firebase records:
+        // numbering is generated locally and may not exist in Firebase.
+        const normalizedLive = mergeWithDefaults(sanitizeForFirebase(current));
+        const categories = MGMT_CATEGORIES.map(c => c.id);
+        if (categories.some(cat => !sameRemoteValue(
+              normalizedLive.mgmt[cat], candidate.remoteMgmt[cat]))) return;
+        if (!sameRemoteValue(normalizedLive.mgmtCounters,candidate.remoteCounters)) return;
+        const currentItems = current.mgmt.strafen || [];
+        if (currentItems.some(item=>item.id===candidate.item.id)) return;
+        const next = sanitizeForFirebase(current);
+        next.mgmt.strafen = [candidate.item,...currentItems];
+        // Preserve every other raw server field and counter unchanged.
+        next.mgmtCounters = {...(current.mgmtCounters||{}),
+          strafen:Number(candidate.remoteCounters.strafen)+1};
+        return next;
+      }, (error,committed,snapshot) => {
+        recoveryPending = false;
+        if (error || !committed) {
+          const reason = error
+            ? 'Firebase-Fehler (' + (error.code || 'unbekannt') + '): ' + (error.message || String(error))
+            : 'Sicherheitsprüfung abgebrochen: Der aktuelle Serverstand weicht vom erwarteten Vergleichsstand ab oder der Eintrag existiert bereits.';
+          console.warn('Gezielte Wiederherstellung nicht abgeschlossen:', {reason, committed});
+          alert('Wiederherstellung NICHT durchgeführt.\\n\\n' + reason +
+            '\\n\\nDer lokale Konfliktentwurf und die Synchronisationssperre bleiben erhalten.\\n\\nBitte diese Meldung kopieren oder fotografieren.');
+          return;
+        }
+        // Verify the transaction result before removing any recovery material.
+        const live = snapshot && snapshot.val();
+        if (!live || !(live.mgmt?.strafen||[]).some(item=>sameRemoteValue(item,candidate.item))) {
+          showToast('Schreibbestätigung unklar. Konfliktentwurf bleibt gesichert.', 'error');
+          return;
+        }
+        // Leave the lock and backup in place until all draft collections have
+        // been independently checked; no implicit release or deletion.
+        showToast('Strafe auf Server wiederhergestellt. Sicherung und Sperre bleiben vorerst erhalten.');
+        openSyncConflictReview();
+      }, false);
+    }
     // Firebase represents empty arrays as null. Compare equivalent empty values
     // without treating them as a user edit.
+    // Canonical structural comparison: Firebase may reorder object keys and
+    // represents empty arrays as null. Arrays with content retain their order.
+    function canonicalRemoteValue(value) {
+      if (value == null || (Array.isArray(value) && value.length === 0)) return null;
+      if (Array.isArray(value)) return value.map(canonicalRemoteValue);
+      if (typeof value === 'object') {
+        const result = {};
+        for (const key of Object.keys(value).sort()) {
+          if (value[key] !== undefined) result[key] = canonicalRemoteValue(value[key]);
+        }
+        return result;
+      }
+      return value;
+    }
     function sameRemoteValue(a, b) {
-      const normalize = value => value == null ? null :
-        Array.isArray(value) && value.length === 0 ? null : value;
-      return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
+      return JSON.stringify(canonicalRemoteValue(a)) ===
+        JSON.stringify(canonicalRemoteValue(b));
     }
 
     // Queue each collection's writes; never launch two transactions against
@@ -2443,7 +2822,9 @@
       {id:'strafbuch',label:'Strafbuch'}, {id:'aufgaben',label:'Aufgaben'},
       {id:'toys',label:'Toys'}, {id:'kleidung',label:'Kleidung'},
       {id:'regeln',label:'Regeln'}, {id:'belohnungen',label:'Belohnungen'},
-      {id:'strafen',label:'Strafen'}
+      {id:'strafen',label:'Strafen'},
+      {id:'eingeloeste-belohnungen',label:'Eingelöste Belohnungen'},
+      {id:'erwartete-bestrafungen',label:'Zu erwartende Bestrafungen'}
     ];
     function getDashboardMetricVisibility() {
       try {
@@ -2453,7 +2834,7 @@
     }
     function setDashboardMetricVisible(id, visible) {
       if (!DASHBOARD_METRIC_OPTIONS.some(x => x.id === id)) return;
-      if (currentRole === 'Daisy' && !hasPermission(id,'visible')) return;
+      if (currentRole === 'Daisy' && !hasPermission(id === 'eingeloeste-belohnungen' ? 'belohnungen' : id === 'erwartete-bestrafungen' ? 'strafen' : id,'visible')) return;
       try {
         const all = JSON.parse(localStorage.getItem(DASHBOARD_METRIC_VISIBILITY_KEY) || '{}');
         all[currentRole] = all[currentRole] && typeof all[currentRole] === 'object' ? all[currentRole] : {};
@@ -2475,7 +2856,8 @@
       document.querySelectorAll('#dashboard-metrics-grid [data-dashboard-permission]').forEach(tile => {
         const category = tile.getAttribute('data-dashboard-permission');
         const permitted = currentRole === 'Master' || hasPermission(category, 'visible');
-        tile.classList.toggle('hidden', !permitted || getDashboardMetricVisibility()[category] === false);
+        const metric = tile.getAttribute('data-dashboard-metric') || category;
+        tile.classList.toggle('hidden', !permitted || getDashboardMetricVisibility()[metric] === false);
       });
     }
 
@@ -2502,6 +2884,9 @@
       document.getElementById('stat-regeln').textContent = (appState.mgmt.regeln || []).length;
       document.getElementById('stat-belohnungen').textContent = (appState.mgmt.belohnungen || []).length;
       document.getElementById('stat-strafen').textContent = (appState.mgmt.strafen || []).length;
+      const redemptions = (appState.rewardLedger || []).filter(row => row && row.redemption);
+      document.getElementById('stat-eingeloeste-belohnungen').textContent = redemptions.filter(row => row.redemption.mode === 'belohnungen' && row.redemption.status === 'completed').length;
+      document.getElementById('stat-erwartete-bestrafungen').textContent = redemptions.filter(row => row.redemption.mode === 'strafen' && row.redemption.status !== 'completed').length;
 
       const limit = parseInt(appState.basics.feedLimit || 20, 10);
       const rawFeed = appState.activityFeed || [];
@@ -3079,6 +3464,7 @@
       const endDate = document.getElementById('cal-end-date').value || '';
       const endTime = document.getElementById('cal-end-time').value || '';
       const owner = document.getElementById('cal-owner').value;
+      const reminderMinutes = document.getElementById('cal-reminder').value === '' ? null : Number(document.getElementById('cal-reminder').value);
       const pointsPlus = Number(document.getElementById('cal-points-plus').value || 0);
       const pointsMinus = Number(document.getElementById('cal-points-minus').value || 0);
       if (!title || !date) { showToast('Bitte Titel und Datum angeben.', 'error'); return null; }
@@ -3086,7 +3472,7 @@
       if (endDate && endDate < date || endDate === date && endTime && time && endTime < time || !endDate && endTime && time && endTime < time) {
         showToast('Das Ende darf nicht vor dem Beginn liegen. Für Termine über Mitternacht bitte Enddatum angeben.', 'error'); return null;
       }
-      return {title,date,time,endDate,endTime,owner,pointsPlus,pointsMinus};
+      return {title,date,time,endDate,endTime,owner,pointsPlus,pointsMinus,reminderMinutes};
     }
     function addCalendarEvent() {
       if (!hasPermission('kalender', 'add')) return;
@@ -3095,7 +3481,7 @@
       const groupId = 'calgroup-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
       const owners = data.owner === 'both' ? ['Master','Daisy'] : [data.owner];
       for (const owner of owners) {
-        const ev = {id:'cal-' + Date.now() + '-' + Math.random().toString(36).slice(2,9),title:data.title,date:data.date,time:data.time,endDate:data.endDate,endTime:data.endTime,owner,createdBy:currentRole,groupId:data.owner === 'both' ? groupId : null,pointsPlus:owner === 'Daisy' && currentRole === 'Master' ? data.pointsPlus : 0,pointsMinus:owner === 'Daisy' && currentRole === 'Master' ? data.pointsMinus : 0,confirmed:false};
+        const ev = {id:'cal-' + Date.now() + '-' + Math.random().toString(36).slice(2,9),title:data.title,date:data.date,time:data.time,endDate:data.endDate,endTime:data.endTime,reminderMinutes:data.reminderMinutes,owner,createdBy:currentRole,groupId:data.owner === 'both' ? groupId : null,pointsPlus:owner === 'Daisy' && currentRole === 'Master' ? data.pointsPlus : 0,pointsMinus:owner === 'Daisy' && currentRole === 'Master' ? data.pointsMinus : 0,confirmed:false};
         appState.kalender.push(ev);
         logActivity('hat Termin angelegt: „' + data.title + '“', 'kalender', null, ev.id);
       }
@@ -3113,6 +3499,7 @@
       document.getElementById('cal-end-date').value = ev.endDate || '';
       document.getElementById('cal-end-time').value = ev.endTime || '';
       document.getElementById('cal-owner').value = ev.owner;
+      document.getElementById('cal-reminder').value = ev.reminderMinutes == null ? '' : String(ev.reminderMinutes);
       document.getElementById('cal-points-plus').value = ev.pointsPlus != null ? ev.pointsPlus : Math.max(0,Number(ev.points || 0));
       document.getElementById('cal-points-minus').value = ev.pointsMinus != null ? ev.pointsMinus : Math.max(0,-Number(ev.points || 0));
       document.getElementById('cal-edit-actions').classList.remove('hidden');
@@ -3157,6 +3544,7 @@
     function closeCalendarDialog() {
       calendarEditingId = null;
       document.getElementById('cal-dialog').classList.add('hidden');
+      document.getElementById('cal-reminder').value = '';
       document.getElementById('cal-owner').disabled = false;
     }
     function cancelCalendarEdit() { closeCalendarDialog(); }
@@ -3169,7 +3557,7 @@
       const pair = !!ev.groupId && document.getElementById('cal-edit-pair').checked;
       const targets = pair ? appState.kalender.filter(x => x.groupId === ev.groupId) : [ev];
       targets.forEach(x => {
-        x.title=data.title; x.date=data.date; x.time=data.time; x.endDate=data.endDate; x.endTime=data.endTime;
+        x.title=data.title; x.date=data.date; x.time=data.time; x.endDate=data.endDate; x.endTime=data.endTime; x.reminderMinutes=data.reminderMinutes; x.lastEditedBy=currentRole;
         if (x.owner === 'Daisy' && currentRole === 'Master' && !x.confirmed && x.id === ev.id) { x.pointsPlus=data.pointsPlus; x.pointsMinus=data.pointsMinus; delete x.points; }
       });
       closeCalendarDialog(); persistState(); refreshAllUI(); showToast('Termin aktualisiert.');
@@ -3300,6 +3688,7 @@
               <span class="font-semibold text-sm text-white">${escapeHtml(entry.reason)}</span>
             </div>
             <p class="text-xs text-slate-400 mt-1">Auflage: ${escapeHtml(entry.measure)}</p>
+            ${entry.redemptionId && entry.completedAt ? `<p class="text-xs text-slate-400 mt-1">Eingelöst: ${new Date(entry.createdAt).toLocaleDateString('de-DE')} · Erfüllt: ${new Date(entry.completedAt).toLocaleDateString('de-DE')}</p>` : ''}
           </div>
           <div class="flex items-center gap-1.5">
             ${canEdit ? `<button onclick="togglePenaltyResolved('${entry.id}')" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-slate-200">${entry.resolved ? 'Öffnen' : '✓ Erledigt'}</button>` : ''}
@@ -3373,6 +3762,7 @@
           context.fillRect(0, 0, canvas.width, canvas.height);
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
           mgmtDraftImage = canvas.toDataURL('image/jpeg', 0.8);
+          mgmtDraftGalleryId = null;
           mgmtImageRemoved = false;
           document.getElementById('mgmt-image-preview-img').src = mgmtDraftImage;
           document.getElementById('mgmt-image-preview').classList.remove('hidden');
@@ -3391,6 +3781,7 @@
 
     function clearMgmtDraftImage() {
       mgmtDraftImage = null;
+      mgmtDraftGalleryId = null;
       mgmtImageRemoved = false;
       const preview = document.getElementById('mgmt-image-preview');
       const image = document.getElementById('mgmt-image-preview-img');
@@ -3474,10 +3865,25 @@
       document.getElementById('task-kind-wrap').classList.toggle('hidden', assignee !== 'Daisy');
       document.getElementById('task-points-fields').classList.toggle('hidden', assignee !== 'Daisy' || kind.value !== 'reward');
     }
+    function openTaskDialog() {
+      if (currentRole !== 'Master' && !hasPermission('aufgaben', 'add')) return;
+      resetTaskForm();
+      document.getElementById('task-assignee').value = 'Daisy';
+      updateTaskForm();
+      document.getElementById('task-dialog-title').textContent = 'Neue Aufgabe anlegen';
+      document.getElementById('task-save-btn').textContent = 'Aufgabe anlegen';
+      document.getElementById('task-dialog').classList.remove('hidden');
+      document.getElementById('task-title').focus();
+    }
+    function closeTaskDialog() {
+      document.getElementById('task-dialog').classList.add('hidden');
+      resetTaskForm();
+    }
     function resetTaskForm() {
       editingTaskId = null;
       ['task-title', 'task-desc', 'task-deadline'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('task-assignee').value = 'Daisy';
+      document.getElementById('task-reminder').value = '';
       document.getElementById('task-kind').value = currentRole === 'Daisy' ? 'personal' : 'reward';
       document.getElementById('task-plus').value = 0;
       document.getElementById('task-minus').value = 0;
@@ -3490,16 +3896,17 @@
       const assignee = document.getElementById('task-assignee').value;
       const kind = currentRole === 'Daisy' || assignee === 'Master' ? 'personal' : document.getElementById('task-kind').value;
       const deadline = document.getElementById('task-deadline').value;
+      const reminderMinutes = document.getElementById('task-reminder').value === '' ? null : Number(document.getElementById('task-reminder').value);
       if (!title || !deadline || !Number.isFinite(new Date(deadline).getTime())) return showToast('Titel und gültige Deadline erforderlich.', 'error');
       if (new Date(deadline).getTime() <= Date.now()) return showToast('Deadline muss in der Zukunft liegen.', 'error');
       const tasks = appState.mgmt.aufgaben;
       const task = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
       if (editingTaskId && (!task || currentRole !== 'Master' || task.status !== 'open')) return;
-      const values = { title, desc, assignee, deadline, taskKind: kind, plusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-plus').value) : 0, minusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-minus').value) : 0 };
+      const values = { title, desc, assignee, deadline, reminderMinutes, taskKind: kind, plusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-plus').value) : 0, minusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-minus').value) : 0 };
       if (task) Object.assign(task, values);
       else tasks.unshift({ id: 'task-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), taskV26: true, status: 'open', cycle: 0, history: [], done: false, createdBy: currentRole, ...values });
       logActivity('hat Aufgabe angelegt/bearbeitet: „' + title + '“', 'aufgaben');
-      resetTaskForm(); persistState(); refreshAllUI(); showToast('Aufgabe gespeichert.');
+      closeTaskDialog(); persistState(); refreshAllUI(); showToast('Aufgabe gespeichert.');
     }
     function editTask(id) {
       if (currentRole !== 'Master') return;
@@ -3510,11 +3917,15 @@
       document.getElementById('task-desc').value = t.desc || '';
       document.getElementById('task-assignee').value = t.assignee;
       document.getElementById('task-deadline').value = t.deadline || '';
+      document.getElementById('task-reminder').value = t.reminderMinutes == null ? '' : String(t.reminderMinutes);
       document.getElementById('task-kind').value = t.taskKind || (t.assignee === 'Daisy' ? 'reward' : 'personal');
       document.getElementById('task-plus').value = t.plusPoints || 0;
       document.getElementById('task-minus').value = t.minusPoints || 0;
       updateTaskForm();
-      document.getElementById('tasks-form').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('task-dialog-title').textContent = 'Aufgabe bearbeiten';
+      document.getElementById('task-save-btn').textContent = 'Änderungen speichern';
+      document.getElementById('task-dialog').classList.remove('hidden');
+      document.getElementById('task-title').focus();
     }
     function reportTask(id) {
       const task = appState.mgmt.aufgaben.find(t => t.id === id);
@@ -3585,9 +3996,264 @@
         return '<div class="rounded-xl border ' + style[2] + ' bg-white/[0.03] p-3 space-y-2"><div class="flex flex-wrap justify-between gap-2"><strong class="text-sm">' + escapeHtml(t.title) + '</strong>' + badgeMark("aufgaben",t.id) + '<span class="text-xs ' + style[1] + '">' + style[0] + '</span></div><p class="text-xs text-slate-400">' + escapeHtml(t.desc || '') + '</p><div class="text-xs text-slate-400">Für: ' + escapeHtml(getDisplayName(t.assignee || 'Master')) + ' · Frist: ' + (t.deadline ? new Date(t.deadline).toLocaleString('de-DE') : 'Keine (Altbestand)') + '</div>' + (t.assignee === 'Daisy' ? '<div class="text-xs text-slate-400">+' + rewardAmount(t.plusPoints) + ' / −' + rewardAmount(t.minusPoints) + ' Punkte pro Fristversäumnis</div>' : '') + (t.reportedAt ? '<div class="text-xs text-amber-300">Gemeldet: ' + new Date(t.reportedAt).toLocaleString('de-DE') + '</div>' : '') + '<div class="flex flex-wrap gap-2 text-xs">' + buttons + reviewButtons + edit + '</div></div>';
       }).join('') || '<p class="text-xs text-slate-400">Noch keine Aufgaben vorhanden.</p>';
     }
+    // Selection is local and provisional until an RTDB ledger transaction commits.
+    let redemptionSelection = {};
+    let redemptionSelectionMode = null;
+    let redemptionPending = false;
+    function redemptionMode() {
+      if (currentRole === 'Daisy' && !hasPermission('rewards','visible')) return null;
+      const balance = rewardBalance();
+      if (balance > 0 && currentRole === 'Daisy') return 'belohnungen';
+      if (balance < 0 && currentRole === 'Master') return 'strafen';
+      return null;
+    }
+    function redemptionCatalog(mode) {
+      return ((appState.mgmt || {})[mode] || []).filter(item =>
+        item && item.id && rewardAmount(item.rewardPoints) > 0);
+    }
+    function redemptionTotal(mode) {
+      const catalog = new Map(redemptionCatalog(mode).map(item => [String(item.id),rewardAmount(item.rewardPoints)]));
+      return Object.entries(redemptionSelection).reduce((sum,[id,count]) =>
+        sum + (catalog.get(id) || 0) * Math.max(0,Math.floor(Number(count)||0)),0);
+    }
+    function changeRedemptionSelection(id,delta) {
+      const mode = redemptionMode();
+      if (!mode || redemptionPending) return;
+      const item = redemptionCatalog(mode).find(x => String(x.id) === String(id));
+      if (!item) return;
+      const count = Math.max(0,(redemptionSelection[id] || 0) + delta);
+      const available = Math.abs(rewardBalance());
+      const nextTotal = redemptionTotal(mode) + delta * rewardAmount(item.rewardPoints);
+      if (delta > 0 && nextTotal > available) return;
+      if (count) redemptionSelection[id] = count;
+      else delete redemptionSelection[id];
+      renderRewards();
+    }
+    function renderRedemptionPanel() {
+      const panel = document.getElementById('reward-redemption-panel');
+      if (!panel) return;
+      const mode = redemptionMode();
+      if (!mode) {
+        redemptionSelection = {};
+        redemptionSelectionMode = null;
+        panel.innerHTML = '<p class="text-xs text-slate-400">Bei positivem Punktestand wählt Daisy Belohnungen. Bei negativem Punktestand verrechnet Master Strafen.</p>';
+        return;
+      }
+      if (redemptionSelectionMode !== mode) { redemptionSelection = {}; redemptionSelectionMode = mode; }
+      const catalog = redemptionCatalog(mode);
+      const total = redemptionTotal(mode);
+      const available = Math.abs(rewardBalance());
+      const remaining = available - total;
+      const noun = mode === 'belohnungen' ? 'Belohnungen' : 'Strafen';
+      panel.innerHTML = '<div class="border border-amber-500/25 rounded-xl p-3 space-y-3">' +
+        '<h3 class="text-sm font-semibold text-amber-200">' + noun + ' auswählen</h3>' +
+        '<p class="text-xs text-slate-400">Mehrfachauswahl möglich. Punkte werden erst nach Bestätigung gebucht.</p>' +
+        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">' + catalog.map(item => {
+          const id = String(item.id);
+          const cost = rewardAmount(item.rewardPoints);
+          const count = redemptionSelection[id] || 0;
+          const disabled = cost > remaining || redemptionPending;
+          return '<div class="rounded-xl border p-3 space-y-2 ' + (count ? 'border-amber-400/90 bg-amber-500/15 ring-1 ring-amber-400/40 shadow-lg shadow-amber-950/20' : disabled ? 'opacity-40 border-slate-800 bg-slate-900/30' : 'border-slate-700 bg-white/[0.02]') + '">' +
+            '<div class="flex justify-between gap-2"><strong class="text-sm">' + escapeHtml(item.title || '') + '</strong>' +
+            (count ? '<span class="shrink-0 rounded-full border border-amber-400/50 bg-amber-400/20 px-2 py-1 text-amber-100 text-[11px] font-semibold">✓ Ausgewählt · ' + count + '×</span>' : '') + '</div>' +
+            '<div class="text-xs text-slate-400">' + cost + ' Punkte</div>' +
+            '<div class="flex gap-2">' +
+            '<button class="px-3 py-1 rounded bg-white/10 disabled:opacity-30" ' + (!count || redemptionPending ? 'disabled' : '') + ' onclick="changeRedemptionSelection(' + JSON.stringify(id).replace(/"/g,'&quot;') + ',-1)">−</button>' +
+            '<button class="px-3 py-1 rounded bg-amber-500/20 disabled:opacity-30" ' + (disabled ? 'disabled' : '') + ' onclick="changeRedemptionSelection(' + JSON.stringify(id).replace(/"/g,'&quot;') + ',1)">+</button>' +
+            '</div></div>';
+        }).join('') + '</div>' +
+        '<div class="flex justify-between text-sm"><span>Ausgewählt: ' + total + ' Punkte</span><strong>Verbleibend: ' + remaining + '</strong></div>' +
+        '<div class="flex gap-2"><button class="px-4 py-2 rounded-lg gold-gradient text-xs font-bold disabled:opacity-40" ' +
+        (!total || redemptionPending ? 'disabled' : '') + ' onclick="confirmRedemption()">Final einlösen</button>' +
+        '<button class="px-4 py-2 rounded-lg bg-white/10 text-xs" ' + (redemptionPending ? 'disabled' : '') +
+        ' onclick="redemptionSelection={};renderRewards()">Zurücksetzen</button></div></div>';
+    }
+    // The UI assigns display itemNumbers while hydrating legacy/fixture records.
+    // Compare against the server catalog after applying the same deterministic
+    // numbering; never ignore actual catalog edits, prices or item identities.
+    function redemptionMgmtMatchesRemote() {
+      if (!lastRemoteState || !lastRemoteState.mgmt) return false;
+      const normalized = mergeWithDefaults(sanitizeForFirebase(lastRemoteState));
+      return sameRemoteValue(appState.mgmt,normalized.mgmt);
+    }
+    async function confirmRedemption() {
+      const mode = redemptionMode();
+      const blockers = [];
+      if (!mode) blockers.push('Rolle/Punktestand erlauben keine Einlösung');
+      if (redemptionPending) blockers.push('Buchung läuft bereits');
+      if (!firebaseDbRef || !productionRoomLoaded || !lastRemoteState)
+        blockers.push('Firebase-Raum noch nicht vollständig synchronisiert');
+      if (productionSyncConflict) blockers.push('Synchronisationskonflikt');
+      if (pendingCollectionWrites.has('rewardLedger')) blockers.push('Punktebuchung wird noch übertragen');
+      if (pendingCollectionWrites.has('mgmt')) blockers.push('Verwaltung wird noch übertragen');
+      if (lastRemoteState && !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger))
+        blockers.push('Lokaler Punktestand weicht vom Server ab');
+      if (lastRemoteState && !redemptionMgmtMatchesRemote())
+        blockers.push('Lokale Verwaltung weicht vom Server ab');
+      if (!testAuthUser) blockers.push('Firebase-Anmeldung fehlt');
+      else if (testAuthRole !== currentRole)
+        blockers.push('Firebase-Rolle ' + (testAuthRole || 'unbekannt') + ' statt ' + currentRole);
+      if (blockers.length) {
+        const message = 'Einlösung gesperrt: ' + blockers.join('; ') + '.';
+        console.warn('Einlösungsdiagnose:', blockers);
+        showToast(message,'error');
+        alert(message);
+        return;
+      }
+      const chosen = redemptionCatalog(mode).filter(item => redemptionSelection[String(item.id)] > 0)
+        .map(item => ({id:String(item.id),title:String(item.title || ''),
+          count:Number(redemptionSelection[String(item.id)]),
+          cost:rewardAmount(item.rewardPoints)}));
+      const total = chosen.reduce((sum,item)=>sum+item.cost*item.count,0);
+      if (!chosen.length || chosen.some(item=>!Number.isSafeInteger(item.count) || item.count <= 0) ||
+          !Number.isSafeInteger(total) || total <= 0 || total > Math.abs(rewardBalance())) return;
+      if (!confirm(chosen.map(item=>item.count+'× '+item.title+' ('+(item.count*item.cost)+' Punkte)').join('\\n') +
+        '\\n\\nGesamt: '+total+' Punkte. Verbindlich einlösen?')) return;
+      if (redemptionMode() !== mode || pendingCollectionWrites.has('rewardLedger') ||
+          pendingCollectionWrites.has('mgmt') ||
+          !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger) ||
+          !redemptionMgmtMatchesRemote()) return;
+      redemptionPending = true;
+      renderRewards();
+      const id = 'redemption:'+Date.now()+':'+Math.random().toString(36).slice(2,12);
+      const amount = mode === 'belohnungen' ? -total : total;
+      const description = (mode === 'belohnungen' ? 'Belohnung eingelöst: ' : 'Strafe verrechnet: ') +
+        chosen.map(item=>item.count+'× '+item.title).join(', ');
+      const actorRole = currentRole;
+      const roomRef = firebaseDbRef;
+      try {
+        // The catalog and ledger must be checked in ONE RTDB transaction.
+        // A price change, deletion, or competing redemption forces a retry
+        // against the latest room state instead of charging stale prices.
+        const result = await roomRef.transaction(current => {
+          if (!current || !current.mgmt || typeof current.mgmt !== 'object') return;
+          if (current.rewardLedger != null && !Array.isArray(current.rewardLedger)) return;
+          const ledger = Array.isArray(current.rewardLedger) ? current.rewardLedger : [];
+          if (ledger.some(row=>row && row.id === id)) return;
+          const catalog = current.mgmt[mode];
+          if (!Array.isArray(catalog)) return;
+          for (const item of chosen) {
+            const live = catalog.find(entry=>entry && String(entry.id) === item.id);
+            if (!live || rewardAmount(live.rewardPoints) !== item.cost ||
+                String(live.title || '') !== item.title) return;
+          }
+          const balance = ledger.reduce((sum,row)=>sum+Number(row && row.amount || 0),0);
+          if (!Number.isSafeInteger(balance) ||
+              (mode === 'belohnungen' ? balance < total : balance > -total)) return;
+          return {...current,rewardLedger:[...ledger,{
+            id,amount,description,timestamp:Date.now(),actorRole,
+            redemption:{mode,items:chosen,status:"pending"}
+          }]};
+        },undefined,false);
+        if (!result.committed) {
+          showToast('Nicht gebucht: Punktestand oder Katalog hat sich geändert. Bitte Auswahl prüfen.','error');
+        } else {
+          redemptionSelection = {};
+          showToast('Einlösung verbindlich gebucht.');
+        }
+      } catch(error) {
+        console.error('Einlösung fehlgeschlagen',error);
+        showToast('Buchungsstatus unklar. Bitte Punkteverlauf vor erneutem Versuch prüfen.','error');
+      } finally {
+        redemptionPending = false;
+        renderRewards();
+      }
+    }
+    let redemptionClosing = false;
+    function pendingRedemptions() {
+      return (appState.rewardLedger || []).filter(row =>
+        row && row.redemption && ['belohnungen','strafen'].includes(row.redemption.mode) &&
+        row.redemption.status !== 'completed');
+    }
+    async function closeRedemption(id) {
+      if (currentRole !== 'Master' || !testAuthUser || testAuthRole !== 'Master' ||
+          !firebaseDbRef || !productionRoomLoaded || productionSyncConflict ||
+          !lastRemoteState || redemptionClosing ||
+          pendingCollectionWrites.has('rewardLedger') ||
+          pendingCollectionWrites.has('strafbuch') ||
+          !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger) ||
+          !sameRemoteValue(appState.strafbuch,lastRemoteState.strafbuch)) {
+        showToast('Abschluss gesperrt: Master-Anmeldung oder Synchronisation prüfen.','error');
+        return;
+      }
+      const entry = pendingRedemptions().find(row => row.id === id);
+      if (!entry) return;
+      const isReward = entry.redemption.mode === 'belohnungen';
+      const label = isReward ? 'Belohnung erfolgt' : 'Bestrafung durchgeführt';
+      if (!confirm(label + '?\\n' + (entry.description || '') +
+        '\\n\\nDer Vorgang wird danach im Strafbuch archiviert.')) return;
+      redemptionClosing = true;
+      renderRewards();
+      try {
+        const result = await firebaseDbRef.transaction(current => {
+          if (!current || !Array.isArray(current.rewardLedger) ||
+              (current.strafbuch != null && !Array.isArray(current.strafbuch))) return;
+          const ledger = current.rewardLedger;
+          const idx = ledger.findIndex(row => row && row.id === id);
+          if (idx < 0 || !ledger[idx].redemption ||
+              !['belohnungen','strafen'].includes(ledger[idx].redemption.mode) ||
+              ledger[idx].redemption.status === 'completed') return;
+          const live = ledger[idx];
+          const archiveId = 'redemption-archive:' + id;
+          const archive = Array.isArray(current.strafbuch) ? current.strafbuch : [];
+          if (archive.some(row => row && row.id === archiveId)) return;
+          const finishedAt = Date.now();
+          const updatedLedger = ledger.slice();
+          updatedLedger[idx] = {...live,redemption:{...live.redemption,
+            status:'completed',completedAt:finishedAt,completedBy:'Master'}};
+          const archiveEntry = {
+            id:archiveId,reason:(isReward ? '🎁 Belohnung erfolgt: ' : '⚖️ Bestrafung durchgeführt: ') +
+              (live.redemption.items || []).map(item=>item.count+'× '+item.title).join(', '),
+            measure:(isReward ? 'Belohnung' : 'Strafe') + ' · ' +
+              Math.abs(Number(live.amount || 0)) + ' Punkte',
+            resolved:true,redemptionId:id,redemptionMode:live.redemption.mode,
+            createdAt:live.timestamp,completedAt:finishedAt,completedBy:'Master'
+          };
+          return {...current,rewardLedger:updatedLedger,strafbuch:[archiveEntry,...archive]};
+        },undefined,false);
+        showToast(result.committed ? 'Abgeschlossen und im Strafbuch archiviert.' :
+          'Nicht abgeschlossen: Daten haben sich geändert. Bitte neu prüfen.',
+          result.committed ? 'success' : 'error');
+      } catch(error) {
+        console.error('Abschluss fehlgeschlagen',error);
+        showToast('Abschlussstatus unklar. Bitte Verlauf und Strafbuch prüfen.','error');
+      } finally {
+        redemptionClosing = false;
+        renderRewards();
+      }
+    }
+    function renderPendingRedemptions() {
+      const target = document.getElementById('rewards-pending');
+      if (!target) return;
+      const items = pendingRedemptions();
+      target.innerHTML = '<div class="border-t border-slate-700 pt-3 space-y-2">' +
+        '<h3 class="text-sm font-semibold text-amber-200">⏳ Ausstehende Belohnungen & Strafen (' +
+        items.length + ')</h3>' +
+        (items.length ? items.slice().reverse().map(row => {
+          const isReward = row.redemption.mode === 'belohnungen';
+          const label = isReward ? 'Belohnung erfolgt' : 'Bestrafung durchgeführt';
+          return '<div class="rounded-xl border border-amber-500/30 bg-amber-500/[0.06] p-3 space-y-2">' +
+            '<div class="text-xs text-amber-200 font-semibold">' +
+              (isReward ? '🎁 Belohnung ausstehend' : '⚖️ Strafe ausstehend') + '</div>' +
+            '<div class="text-sm text-white">' +
+              (row.redemption.items || []).map(item=>escapeHtml(String(item.count))+'× '+
+                escapeHtml(String(item.title))).join(', ') + '</div>' +
+            '<div class="text-xs text-slate-400">Gebucht: ' +
+              new Date(row.timestamp).toLocaleString('de-DE') + ' · ' +
+              Math.abs(Number(row.amount)) + ' Punkte</div>' +
+            (currentRole === 'Master' ?
+              '<button type="button" class="px-3 py-2 rounded-lg gold-gradient text-xs font-semibold disabled:opacity-40" ' +
+              (redemptionClosing ? 'disabled' : '') + ' onclick="closeRedemption(' +
+              JSON.stringify(String(row.id)).replace(/"/g,'&quot;') + ')">' + label + '</button>' : '') +
+            '</div>';
+        }).join('') : '<p class="text-xs text-slate-400">Keine offenen Einlösungen.</p>') +
+        '</div>';
+    }
     function renderRewards() {
       const allowed = currentRole === 'Master' || hasPermission('rewards','visible');
       document.getElementById('rewards-balance').textContent = allowed ? rewardBalance() + ' Punkte' : '';
+      renderRedemptionPanel();
+      renderPendingRedemptions();
       document.getElementById('reward-rule-editor').innerHTML = '';
       document.getElementById('rewards-ledger').innerHTML = allowed
         ? (appState.rewardLedger || []).slice().reverse().map(row => '<div class="flex justify-between gap-3 border-b border-slate-800 py-2 text-xs"><span>' + escapeHtml(row.description || '') + '<br><span class="text-slate-500">' + new Date(row.timestamp).toLocaleString('de-DE') + '</span></span><strong class="' + (row.amount >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (row.amount > 0 ? '+' : '') + row.amount + '</strong>' + (currentRole === 'Master' ? '<button class="ml-2 text-rose-300" title="Buchung löschen" onclick="deleteRewardBooking(' + JSON.stringify(String(row.id)).replace(/\"/g, '&quot;') + ',' + JSON.stringify(String(row.timestamp)).replace(/\"/g, '&quot;') + ')">🗑️</button>' : '') + '</div>').join('') || '<p class="text-xs text-slate-500">Noch keine Buchungen.</p>'
@@ -3613,11 +4279,82 @@
       const bal = rewardBalance();
       document.getElementById('dashboard-reward-balance').textContent = (bal > 0 ? '+' : '') + bal;
       const candidates = (appState.mgmt[bal >= 0 ? 'belohnungen' : 'strafen'] || []).filter(x => rewardAmount(x.rewardPoints) > 0 && rewardAmount(x.rewardPoints) <= Math.abs(bal)).sort((a,b) => rewardAmount(b.rewardPoints) - rewardAmount(a.rewardPoints));
-      document.getElementById('dashboard-reward-hint').textContent = candidates.length ? (bal >= 0 ? '🎁 Erreichbar: ' : '⚠️ Strafe möglich: ') + candidates[0].title + ' (' + rewardAmount(candidates[0].rewardPoints) + ' Punkte)' : (bal < 0 ? 'Noch keine passende Strafe hinterlegt' : 'Noch keine Belohnung erreichbar');
+      const hint = document.getElementById('dashboard-reward-hint');
+      if (currentRole === 'Daisy' && bal > 0 && candidates.length &&
+          hasPermission('rewards','visible')) {
+        hint.innerHTML = '<button type="button" onclick="switchTab(\'rewards\')" class="w-full text-left rounded-lg border border-amber-400/50 bg-amber-500/15 px-3 py-2 text-amber-100 font-semibold">🎁 Belohnung verfügbar · ' +
+          escapeHtml(candidates[0].title) + ' (' +
+          rewardAmount(candidates[0].rewardPoints) + ' Punkte) · Zu Rewards →</button>';
+      } else {
+        hint.textContent = candidates.length ? (bal >= 0 ? '🎁 Erreichbar: ' : '⚠️ Strafe möglich: ') +
+          candidates[0].title + ' (' + rewardAmount(candidates[0].rewardPoints) + ' Punkte)' :
+          (bal < 0 ? 'Noch keine passende Strafe hinterlegt' : 'Noch keine Belohnung erreichbar');
+      }
     }
 
     setInterval(() => { if (currentRole && processTaskDeadlines()) refreshAllUI(); }, 30000);
 
+    const REWARD_GALLERY = {
+      belohnungen: [['film','🎬'],['geschenk','🎁'],['kerzen','🕯️'],['essen','🍰'],['musik','🎧'],['bad','🛁'],['reise','✈️'],['buch','📖'],['blumen','💐'],['sterne','🌟']],
+      strafen: [['hammer','🔨'],['uhr','⏳'],['blitz','⚡'],['kette','⛓️'],['schloss','🔒'],['glocke','🔔'],['schild','🛡️'],['ziel','🎯'],['karte','🃏'],['waage','⚖️']]
+    };
+    function galleryImage(cat, id) {
+      const options = REWARD_GALLERY[cat] || [];
+      const index = options.findIndex(entry => entry[0] === id);
+      if (index < 0) return '';
+      const emoji = options[index][1];
+      const punishment = cat === 'strafen';
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">' +
+        '<defs><radialGradient id="bg"><stop stop-color="' + (punishment ? '#842b36' : '#745019') +
+        '"/><stop offset="1" stop-color="#11121d"/></radialGradient></defs>' +
+        '<rect width="160" height="160" rx="18" fill="url(#bg)"/>' +
+        '<path d="M15 30L44 45M115 19L105 49M12 115L42 104M120 120L145 142" stroke="' +
+        (punishment ? '#ef6673' : '#e8b95c') + '" stroke-width="5" opacity=".7"/>' +
+        '<text x="80" y="105" text-anchor="middle" font-size="76">' + emoji + '</text>' +
+        '<rect x="5" y="5" width="150" height="150" rx="14" fill="none" stroke="#e8b95c" stroke-width="3"/></svg>';
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+    function rewardImage(item, cat) {
+      if (item.imgUrl) return item.imgUrl;
+      if (item.galleryImageId) return galleryImage(cat,item.galleryImageId);
+      // Existing catalog entries get a stable visual fallback without migrating room data.
+      if (REWARD_GALLERY[cat]) {
+        const key = String(item.id || item.title || '');
+        let hash = 0;
+        for (let i = 0; i < key.length; i++) hash = ((hash * 31) + key.charCodeAt(i)) >>> 0;
+        return galleryImage(cat,REWARD_GALLERY[cat][hash % REWARD_GALLERY[cat].length][0]);
+      }
+      return '';
+    }
+    function chooseRewardGallery(id) {
+      if (!['belohnungen','strafen'].includes(activeMgmtCategory)) return;
+      if (!(REWARD_GALLERY[activeMgmtCategory] || []).some(entry=>entry[0]===id)) return;
+      mgmtDraftImage = null; mgmtImageRemoved = false;
+      mgmtDraftGalleryId = id;
+      const preview = document.getElementById('mgmt-image-preview');
+      const img = document.getElementById('mgmt-image-preview-img');
+      img.src = galleryImage(activeMgmtCategory,id);
+      preview.classList.remove('hidden');
+      renderRewardGallery();
+    }
+    function renderRewardGallery() {
+      const box = document.getElementById('mgmt-gallery');
+      if (!box) return;
+      const options = REWARD_GALLERY[activeMgmtCategory];
+      box.classList.toggle('hidden',!options);
+      if (!options) return;
+      box.innerHTML = '<p class="text-xs text-amber-200 mb-2">Illustration auswählen (ohne Auswahl: Zufallsmotiv)</p>' +
+        '<div class="grid grid-cols-5 gap-2">' + options.map(([id]) =>
+          '<button type="button" title="' + id + '" onclick="chooseRewardGallery(\'' + id +
+          '\')" class="rounded-lg border p-1 ' +
+          (mgmtDraftGalleryId === id ? 'border-amber-400 bg-amber-500/20' : 'border-slate-700') +
+          '"><img alt="' + id + '" src="' + galleryImage(activeMgmtCategory,id) +
+          '" class="w-full aspect-square rounded object-cover"></button>').join('') + '</div>';
+    }
+    function randomRewardGalleryId(cat) {
+      const entries = REWARD_GALLERY[cat] || [];
+      return entries.length ? entries[Math.floor(Math.random()*entries.length)][0] : null;
+    }
     function renderVerwaltung() {
       const visibleCats = MGMT_CATEGORIES.filter(cat => cat.id !== 'aufgaben' && hasPermission(cat.id, 'visible'));
       const subTabsEl = document.getElementById('verwaltung-subtabs');
@@ -3650,7 +4387,7 @@
       const canDelete = hasPermission(activeMgmtCategory, 'delete');
       const isEditing = !!mgmtEditingItemId;
       document.getElementById('mgmt-add-box').classList.toggle('hidden', !canAdd && !(isEditing && canEdit));
-      document.getElementById('mgmt-image-controls').classList.toggle('hidden', !(canAdd || (isEditing && canEdit)) || !['kleidung', 'toys'].includes(activeMgmtCategory));
+      document.getElementById('mgmt-image-controls').classList.toggle('hidden', !(canAdd || (isEditing && canEdit)) || !['kleidung', 'toys','belohnungen','strafen'].includes(activeMgmtCategory));
       document.getElementById('mgmt-points-wrap').classList.toggle('hidden', !['belohnungen','strafen'].includes(activeMgmtCategory));
       const bonus = rewardAmount(appState.rewardRules?.[activeMgmtCategory]);
       const hint = document.getElementById('mgmt-bonus-hint');
@@ -3661,6 +4398,7 @@
       document.getElementById('mgmt-submit-button').onclick = isEditing ? saveMgmtEdit : addMgmtItem;
       document.getElementById('mgmt-cancel-edit').classList.toggle('hidden', !isEditing);
 
+      renderRewardGallery();
       numberMgmtItems(appState);
       const items = appState.mgmt[activeMgmtCategory] || [];
       const listEl = document.getElementById('mgmt-items-list');
@@ -3685,7 +4423,7 @@
             </div>
             ${rewardCategory ? `<p class="text-xs text-amber-300">Punktwert: ${activeMgmtCategory === 'strafen' ? '−' : '+'}${rewardAmount(item.rewardPoints)}</p>` : ''}
             ${item.desc ? `<p class="text-xs text-slate-400 mt-1 break-words">${escapeHtml(item.desc)}</p>` : ''}
-            ${item.imgUrl ? `<img src="${escapeHtml(item.imgUrl)}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 w-auto mt-2 border border-slate-700" />` : ''}
+            ${rewardImage(item,activeMgmtCategory) ? `<img src="${escapeHtml(rewardImage(item,activeMgmtCategory))}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 w-auto mt-2 border border-slate-700" />` : ''}
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             ${canEdit ? `<button onclick="editMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 text-xs" title="Bearbeiten">✏️</button>` : ''}
@@ -3705,20 +4443,20 @@
       if (catId !== activeMgmtCategory || !hasPermission(catId, 'edit')) return;
       const item = (appState.mgmt[catId] || []).find(entry => entry.id === itemId);
       if (!item) return;
-      mgmtEditingItemId = itemId; mgmtDraftImage = null; mgmtImageRemoved = false;
+      mgmtEditingItemId = itemId; mgmtDraftImage = null; mgmtDraftGalleryId = item.galleryImageId || null; mgmtImageRemoved = false;
       document.getElementById('mgmt-title').value = item.title || '';
       document.getElementById('mgmt-desc').value = item.desc || '';
       document.getElementById('mgmt-points').value = rewardAmount(item.rewardPoints);
       const preview = document.getElementById('mgmt-image-preview');
       const previewImg = document.getElementById('mgmt-image-preview-img');
-      if (item.imgUrl && ['kleidung', 'toys'].includes(catId)) { previewImg.src = item.imgUrl; preview.classList.remove('hidden'); }
+      if (rewardImage(item,catId)) { previewImg.src = rewardImage(item,catId); preview.classList.remove('hidden'); }
       else { previewImg.src = ''; preview.classList.add('hidden'); }
       renderVerwaltung();
       document.getElementById('mgmt-add-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function removeMgmtImage() {
-      mgmtDraftImage = null; mgmtImageRemoved = true;
+      mgmtDraftImage = null; mgmtDraftGalleryId = null; mgmtImageRemoved = true;
       const preview = document.getElementById('mgmt-image-preview');
       const previewImg = document.getElementById('mgmt-image-preview-img');
       if (previewImg) previewImg.src = ''; if (preview) preview.classList.add('hidden');
@@ -3743,7 +4481,15 @@
       if (!title) { showToast('Bitte eine Bezeichnung eingeben.', 'error'); return; }
       const oldTitle = item.title || ''; item.title = title; item.desc = desc;
       if (['belohnungen','strafen'].includes(catId)) item.rewardPoints = rewardAmount(document.getElementById('mgmt-points').value);
-      if (['kleidung', 'toys'].includes(catId)) { if (mgmtDraftImage) item.imgUrl = mgmtDraftImage; else if (mgmtImageRemoved) delete item.imgUrl; }
+      if (['kleidung','toys','belohnungen','strafen'].includes(catId)) {
+        if (mgmtDraftImage) { item.imgUrl = mgmtDraftImage; delete item.galleryImageId; }
+        else if (mgmtDraftGalleryId) { item.galleryImageId = mgmtDraftGalleryId; delete item.imgUrl; }
+        else if (mgmtImageRemoved && ['belohnungen','strafen'].includes(catId)) {
+          item.galleryImageId = randomRewardGalleryId(catId); delete item.imgUrl;
+        } else if (mgmtImageRemoved) delete item.imgUrl;
+        if (['belohnungen','strafen'].includes(catId) && !rewardImage(item,catId))
+          item.galleryImageId = randomRewardGalleryId(catId);
+      }
       const catObj = MGMT_CATEGORIES.find(category => category.id === catId);
       logActivity('hat ' + (catObj ? catObj.singular : 'Eintrag') + ' bearbeitet: „' + oldTitle + '“ → „' + title + '“', 'verwaltung', catId, item.id);
       mgmtEditingItemId = null;
@@ -3765,7 +4511,9 @@
       appState.mgmtCounters[activeMgmtCategory] = next;
       const newItem = { id: 'mgmt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), itemNumber: prefix + '-' + String(next).padStart(4, '0'), title, desc, done: false };
       if (['belohnungen','strafen'].includes(activeMgmtCategory)) newItem.rewardPoints = rewardAmount(document.getElementById('mgmt-points').value);
-      if (['kleidung', 'toys'].includes(activeMgmtCategory) && mgmtDraftImage) newItem.imgUrl = mgmtDraftImage;
+      if (['kleidung','toys','belohnungen','strafen'].includes(activeMgmtCategory) && mgmtDraftImage) newItem.imgUrl = mgmtDraftImage;
+      if (['belohnungen','strafen'].includes(activeMgmtCategory) && !mgmtDraftImage)
+        newItem.galleryImageId = mgmtDraftGalleryId || randomRewardGalleryId(activeMgmtCategory);
       if (!Array.isArray(appState.mgmt[activeMgmtCategory])) {
         appState.mgmt[activeMgmtCategory] = [];
       }
@@ -3823,6 +4571,9 @@
           <button onclick="selectSettingsSubTab('sicherheit')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'sicherheit' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
             🛡️ Sicherheit & Push
           </button>
+          <button onclick="selectSettingsSubTab('entwicklung')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${activeSettingsSubTab === 'entwicklung' ? 'gold-gradient shadow' : 'bg-white/5 text-slate-300 hover:bg-white/10'}">
+            🧪 Entwicklung
+          </button>
         `;
       } else {
         if (!['basics', 'ansicht', 'benachrichtigungen', 'daisy-security'].includes(activeSettingsSubTab)) activeSettingsSubTab = 'basics';
@@ -3849,6 +4600,8 @@
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
+      document.getElementById('settings-panel-entwicklung').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'entwicklung');
+      if (isMaster && activeSettingsSubTab === 'entwicklung') renderDevelopmentPanel();
       document.getElementById('settings-panel-benachrichtigungen').classList.toggle('hidden', isMaster || activeSettingsSubTab !== 'benachrichtigungen');
       const authParent = document.getElementById(isMaster ? 'settings-panel-sicherheit' : 'settings-panel-benachrichtigungen');
       let authPanel = document.getElementById('test-firebase-auth-panel');
@@ -3904,6 +4657,121 @@
       }
     }
 
+    // A hard guard on both hosting origin and database room keeps developer tools test-only.
+    const DEVELOPMENT_TEST_ROOM = 'dominion-test-20261114-isolated';
+    function developmentToolsAllowed() {
+      return currentRole === 'Master' &&
+        location.hostname === 'jnilats33.github.io' &&
+        location.pathname.startsWith('/Dominion-Test/') &&
+        firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM &&
+        !!firebaseDbRef && productionRoomLoaded && !productionSyncConflict &&
+        !!testAuthUser && testAuthRole === 'Master';
+    }
+    function renderDevelopmentPanel() {
+      const preview = document.getElementById('development-import-preview');
+      const button = document.getElementById('development-import-button');
+      if (!preview || !button) return;
+      const allowed = developmentToolsAllowed();
+      preview.textContent = allowed
+        ? 'Vorschau: 4 Belohnungen, 4 Strafen, 2 Aufgaben und 3 Termine. Vorhandene Einträge bleiben bestehen; gleiche Test-IDs werden übersprungen. Keine Punktegutschrift beim Import.'
+        : 'Import gesperrt. Erforderlich: Dominion-Test, isolierter Testraum und Firebase-Anmeldung als Master.';
+      button.disabled = !allowed || developmentImportPending;
+      const balanceLabel = document.getElementById('development-balance-current');
+      if (balanceLabel) balanceLabel.textContent = allowed
+        ? 'Aktueller Punktestand: ' + rewardBalance() + ' Punkte'
+        : 'Testbuchungen erst nach bestätigter Firebase-Master-Anmeldung verfügbar.';
+      document.querySelectorAll('[data-development-balance]').forEach(el => {
+        el.disabled = !allowed || developmentImportPending || developmentBalancePending ||
+          pendingCollectionWrites.has('rewardLedger') ||
+          !lastRemoteState || !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger);
+      });
+    }
+    let developmentBalancePending = false;
+    async function setDevelopmentBalance(target) {
+      if (!Number.isSafeInteger(target) || ![100,-80,0].includes(target) ||
+          !developmentToolsAllowed() || developmentBalancePending ||
+          developmentImportPending || pendingCollectionWrites.has('rewardLedger') ||
+          !lastRemoteState || !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger)) return;
+      if (!confirm('TEST-PUNKTESTAND auf ' + target + ' setzen?\\nEs wird eine Ausgleichsbuchung im isolierten Testraum angelegt.')) return;
+      if (!developmentToolsAllowed()) return;
+      developmentBalancePending = true;
+      renderDevelopmentPanel();
+      const roomRef = firebaseDbRef;
+      const id = 'development-balance:' + Date.now() + ':' + Math.random().toString(36).slice(2,12);
+      try {
+        const result = await roomRef.child('rewardLedger').transaction(current => {
+          if (current != null && !Array.isArray(current)) return;
+          const ledger = Array.isArray(current) ? current : [];
+          if (ledger.some(entry => entry && entry.id === id)) return;
+          const balance = ledger.reduce((sum,entry) => sum + Number(entry && entry.amount || 0),0);
+          const delta = target - balance;
+          if (!Number.isSafeInteger(balance) || !Number.isSafeInteger(delta)) return;
+          if (delta === 0) return ledger;
+          return [...ledger,{
+            id,amount:delta,
+            description:'🧪 Test-Punktestand auf ' + target + ' gesetzt',
+            timestamp:Date.now(),actorRole:'Master',developmentFixture:true
+          }];
+        },undefined,false);
+        if (!result.committed) throw new Error('Buchung nicht bestätigt');
+        showToast('Test-Punktestand auf ' + target + ' gesetzt.');
+      } catch(error) {
+        console.error('Test-Punktestand fehlgeschlagen',error);
+        showToast('Testbuchung fehlgeschlagen. Bitte Punktestand prüfen.','error');
+      } finally {
+        developmentBalancePending = false;
+        renderDevelopmentPanel();
+      }
+    }
+    let developmentImportPending = false;
+    async function importDevelopmentFixtures() {
+      if (!developmentToolsAllowed() || developmentImportPending) return;
+      if (!confirm('TESTDATEN IMPORTIEREN?\\n4 Belohnungen, 4 Strafen, 2 Aufgaben und 3 Termine.\\nBestehende Einträge bleiben erhalten. Fortfahren?')) return;
+      developmentImportPending = true;
+      renderDevelopmentPanel();
+      try {
+        const response = await fetch('tests/fixtures/reward-cycle.sample.json', {cache:'no-store'});
+        if (!response.ok) throw new Error('Testdatendatei fehlt ('+response.status+')');
+        const fixtures = await response.json();
+        if (fixtures.schema !== 'dominion-test-fixtures-v1' || !fixtures.mgmt ||
+            !Array.isArray(fixtures.kalender)) throw new Error('Ungültige Testdaten');
+        if (!developmentToolsAllowed()) throw new Error('Testumgebung nicht mehr aktiv');
+        const roomRef = firebaseDbRef;
+        const mergeUnique = (existing,additions) => {
+          if (existing != null && !Array.isArray(existing)) return;
+          const output = Array.isArray(existing) ? existing.slice() : [];
+          const ids = new Set(output.map(x=>String(x && x.id)));
+          for (const item of additions) {
+            if (!item || typeof item.id !== 'string' || !item.id.startsWith('test-')) continue;
+            if (!ids.has(item.id)) {output.push(item);ids.add(item.id);}
+          }
+          return output;
+        };
+        const mgmtResult = await roomRef.child('mgmt').transaction(current => {
+          if (!current || typeof current !== 'object' || Array.isArray(current)) return;
+          const next = {...current};
+          for (const category of ['belohnungen','strafen','aufgaben']) {
+            if (!Array.isArray(fixtures.mgmt[category])) return;
+            const merged = mergeUnique(next[category],fixtures.mgmt[category]);
+            if (!merged) return;
+            next[category] = merged;
+          }
+          return next;
+        },undefined,false);
+        if (!mgmtResult.committed) throw new Error('Verwaltungsdaten nicht übernommen');
+        if (!developmentToolsAllowed()) throw new Error('Testumgebung nach Teilimport nicht mehr aktiv');
+        const calendarResult = await roomRef.child('kalender').transaction(current =>
+          mergeUnique(current,fixtures.kalender),undefined,false);
+        if (!calendarResult.committed) throw new Error('Termine nicht übernommen');
+        showToast('Testdaten importiert. Bereits vorhandene Testeinträge wurden übersprungen.');
+      } catch(error) {
+        console.error('Testdatenimport:',error);
+        showToast('Testdatenimport fehlgeschlagen: '+error.message,'error');
+      } finally {
+        developmentImportPending = false;
+        renderDevelopmentPanel();
+      }
+    }
     function selectSettingsSubTab(subTab) {
       if (currentRole !== 'Master' && !['basics', 'ansicht', 'benachrichtigungen', 'daisy-security'].includes(subTab)) return;
       activeSettingsSubTab = subTab;
