@@ -350,3 +350,19 @@ test('locked local save adds only edited collections to recovery draft',()=>{
   assert.deepEqual(Object.keys(updated.drafts).sort(),['einkauf','kalender']);
   draftStorage.clear();
 });
+
+test('conflict captures unsent edits in other collections before locking',()=>{
+  draftStorage.clear();
+  const remote={kalender:[{id:'a'}],einkauf:[{id:'old'}]};
+  const local={kalender:[{id:'a'},{id:'local'}],einkauf:[{id:'old'},{id:'local-shopping'}]};
+  const h=delayedHarness(remote,local);
+  h.sandbox.runPersist();
+  h.mutateRemote('kalender',[{id:'a'},{id:'other-device'}]);
+  h.flush();
+  assert.equal(h.sandbox.productionSyncConflict,true);
+  const draft=JSON.parse(draftStorage.get('dominion_sync_conflict_draft_v1'));
+  assert.deepEqual(draft.drafts.kalender,local.kalender);
+  assert.deepEqual(draft.drafts.einkauf,local.einkauf);
+  assert.deepEqual(h.state.kalender,[{id:'a'},{id:'other-device'}]);
+  draftStorage.clear();
+});
