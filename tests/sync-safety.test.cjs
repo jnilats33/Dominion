@@ -255,3 +255,31 @@ test('remote snapshots cannot revert edits made after conflict draft',()=>{
   assert.equal(h.pending.length,0);
   draftStorage.clear();
 });
+
+test('edits after conflict update recovery draft and survive simulated restart',()=>{
+  draftStorage.clear();
+  const remote={kalender:[{id:'a'}]};
+  const h=delayedHarness(remote,{kalender:[{id:'a'},{id:'local'}]});
+  h.sandbox.runPersist();
+  h.mutateRemote('kalender',[{id:'a'},{id:'remote'}]);
+  h.flush();
+  assert.equal(h.sandbox.productionSyncConflict,true);
+  // Execute the real local save function from the HTML, not the test stub.
+  const saveStart=html.indexOf('    function saveStateLocalOnly()');
+  const saveEnd=html.indexOf('    // Keep a separate local recovery copy.',saveStart);
+  assert.ok(saveStart>=0 && saveEnd>saveStart);
+  h.sandbox.STORAGE_KEY='dominion_app_state_v2';
+  vm.runInContext(html.slice(saveStart,saveEnd)+'\nthis.saveReal=saveStateLocalOnly;',h.sandbox);
+  h.sandbox.appState.kalender.push({id:'later-edit'});
+  h.sandbox.saveReal();
+  const draft=JSON.parse(draftStorage.get('dominion_sync_conflict_draft_v1'));
+  assert.deepEqual(draft.drafts.kalender,[{id:'a'},{id:'local'},{id:'later-edit'}]);
+  const fresh=delayedHarness(remote,remote);
+  vm.runInContext('restoreSyncConflictLock()',fresh.sandbox);
+  assert.deepEqual(JSON.parse(JSON.stringify(fresh.sandbox.appState.kalender)),
+    [{id:'a'},{id:'local'},{id:'later-edit'}]);
+  assert.equal(fresh.sandbox.productionRoomLoaded,false);
+  fresh.sandbox.runPersist();
+  assert.equal(fresh.pending.length,0);
+  draftStorage.clear();
+});
