@@ -1113,6 +1113,7 @@
     let recordingStartedAt = 0;
     let firebaseDbRef = null;
     let firebaseRoomPathPending = null;
+    let productionRoomLoaded = false;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
     let testAuthUser = null;
@@ -1182,7 +1183,7 @@
 
     function persistState() {
       saveStateLocalOnly();
-      if (firebaseDbRef && !isApplyingRemoteUpdate) {
+      if (firebaseDbRef && productionRoomLoaded && !isApplyingRemoteUpdate) {
         const stateWithoutChat = { ...appState };
         delete stateWithoutChat.chat;
         delete stateWithoutChat.fcmToken; // Never publish a push token in shared room state.
@@ -1196,7 +1197,7 @@
     // Production chat v2: write only the new message, never the whole history.
     function persistChat(message) {
       saveStateLocalOnly();
-      if (!message || !firebaseDbRef || isApplyingRemoteUpdate) return;
+      if (!message || !firebaseDbRef || !productionRoomLoaded || isApplyingRemoteUpdate) return;
       firebaseDbRef.child('chatV2').child(message.id).set(sanitizeForFirebase(message))
         .catch(error => {
           console.warn('Chat-v2 Sync Fehler:', error);
@@ -1484,7 +1485,8 @@
         firebaseDbRef.child('chatV2').off();
       }
       firebaseDbRef = firebase.database().ref('rooms/' + safeRoomPath);
-      appState.chat = []; // Previous chat was disposable test data.
+      productionRoomLoaded = false;
+      appState.chat = []; // The previous chat is explicitly excluded from this release.
       saveStateLocalOnly();
       firebaseDbRef.child('chatV2').on('child_added', snapshot => {
         const message = snapshot.val();
@@ -1502,10 +1504,10 @@
         updateSyncIndicator(true);
         const remoteData = snapshot.val();
         if (!remoteData) {
-          // Production room: initialize only if truly absent (existing content must remain untouched).
-          firebaseDbRef.transaction(existing => existing === null ? sanitizeForFirebase(createDefaultState()) : undefined, (error, committed) => {
-            if (error) { console.warn('Raum-Initialisierung:', error); updateSyncIndicator(false); }
-          }, false);
+          // Fail closed: NEVER initialize an absent production room with default data.
+          console.error('Produktivraum fehlt: Keine automatische Initialisierung oder Schreibzugriffe.');
+          productionRoomLoaded = false;
+          updateSyncIndicator(false);
           return;
         }
 
@@ -1517,6 +1519,7 @@
           appState = mergeWithDefaults(stateWithoutChats);
           delete appState.fcmToken;
           appState.chat = liveChat;
+          productionRoomLoaded = true;
           saveStateLocalOnly();
           refreshAllUI();
         } catch (err) {
