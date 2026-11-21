@@ -136,7 +136,7 @@ function listenerHarness(remote,local) {
     firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
     saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
     updateSyncIndicator(){},showToast(){},refreshAllUI(){},localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1',
-    mergeWithDefaults:x=>structuredClone(x),console
+    mergeWithDefaults:x=>structuredClone(x),console,document:documentMock
   };
   const start=html.indexOf("firebaseDbRef.on('value', (snapshot) => {");
   const end=html.indexOf("}, (error) => {",start);
