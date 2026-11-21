@@ -72,3 +72,45 @@ test('two rapid writes from same baseline must not silently lose the second',()=
   h.sandbox.runPersist();
   assert.deepEqual(h.state.kalender,[{id:'a'},{id:'first'},{id:'second'}]);
 });
+
+function delayedHarness(remote,local) {
+  let state=structuredClone(remote);
+  const pending=[], notifications=[];
+  const sandbox={
+    appState:structuredClone(local),lastRemoteState:structuredClone(remote),
+    firebaseDbRef:{child(key){return {transaction(update,done){pending.push({key,update,done});}}}},
+    productionRoomLoaded:true,isApplyingRemoteUpdate:false,
+    saveStateLocalOnly(){},sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
+    updateSyncIndicator(){},showToast:m=>notifications.push(m),console
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(source+'\nthis.runPersist=persistState;',sandbox);
+  function flush(){
+    const job=pending.shift();
+    assert.ok(job,'pending transaction');
+    const result=job.update(structuredClone(state[job.key]??null));
+    if(result===undefined)job.done(null,false);
+    else {state[job.key]=structuredClone(result);job.done(null,true);}
+  }
+  return {sandbox,pending,notifications,flush,get state(){return state;},mutateRemote(k,v){state[k]=v;}};
+}
+test('delayed transaction queues second local edit',()=>{
+  const h=delayedHarness({kalender:[{id:'a'}]},{kalender:[{id:'a'},{id:'first'}]});
+  h.sandbox.runPersist();
+  h.sandbox.appState.kalender.push({id:'second'});
+  h.sandbox.runPersist();
+  assert.equal(h.pending.length,1);
+  h.flush();
+  assert.equal(h.pending.length,1);
+  h.flush();
+  assert.deepEqual(h.state.kalender,[{id:'a'},{id:'first'},{id:'second'}]);
+});
+test('delayed external conflict does not retry and overwrite remote changes',()=>{
+  const h=delayedHarness({kalender:[{id:'a'}]},{kalender:[{id:'a'},{id:'local'}]});
+  h.sandbox.runPersist();
+  h.mutateRemote('kalender',[{id:'a'},{id:'remote'}]);
+  h.flush();
+  assert.deepEqual(h.state.kalender,[{id:'a'},{id:'remote'}]);
+  assert.equal(h.pending.length,0);
+  assert.equal(h.sandbox.productionRoomLoaded,false);
+});
