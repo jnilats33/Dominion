@@ -977,6 +977,7 @@
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
+    const SYNC_CONFLICT_DRAFT_KEY = 'dominion_sync_conflict_draft_v1';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
     const DEFAULT_ROOM_CODE = 'D+W Connection';
     const FIREBASE_WEB_CONFIG = {"apiKey":"AIzaSyC3YyPJsXsX-u2EHKHcByPVj1Ru2Fn3YPo","authDomain":"dominionapp-45bfa.firebaseapp.com","databaseURL":"https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app","projectId":"dominionapp-45bfa","storageBucket":"dominionapp-45bfa.firebasestorage.app","messagingSenderId":"1047436704498","appId":"1:1047436704498:web:4b7f9b229b5ad7cc0fee6b"};
@@ -1144,6 +1145,7 @@
         console.error('Fehler beim Laden des Status:', e);
         appState = createDefaultState();
       }
+      restoreSyncConflictLock();
       saveStateLocalOnly();
     }
 
@@ -1183,6 +1185,44 @@
       }
     }
 
+    // Keep a separate local recovery copy. Never upload this draft automatically.
+    function saveSyncConflictDraft(key, error) {
+      try {
+        const previous = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || '{}');
+        const drafts = previous && typeof previous.drafts === 'object' && previous.drafts ? previous.drafts : {};
+        drafts[key] = sanitizeForFirebase(appState[key]);
+        localStorage.setItem(SYNC_CONFLICT_DRAFT_KEY, JSON.stringify({
+          createdAt: previous.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          reason: error ? 'write-error' : 'write-conflict',
+          drafts
+        }));
+        return true;
+      } catch (draftError) {
+        console.error('Konfliktentwurf konnte nicht separat gesichert werden:', draftError);
+        return false;
+      }
+    }
+
+    function restoreSyncConflictLock() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+        if (!saved || !saved.drafts || !Object.keys(saved.drafts).length) return;
+        productionSyncConflict = true;
+        productionRoomLoaded = false;
+        // Preserve the saved edits locally, without writing them to Firebase.
+        for (const [key, value] of Object.entries(saved.drafts)) {
+          if (key !== 'chat' && key !== 'chatV2' && key !== 'firebase' &&
+              key !== 'fcmToken' && key !== 'version') appState[key] = value;
+        }
+        console.warn('Ungespeicherter Konfliktentwurf gefunden; Synchronisation bleibt gesperrt.');
+      } catch (error) {
+        productionSyncConflict = true; // unreadable draft: fail closed
+        productionRoomLoaded = false;
+        console.error('Konfliktentwurf nicht lesbar; Synchronisation gesperrt.', error);
+      }
+    }
+
     // Firebase represents empty arrays as null. Compare equivalent empty values
     // without treating them as a user edit.
     function sameRemoteValue(a, b) {
@@ -1217,10 +1257,12 @@
           pendingCollectionWrites.delete(key);
           if (error || !committed) {
             console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
+            const draftSaved = saveSyncConflictDraft(key, error);
             productionSyncConflict = true;
             productionRoomLoaded = false; // fail closed; snapshots must not auto-unlock
             updateSyncIndicator(false);
-            showToast('Synchronisationskonflikt in ' + key + ': Änderung nicht gespeichert. Bitte Datenstand prüfen.', 'error');
+            showToast('Synchronisation gesperrt: ' + key + ' nicht gespeichert. ' +
+              (draftSaved ? 'Lokaler Konfliktentwurf gesichert.' : 'Lokale Sicherung fehlgeschlagen – bitte Daten sofort exportieren!'), 'error');
             return;
           }
           if (roomRef !== firebaseDbRef) return;
@@ -1593,6 +1635,7 @@
               appState[key] = localBeforeSnapshot[key];
             }
           }
+          if (productionSyncConflict) restoreSyncConflictLock();
           delete appState.fcmToken;
           appState.chat = liveChat;
           lastRemoteState = sanitizeForFirebase(stateWithoutChats);
