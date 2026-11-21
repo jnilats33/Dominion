@@ -13,11 +13,20 @@ initializeApp();
 const ROOM = 'D+W Connection';
 const REGION = 'europe-west1';
 const ROLES = new Set(['Master', 'Daisy']);
+// Same role-to-UID mapping already enforced by the live RTDB security rules.
+// These are Firebase Auth UIDs, not passwords or push tokens.
+const ROLE_UIDS = Object.freeze({
+  Master: 'ctgxl53FnFfeG75Z3tCiDnijbG43',
+  Daisy: 'WH2QtbiWtdcIPgo2VuXu1xPyhD13',
+});
 
 function verifiedRole(request) {
-  // Only Firebase Auth custom claims issued by a trusted administrator count.
+  // Require both trusted custom claim and the specific account UID.
   const role = request.auth?.token?.dominionTestRole;
-  if (!ROLES.has(role)) throw new HttpsError('permission-denied', 'Verified Firebase role required.');
+  const uid = request.auth?.uid;
+  if (!ROLES.has(role) || ROLE_UIDS[role] !== uid) {
+    throw new HttpsError('permission-denied', 'Verified Firebase role and account required.');
+  }
   return role;
 }
 
