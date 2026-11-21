@@ -685,7 +685,8 @@
       <section id="tab-rewards" class="hidden space-y-4 animate-fade">
         <div class="glass-card rounded-2xl p-5 space-y-4">
           <h2 class="font-display text-lg font-bold text-[#e5b55c]">🎯 Rewards</h2>
-          <div class="text-xs text-slate-400">Daisys Punktekonto · Einlösung von Belohnungen und Durchführung von Strafen folgen später.</div>
+          <div class="text-xs text-slate-400">Punkte verdienen, Belohnungen einlösen und Strafen verrechnen.</div>
+          <div id="reward-redemption-panel" class="space-y-3"></div>
           <div id="rewards-balance" class="text-3xl font-bold"></div>
           <div id="reward-rule-editor" class="space-y-2"></div>
           <h3 class="text-sm font-semibold">Punkteverlauf</h3>
@@ -3585,9 +3586,124 @@
         return '<div class="rounded-xl border ' + style[2] + ' bg-white/[0.03] p-3 space-y-2"><div class="flex flex-wrap justify-between gap-2"><strong class="text-sm">' + escapeHtml(t.title) + '</strong>' + badgeMark("aufgaben",t.id) + '<span class="text-xs ' + style[1] + '">' + style[0] + '</span></div><p class="text-xs text-slate-400">' + escapeHtml(t.desc || '') + '</p><div class="text-xs text-slate-400">Für: ' + escapeHtml(getDisplayName(t.assignee || 'Master')) + ' · Frist: ' + (t.deadline ? new Date(t.deadline).toLocaleString('de-DE') : 'Keine (Altbestand)') + '</div>' + (t.assignee === 'Daisy' ? '<div class="text-xs text-slate-400">+' + rewardAmount(t.plusPoints) + ' / −' + rewardAmount(t.minusPoints) + ' Punkte pro Fristversäumnis</div>' : '') + (t.reportedAt ? '<div class="text-xs text-amber-300">Gemeldet: ' + new Date(t.reportedAt).toLocaleString('de-DE') + '</div>' : '') + '<div class="flex flex-wrap gap-2 text-xs">' + buttons + reviewButtons + edit + '</div></div>';
       }).join('') || '<p class="text-xs text-slate-400">Noch keine Aufgaben vorhanden.</p>';
     }
+    // Selection is local and provisional until an RTDB ledger transaction commits.
+    let redemptionSelection = {};
+    let redemptionPending = false;
+    function redemptionMode() {
+      if (currentRole === 'Daisy' && !hasPermission('rewards','visible')) return null;
+      const balance = rewardBalance();
+      if (balance > 0 && currentRole === 'Daisy') return 'belohnungen';
+      if (balance < 0 && currentRole === 'Master') return 'strafen';
+      return null;
+    }
+    function redemptionCatalog(mode) {
+      return ((appState.mgmt || {})[mode] || []).filter(item =>
+        item && item.id && rewardAmount(item.rewardPoints) > 0);
+    }
+    function redemptionTotal(mode) {
+      const catalog = new Map(redemptionCatalog(mode).map(item => [String(item.id),rewardAmount(item.rewardPoints)]));
+      return Object.entries(redemptionSelection).reduce((sum,[id,count]) =>
+        sum + (catalog.get(id) || 0) * Math.max(0,Math.floor(Number(count)||0)),0);
+    }
+    function changeRedemptionSelection(id,delta) {
+      const mode = redemptionMode();
+      if (!mode || redemptionPending) return;
+      const item = redemptionCatalog(mode).find(x => String(x.id) === String(id));
+      if (!item) return;
+      const count = Math.max(0,(redemptionSelection[id] || 0) + delta);
+      const available = Math.abs(rewardBalance());
+      const nextTotal = redemptionTotal(mode) + delta * rewardAmount(item.rewardPoints);
+      if (delta > 0 && nextTotal > available) return;
+      if (count) redemptionSelection[id] = count;
+      else delete redemptionSelection[id];
+      renderRewards();
+    }
+    function renderRedemptionPanel() {
+      const panel = document.getElementById('reward-redemption-panel');
+      if (!panel) return;
+      const mode = redemptionMode();
+      if (!mode) {
+        redemptionSelection = {};
+        panel.innerHTML = '<p class="text-xs text-slate-400">Bei positivem Punktestand wählt Daisy Belohnungen. Bei negativem Punktestand verrechnet Master Strafen.</p>';
+        return;
+      }
+      const catalog = redemptionCatalog(mode);
+      const total = redemptionTotal(mode);
+      const available = Math.abs(rewardBalance());
+      const remaining = available - total;
+      const noun = mode === 'belohnungen' ? 'Belohnungen' : 'Strafen';
+      panel.innerHTML = '<div class="border border-amber-500/25 rounded-xl p-3 space-y-3">' +
+        '<h3 class="text-sm font-semibold text-amber-200">' + noun + ' auswählen</h3>' +
+        '<p class="text-xs text-slate-400">Mehrfachauswahl möglich. Punkte werden erst nach Bestätigung gebucht.</p>' +
+        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">' + catalog.map(item => {
+          const id = String(item.id);
+          const cost = rewardAmount(item.rewardPoints);
+          const count = redemptionSelection[id] || 0;
+          const disabled = cost > remaining || redemptionPending;
+          return '<div class="rounded-xl border p-3 space-y-2 ' + (disabled && !count ? 'opacity-40 border-slate-800' : 'border-slate-700') + '">' +
+            '<div class="flex justify-between gap-2"><strong class="text-sm">' + escapeHtml(item.title || '') + '</strong>' +
+            (count ? '<span class="text-amber-300 text-xs">' + count + '×</span>' : '') + '</div>' +
+            '<div class="text-xs text-slate-400">' + cost + ' Punkte</div>' +
+            '<div class="flex gap-2">' +
+            '<button class="px-3 py-1 rounded bg-white/10 disabled:opacity-30" ' + (!count || redemptionPending ? 'disabled' : '') + ' onclick="changeRedemptionSelection(' + JSON.stringify(id).replace(/"/g,'&quot;') + ',-1)">−</button>' +
+            '<button class="px-3 py-1 rounded bg-amber-500/20 disabled:opacity-30" ' + (disabled ? 'disabled' : '') + ' onclick="changeRedemptionSelection(' + JSON.stringify(id).replace(/"/g,'&quot;') + ',1)">+</button>' +
+            '</div></div>';
+        }).join('') + '</div>' +
+        '<div class="flex justify-between text-sm"><span>Ausgewählt: ' + total + ' Punkte</span><strong>Verbleibend: ' + remaining + '</strong></div>' +
+        '<div class="flex gap-2"><button class="px-4 py-2 rounded-lg gold-gradient text-xs font-bold disabled:opacity-40" ' +
+        (!total || redemptionPending ? 'disabled' : '') + ' onclick="confirmRedemption()">Final einlösen</button>' +
+        '<button class="px-4 py-2 rounded-lg bg-white/10 text-xs" ' + (redemptionPending ? 'disabled' : '') +
+        ' onclick="redemptionSelection={};renderRewards()">Zurücksetzen</button></div></div>';
+    }
+    async function confirmRedemption() {
+      const mode = redemptionMode();
+      if (!mode || redemptionPending || !firebaseDbRef || !productionRoomLoaded ||
+          productionSyncConflict || !lastRemoteState || pendingCollectionWrites.has('rewardLedger')) {
+        showToast('Synchronisation nicht bereit. Bitte später erneut versuchen.','error'); return;
+      }
+      const chosen = redemptionCatalog(mode).filter(item => redemptionSelection[String(item.id)] > 0)
+        .map(item => ({id:String(item.id),title:String(item.title || ''),count:redemptionSelection[String(item.id)],
+          cost:rewardAmount(item.rewardPoints)}));
+      const total = chosen.reduce((sum,item)=>sum+item.cost*item.count,0);
+      if (!total || total > Math.abs(rewardBalance())) return;
+      if (!confirm(chosen.map(item=>item.count+'× '+item.title+' ('+(item.count*item.cost)+' Punkte)').join('\n') +
+        '\n\nGesamt: '+total+' Punkte. Verbindlich einlösen?')) return;
+      redemptionPending = true;
+      renderRewards();
+      const id = 'redemption:'+Date.now()+':'+Math.random().toString(36).slice(2,12);
+      const amount = mode === 'belohnungen' ? -total : total;
+      const description = (mode === 'belohnungen' ? 'Belohnung eingelöst: ' : 'Strafe verrechnet: ') +
+        chosen.map(item=>item.count+'× '+item.title).join(', ');
+      let attempted = false;
+      try {
+        const result = await firebaseDbRef.child('rewardLedger').transaction(current => {
+          if (current != null && !Array.isArray(current)) return;
+          const ledger = Array.isArray(current) ? current : [];
+          if (ledger.some(row=>row && row.id === id)) return;
+          const balance = ledger.reduce((sum,row)=>sum+Number(row?.amount||0),0);
+          if (!Number.isFinite(balance) || (mode === 'belohnungen' ? balance < total : balance > -total)) return;
+          attempted = true;
+          return [...ledger,{id,amount,description,timestamp:Date.now(),actorRole:currentRole,
+            redemption:{mode,items:chosen}}];
+        },undefined,false);
+        if (!result.committed) {
+          showToast('Einlösung nicht gebucht: Punktebestand hat sich möglicherweise geändert.','error');
+        } else {
+          redemptionSelection = {};
+          showToast('Einlösung verbindlich gebucht.');
+        }
+      } catch(error) {
+        console.error('Einlösung fehlgeschlagen',error);
+        showToast('Einlösung konnte nicht bestätigt werden. Bitte Punkteverlauf prüfen.','error');
+      } finally {
+        redemptionPending = false;
+        renderRewards();
+      }
+    }
     function renderRewards() {
       const allowed = currentRole === 'Master' || hasPermission('rewards','visible');
       document.getElementById('rewards-balance').textContent = allowed ? rewardBalance() + ' Punkte' : '';
+      renderRedemptionPanel();
       document.getElementById('reward-rule-editor').innerHTML = '';
       document.getElementById('rewards-ledger').innerHTML = allowed
         ? (appState.rewardLedger || []).slice().reverse().map(row => '<div class="flex justify-between gap-3 border-b border-slate-800 py-2 text-xs"><span>' + escapeHtml(row.description || '') + '<br><span class="text-slate-500">' + new Date(row.timestamp).toLocaleString('de-DE') + '</span></span><strong class="' + (row.amount >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (row.amount > 0 ? '+' : '') + row.amount + '</strong>' + (currentRole === 'Master' ? '<button class="ml-2 text-rose-300" title="Buchung löschen" onclick="deleteRewardBooking(' + JSON.stringify(String(row.id)).replace(/\"/g, '&quot;') + ',' + JSON.stringify(String(row.timestamp)).replace(/\"/g, '&quot;') + ')">🗑️</button>' : '') + '</div>').join('') || '<p class="text-xs text-slate-500">Noch keine Buchungen.</p>'
