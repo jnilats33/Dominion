@@ -1114,6 +1114,7 @@
     let firebaseDbRef = null;
     let firebaseRoomPathPending = null;
     let productionRoomLoaded = false;
+    let productionSyncConflict = false; // Latch: a later snapshot must not silently unlock writes.
     let lastRemoteState = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
@@ -1196,7 +1197,7 @@
     const pendingCollectionWrites = new Map();
     function persistState() {
       saveStateLocalOnly();
-      if (!firebaseDbRef || !productionRoomLoaded || isApplyingRemoteUpdate || !lastRemoteState) return;
+      if (!firebaseDbRef || !productionRoomLoaded || productionSyncConflict || isApplyingRemoteUpdate || !lastRemoteState) return;
       const stateWithoutChat = { ...appState };
       delete stateWithoutChat.chat;
       delete stateWithoutChat.chatV2;
@@ -1216,7 +1217,8 @@
           pendingCollectionWrites.delete(key);
           if (error || !committed) {
             console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
-            productionRoomLoaded = false; // fail closed until fresh snapshot
+            productionSyncConflict = true;
+            productionRoomLoaded = false; // fail closed; snapshots must not auto-unlock
             updateSyncIndicator(false);
             showToast('Synchronisationskonflikt in ' + key + ': Änderung nicht gespeichert. Bitte Datenstand prüfen.', 'error');
             return;
@@ -1594,8 +1596,8 @@
           delete appState.fcmToken;
           appState.chat = liveChat;
           lastRemoteState = sanitizeForFirebase(stateWithoutChats);
-          productionRoomLoaded = true;
-          updateSyncIndicator(true);
+          productionRoomLoaded = !productionSyncConflict;
+          updateSyncIndicator(!productionSyncConflict);
           saveStateLocalOnly();
           refreshAllUI();
         } catch (err) {
