@@ -270,9 +270,14 @@
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Version 2.9</span>
           </div>
           <p class="text-[11px] text-slate-400">Stand: 21.11.2026 · Dieses Update enthält die bisherigen Verbesserungen und zusätzliche Stabilitätsmaßnahmen.</p>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Neu in Dominion v2.9: Der Kalender unterstützt komfortable Termin-Pop-ups, Zeitspannen, mehrtägige Termine und getrennte Punkte für Erfüllung oder Nichterfüllung. Dashboard-Bereiche lassen sich unter Einstellungen → Ansicht individuell sortieren. Neue Inhalte werden über Menüzähler kenntlich gemacht. Chat und Audionachrichten wurden überarbeitet; die Push-Benachrichtigungen wurden technisch vorbereitet. Der Bilder-Upload für Toys und Kleidung ist wieder verfügbar. Außerdem schützen zusätzliche Prüfungen die Synchronisation vor unbeabsichtigtem Überschreiben. Die erweiterte Konfliktauflösung folgt in einem späteren Update.
-          </p>
+          <ul class="text-xs text-slate-300 leading-relaxed list-disc pl-5 space-y-1">
+            <li><strong>Kalender:</strong> Termin-Pop-ups, Zeitspannen, mehrtägige Termine und getrennte Punkte für Erfüllung oder Nichterfüllung.</li>
+            <li><strong>Dashboard:</strong> Bereiche sortieren und Übersichtskacheln separat ein- oder ausblenden.</li>
+            <li><strong>Neue Inhalte:</strong> Menüzähler für ungelesene Einträge.</li>
+            <li><strong>Chat:</strong> Nachrichten und Audionachrichten überarbeitet; Push-Benachrichtigungen vorbereitet.</li>
+            <li><strong>Bilder:</strong> Upload für Toys und Kleidung wiederhergestellt.</li>
+            <li><strong>Synchronisation:</strong> Zusätzliche Schutzprüfungen. Erweiterte Konfliktauflösung folgt.</li>
+          </ul>
           <details class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
               <span>📚 Frühere Updates und Änderungen anzeigen</span>
@@ -306,7 +311,8 @@
               <span id="dashboard-metrics-arrow" aria-hidden="true">▾</span>
               <span>Übersicht</span>
             </button>
-            <button type="button" id="dashboard-metrics-pin" onclick="toggleDashboardMetricsPin()" aria-pressed="false" title="Übersicht geöffnet halten" aria-label="Übersicht geöffnet halten" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">📌</button>
+            <div class="flex items-center gap-1"><button type="button" onclick="jumpToTarget('einstellungen','ansicht','dashboard-metric-visibility-settings')" title="Übersichtskacheln anpassen" aria-label="Übersichtskacheln anpassen" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">⚙️</button>
+            <button type="button" id="dashboard-metrics-pin" onclick="toggleDashboardMetricsPin()" aria-pressed="false" title="Übersicht geöffnet halten" aria-label="Übersicht geöffnet halten" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">📌</button></div>
           </div>
           <div id="dashboard-metrics-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div onclick="switchTab('kalender')" data-dashboard-permission="kalender" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
@@ -369,6 +375,16 @@
               <span>📜</span>
             </div>
             <div id="stat-regeln" class="text-2xl font-bold text-white">0</div>
+            <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
+          </div>
+          <div onclick="jumpToTarget('verwaltung','belohnungen')" data-dashboard-permission="belohnungen" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Belohnungen</span><span>🎁</span></div>
+            <div id="stat-belohnungen" class="text-2xl font-bold text-white">0</div>
+            <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
+          </div>
+          <div onclick="jumpToTarget('verwaltung','strafen')" data-dashboard-permission="strafen" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
+            <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Strafen</span><span>⚡</span></div>
+            <div id="stat-strafen" class="text-2xl font-bold text-white">0</div>
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
           </div>
@@ -696,6 +712,11 @@
                 <p class="text-xs text-slate-400 mt-1">Wähle, welche Bereiche auf deinem Dashboard angezeigt werden. Einklappen und Festpinnen bleiben unabhängig davon.</p>
               </div>
               <div id="dashboard-visibility-options" class="space-y-3"></div>
+              <div id="dashboard-metric-visibility-settings" class="border-t border-slate-800 pt-4 space-y-3">
+                <h3 class="font-semibold text-sm text-white">🔢 Übersichtskacheln</h3>
+                <p class="text-xs text-slate-400">Wähle die Kacheln der Übersicht aus. Daisy sieht nur freigegebene Bereiche.</p>
+                <div id="dashboard-metric-visibility-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+              </div>
               <p class="text-[11px] text-slate-500">Diese Ansicht wird für deine Rolle auf diesem Gerät gespeichert.</p>
             </div>
           </div>
@@ -2413,11 +2434,46 @@
       `).join('');
     }
 
+    // Role-specific, device-local display settings; no Firebase writes.
+    const DASHBOARD_METRIC_VISIBILITY_KEY = 'dominion-prod-metric-visibility-v1';
+    const DASHBOARD_METRIC_OPTIONS = [
+      {id:'kalender',label:'Termine'}, {id:'einkauf',label:'Einkauf'},
+      {id:'strafbuch',label:'Strafbuch'}, {id:'aufgaben',label:'Aufgaben'},
+      {id:'toys',label:'Toys'}, {id:'kleidung',label:'Kleidung'},
+      {id:'regeln',label:'Regeln'}, {id:'belohnungen',label:'Belohnungen'},
+      {id:'strafen',label:'Strafen'}
+    ];
+    function getDashboardMetricVisibility() {
+      try {
+        const all = JSON.parse(localStorage.getItem(DASHBOARD_METRIC_VISIBILITY_KEY) || '{}');
+        return all[currentRole] && typeof all[currentRole] === 'object' ? all[currentRole] : {};
+      } catch (_) { return {}; }
+    }
+    function setDashboardMetricVisible(id, visible) {
+      if (!DASHBOARD_METRIC_OPTIONS.some(x => x.id === id)) return;
+      if (currentRole === 'Daisy' && !hasPermission(id,'visible')) return;
+      try {
+        const all = JSON.parse(localStorage.getItem(DASHBOARD_METRIC_VISIBILITY_KEY) || '{}');
+        all[currentRole] = all[currentRole] && typeof all[currentRole] === 'object' ? all[currentRole] : {};
+        all[currentRole][id] = !!visible;
+        localStorage.setItem(DASHBOARD_METRIC_VISIBILITY_KEY, JSON.stringify(all));
+      } catch (error) { console.warn('Kacheleinstellung konnte nicht gespeichert werden:', error); }
+      updateDashboardMetricPermissions();
+      renderDashboardMetricVisibilitySettings();
+    }
+    function renderDashboardMetricVisibilitySettings() {
+      const box = document.getElementById('dashboard-metric-visibility-options');
+      if (!box) return;
+      const prefs = getDashboardMetricVisibility();
+      box.innerHTML = DASHBOARD_METRIC_OPTIONS.filter(x => currentRole === 'Master' || hasPermission(x.id,'visible')).map(x =>
+        `<label class="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] border border-slate-800 px-3 py-2 text-xs text-slate-200"><span>${x.label}</span><input type="checkbox" class="w-4 h-4 accent-amber-500" onchange="setDashboardMetricVisible('${x.id}',this.checked)" ${prefs[x.id] !== false ? 'checked' : ''}></label>`
+      ).join('');
+    }
     function updateDashboardMetricPermissions() {
       document.querySelectorAll('#dashboard-metrics-grid [data-dashboard-permission]').forEach(tile => {
         const category = tile.getAttribute('data-dashboard-permission');
         const permitted = currentRole === 'Master' || hasPermission(category, 'visible');
-        tile.classList.toggle('hidden', !permitted);
+        tile.classList.toggle('hidden', !permitted || getDashboardMetricVisibility()[category] === false);
       });
     }
 
@@ -2442,6 +2498,8 @@
       document.getElementById('stat-toys').textContent = (appState.mgmt.toys || []).length;
       document.getElementById('stat-kleidung').textContent = (appState.mgmt.kleidung || []).length;
       document.getElementById('stat-regeln').textContent = (appState.mgmt.regeln || []).length;
+      document.getElementById('stat-belohnungen').textContent = (appState.mgmt.belohnungen || []).length;
+      document.getElementById('stat-strafen').textContent = (appState.mgmt.strafen || []).length;
 
       const limit = parseInt(appState.basics.feedLimit || 20, 10);
       const rawFeed = appState.activityFeed || [];
@@ -3785,6 +3843,7 @@
       document.getElementById('daisy-security-pin-label').textContent = getDisplayName('Daisy') + '-PIN';
       document.getElementById('settings-panel-ansicht').classList.toggle('hidden', activeSettingsSubTab !== 'ansicht');
       renderDashboardVisibilitySettings();
+      renderDashboardMetricVisibilitySettings();
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
