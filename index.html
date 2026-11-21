@@ -1238,6 +1238,29 @@
       }
     }
 
+    // Read-only conflict review. No writes, no automatic resolution.
+    function buildSyncConflictReview() {
+      const raw = localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY);
+      if (!raw) return {status:'none', collections:[]};
+      let saved;
+      try { saved = JSON.parse(raw); }
+      catch (_) { return {status:'unreadable', collections:[]}; }
+      if (!saved || !saved.drafts || typeof saved.drafts !== 'object' ||
+          Array.isArray(saved.drafts)) return {status:'unreadable', collections:[]};
+      const forbidden = new Set(['chat','chatV2','firebase','fcmToken','version']);
+      const collections = Object.keys(saved.drafts).filter(key=>!forbidden.has(key)).sort().map(key=>{
+        const local = saved.drafts[key];
+        const server = lastRemoteState && Object.prototype.hasOwnProperty.call(lastRemoteState,key)
+          ? lastRemoteState[key] : null;
+        return {key, matchesServer:lastRemoteState ? sameRemoteValue(local,server) : null,
+          local:JSON.parse(JSON.stringify(local === undefined ? null : local)),
+          server:lastRemoteState ? JSON.parse(JSON.stringify(server)) : null};
+      });
+      return {status:lastRemoteState ? 'ready' : 'server-unavailable',
+        createdAt:saved.createdAt || null, updatedAt:saved.updatedAt || null,
+        collections};
+    }
+
     // Firebase represents empty arrays as null. Compare equivalent empty values
     // without treating them as a user edit.
     function sameRemoteValue(a, b) {
