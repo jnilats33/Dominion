@@ -1,0 +1,19 @@
+name: Dominion regression tests
+on:
+  pull_request:
+  push:
+    branches:
+      - feature/reward-redemption-cycle
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax check
+        run: |
+          node -e "const fs=require('fs');const vm=require('vm');const s=fs.readFileSync('index.html','utf8');const m=[...s.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)];for(const x of m){if(x[1].trim())new vm.Script(x[1]);}console.log('Checked',m.length,'inline scripts')"
+      - name: Offline regression tests
+        run: node --test tests/*.test.cjs
