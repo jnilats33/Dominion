@@ -3765,35 +3765,15 @@
       showToast('Backup heruntergeladen.');
     }
 
+    // Production release safety: importing or resetting shared data is disabled
+    // until a separate, reviewed recovery workflow exists.
     function importBackupJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const imported = JSON.parse(e.target.result);
-          appState = mergeWithDefaults(imported);
-          persistState();
-          refreshAllUI();
-          showToast('Backup erfolgreich wiederhergestellt!');
-        } catch (err) {
-          showToast('Ungültige Backup-Datei.', 'error');
-        }
-      };
-      reader.readAsText(file);
+      if (event && event.target) event.target.value = '';
+      showToast('Backup-Import ist in dieser Produktivversion aus Sicherheitsgründen gesperrt.', 'error');
     }
 
     function confirmFactoryReset() {
-      openConfirmModal(
-        'Werksreset durchführen?',
-        'Möchtest du wirklich alle Daten, Termine, Einträge und den Chatverlauf unwiderruflich auf die Standardwerte zurücksetzen?',
-        () => {
-          appState = createDefaultState();
-          persistState();
-          refreshAllUI();
-          showToast('Alle Daten wurden zurückgesetzt.');
-        }
-      );
+      showToast('Werksreset ist in dieser Produktivversion aus Sicherheitsgründen gesperrt.', 'error');
     }
 
     function showToast(message, type = 'success') {
