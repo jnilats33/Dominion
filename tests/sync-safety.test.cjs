@@ -64,3 +64,11 @@ test('disabled sync cannot write',()=>{
   h.sandbox.runPersist();
   assert.deepEqual(h.calls,[]);
 });
+
+test('two rapid writes from same baseline must not silently lose the second',()=>{
+  const h=harness({kalender:[{id:'a'}]},{kalender:[{id:'a'},{id:'first'}]});
+  h.sandbox.runPersist();
+  h.sandbox.appState.kalender.push({id:'second'});
+  h.sandbox.runPersist();
+  assert.deepEqual(h.state.kalender,[{id:'a'},{id:'first'},{id:'second'}]);
+});
