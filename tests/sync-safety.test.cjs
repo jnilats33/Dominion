@@ -222,7 +222,10 @@ test('two independent conflicts preserve both recovery drafts',()=>{
   h.sandbox.runPersist();
   h.mutateRemote('kalender',[{id:'a'},{id:'remote-k'}]);
   h.mutateRemote('einkauf',[{id:'x'},{id:'remote-e'}]);
+  assert.equal(h.pending.length,2,'both collection transactions must be pending');
   h.flush();
+  h.flush();
+  assert.equal(h.pending.length,0,'both transaction callbacks must complete');
   const draft=JSON.parse(draftStorage.get('dominion_sync_conflict_draft_v1'));
   assert.deepEqual(Object.keys(draft.drafts).sort(),['einkauf','kalender']);
   assert.deepEqual(draft.drafts.kalender,local.kalender);
