@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const html = fs.readFileSync(require('node:path').join(__dirname,'..','index.html'),'utf8');
-const start = html.indexOf('    function sameRemoteValue(');
+const start = html.indexOf('    function saveSyncConflictDraft(');
 const end = html.indexOf('    // Production chat v2:',start);
 assert.ok(start >= 0 && end > start, 'Sync functions found');
 const source = html.slice(start,end);
@@ -26,7 +26,7 @@ function harness(remote, local) {
     productionRoomLoaded:true, productionSyncConflict:false, isApplyingRemoteUpdate:false,
     saveStateLocalOnly(){}, sanitizeForFirebase:x=>JSON.parse(JSON.stringify(x)),
     updateSyncIndicator(){}, showToast:(message)=>notifications.push(message),
-    console,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1',localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
+    console,localStorage:localStorageMock,SYNC_CONFLICT_DRAFT_KEY:'dominion_sync_conflict_draft_v1'
   };
   vm.createContext(sandbox);
   vm.runInContext(source+'\nthis.runPersist = persistState; this.same = sameRemoteValue;',sandbox);
