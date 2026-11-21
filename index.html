@@ -3672,6 +3672,8 @@
       if (!mode || redemptionPending || !firebaseDbRef || !productionRoomLoaded ||
           productionSyncConflict || !lastRemoteState ||
           pendingCollectionWrites.has('rewardLedger') || pendingCollectionWrites.has('mgmt') ||
+          !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger) ||
+          !sameRemoteValue(appState.mgmt,lastRemoteState.mgmt) ||
           !testAuthUser || testAuthRole !== currentRole) {
         showToast('Synchronisation oder Rollenprüfung nicht bereit.','error'); return;
       }
@@ -3685,7 +3687,9 @@
       if (!confirm(chosen.map(item=>item.count+'× '+item.title+' ('+(item.count*item.cost)+' Punkte)').join('\\n') +
         '\\n\\nGesamt: '+total+' Punkte. Verbindlich einlösen?')) return;
       if (redemptionMode() !== mode || pendingCollectionWrites.has('rewardLedger') ||
-          pendingCollectionWrites.has('mgmt')) return;
+          pendingCollectionWrites.has('mgmt') ||
+          !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger) ||
+          !sameRemoteValue(appState.mgmt,lastRemoteState.mgmt)) return;
       redemptionPending = true;
       renderRewards();
       const id = 'redemption:'+Date.now()+':'+Math.random().toString(36).slice(2,12);
