@@ -219,6 +219,21 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                 <span id="sync-status-label">Live</span>
               </span>
+              <button id="sync-recovery-test-button" type="button" onclick="recoverOverdueTaskTest()" hidden
+                class="px-2 py-0.5 rounded-lg border border-amber-500/50 text-amber-200 bg-amber-950/50 text-[10px] font-semibold"
+                title="TEST: geprüften Verspätungsvorgang atomar wiederherstellen">Verspätung reparieren</button>
+              <button id="sync-counter-seven-button" type="button" onclick="repairSeventhCounterTest()" hidden
+                class="px-2 py-0.5 rounded-lg border border-amber-500/50 text-amber-200 bg-amber-950/50 text-[10px] font-semibold"
+                title="TEST: nur den geprüften Aufgabenzähler und ggf. fehlende Nummer reparieren">Zähler 7 reparieren</button>
+              <button id="sync-fresh-check-button" type="button" onclick="inspectFreshConflictTest()" hidden
+                class="px-2 py-0.5 rounded-lg border border-sky-500/50 text-sky-200 bg-sky-950/50 text-[10px] font-semibold"
+                title="Konfliktentwurf mit frischem TEST-Serverstand vergleichen, nur lesen">Serverstand prüfen</button>
+              <button id="task-counter-check-button" type="button" onclick="inspectTaskCounterTest()" hidden
+                class="px-2 py-0.5 rounded-lg border border-sky-500/50 text-sky-200 bg-sky-950/50 text-[10px] font-semibold"
+                title="Aufgabennummern und Zähler in TEST nur lesen">Aufgabenzähler prüfen</button>
+              <button id="task-counter-repair-button" type="button" onclick="repairTaskCounterTest()" hidden
+                class="px-2 py-0.5 rounded-lg border border-amber-500/50 text-amber-200 bg-amber-950/50 text-[10px] font-semibold"
+                title="TEST: Fehlende Nummer A-0005 und Zähler nach Sicherheitsprüfung reparieren">Aufgabenzähler reparieren</button>
               <button id="sync-conflict-review-button" type="button" onclick="openSyncConflictReview()" hidden
                 class="px-2 py-0.5 rounded-lg border border-rose-500/50 text-rose-200 bg-rose-950/50 text-[10px] font-semibold"
                 title="Ungespeicherte Änderungen ansehen">Konflikt prüfen</button>
@@ -870,7 +885,7 @@
           </div>
 
           <!-- SUB-TAB C: SICHERHEIT & PUSH (MASTER ONLY) -->
-          <div id="settings-panel-benachrichtigungen" class="hidden space-y-5">
+          <div id="settings-panel-benachrichtigungen" class="hidden space-y-5"><div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3"><h3 class="font-semibold text-sm">🔔 Push-Ereignisse</h3><div id="push-preferences-list" class="space-y-2"></div><p id="push-preferences-status" class="text-xs text-amber-300"></p></div>
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
               <h3 class="font-semibold text-sm text-white">🔔 Benachrichtigungen auf diesem Gerät</h3>
               <p class="text-xs text-slate-300">Erlaube Benachrichtigungen für dieses Smartphone. Die Zustellung bei geschlossener App wird separat getestet.</p>
@@ -898,7 +913,7 @@
               </div>
             </div>
           </div>
-          <div id="settings-panel-sicherheit" class="hidden space-y-5">
+          <div id="settings-panel-sicherheit" class="hidden space-y-5"><div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3"><h3 class="font-semibold text-sm">🔔 Push-Ereignisse</h3><div id="master-push-preferences-list" class="space-y-2"></div><p id="master-push-preferences-status" class="text-xs text-amber-300"></p></div>
             <!-- Firebase Live-Sync -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-slate-800 space-y-3.5">
               <div class="flex items-center justify-between">
@@ -1036,8 +1051,9 @@
      */
     const APP_VERSION = '2.11';
     const STORAGE_KEY = 'dominion_app_state_v2';
-    const LEGACY_KEYS = ['dominion_app_state_v2_1', 'dominion_app_state_v1', 'dominion_state'];
+    const LEGACY_KEYS = [];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
+    const PUSH_EVENTS = {chat:'Neue Chatnachrichten',task:'Neue Aufgaben',taskReview:'Aufgaben zur Prüfung',calendar:'Kalendertermine',shopping:'Einkaufsliste',rewards:'Belohnungen und Einlösungen',penalty:'Strafbuch'};
     const SYNC_CONFLICT_DRAFT_KEY = 'dominion_sync_conflict_draft_v1';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
     const DEFAULT_ROOM_CODE = 'D+W Connection';
@@ -1180,6 +1196,7 @@
     let productionRoomLoaded = false;
     let productionSyncConflict = false; // Latch: a later snapshot must not silently unlock writes.
     let lastRemoteState = null;
+    let lastRemoteRawState = null;
     let isApplyingRemoteUpdate = false;
     let messagingInstance = null;
     let testAuthUser = null;
@@ -1213,6 +1230,8 @@
     }
 
     function mergeWithDefaults(incoming) {
+      // Numbering mutates nested management items; never mutate the raw Firebase snapshot.
+      incoming = sanitizeForFirebase(incoming);
       const def = createDefaultState();
       const merged = {
         ...def,
@@ -1255,7 +1274,7 @@
     }
 
     // Keep a separate local recovery copy. Never upload this draft automatically.
-    function saveSyncConflictDraft(key, error, refreshAll = false) {
+    function saveSyncConflictDraft(key, error, refreshAll = false, diagnostic = null) {
       try {
         const previous = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || '{}');
         const drafts = previous && typeof previous.drafts === 'object' && previous.drafts ? previous.drafts : {};
@@ -1277,6 +1296,7 @@
           createdAt: previous.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           reason: error ? 'write-error' : 'write-conflict',
+          diagnostic: diagnostic || previous.diagnostic || null,
           drafts
         }));
         return true;
@@ -1307,6 +1327,31 @@
       }
     }
 
+    // Read-only comparison for known optional defaults in conflict diagnostics.
+    // Do not use this in persistence, transactions or automatic unlocking.
+    function sameConflictReviewValue(key, local, server) {
+      function normalize(value) {
+        const copy = JSON.parse(JSON.stringify(value));
+        if (key === 'activityFeed' && Array.isArray(copy)) {
+          for (const entry of copy) {
+            if (!entry || typeof entry !== 'object') continue;
+            for (const field of ['targetItemId', 'targetSubCategory']) {
+              if (entry[field] === null) delete entry[field];
+            }
+          }
+        }
+        if (key === 'mgmt' && copy && typeof copy === 'object' && Array.isArray(copy.aufgaben)) {
+          for (const task of copy.aufgaben) {
+            if (!task || typeof task !== 'object') continue;
+            if (Array.isArray(task.history) && task.history.length === 0) delete task.history;
+            if (task.reminderMinutes === null) delete task.reminderMinutes;
+          }
+        }
+        return copy;
+      }
+      return sameRemoteValue(normalize(local), normalize(server));
+    }
+
     // Read-only conflict review. No writes, no automatic resolution.
     function buildSyncConflictReview() {
       const raw = localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY);
@@ -1321,11 +1366,12 @@
         const local = saved.drafts[key];
         const server = lastRemoteState && Object.prototype.hasOwnProperty.call(lastRemoteState,key)
           ? lastRemoteState[key] : null;
-        return {key, matchesServer:lastRemoteState ? sameRemoteValue(local,server) : null,
+        return {key, matchesServer:lastRemoteState ? sameConflictReviewValue(key,local,server) : null,
           local:JSON.parse(JSON.stringify(local === undefined ? null : local)),
           server:lastRemoteState ? JSON.parse(JSON.stringify(server)) : null};
       });
       return {status:lastRemoteState ? 'ready' : 'server-unavailable',
+        diagnostic:saved.diagnostic || null,
         createdAt:saved.createdAt || null, updatedAt:saved.updatedAt || null,
         collections};
     }
@@ -1333,6 +1379,532 @@
     function updateSyncConflictReviewButton() {
       const button = document.getElementById('sync-conflict-review-button');
       if (button) button.hidden = !productionSyncConflict;
+      const sevenButton = document.getElementById('sync-counter-seven-button');
+      if (sevenButton) sevenButton.hidden = !productionSyncConflict ||
+        location.hostname !== 'jnilats33.github.io' ||
+        !location.pathname.startsWith('/Dominion-Test/') ||
+        firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM;
+      const recoveryButton = document.getElementById('sync-recovery-test-button');
+      if (recoveryButton) recoveryButton.hidden = !productionSyncConflict ||
+        location.hostname !== 'jnilats33.github.io' ||
+        !location.pathname.startsWith('/Dominion-Test/');
+      const freshButton = document.getElementById('sync-fresh-check-button');
+      if (freshButton) freshButton.hidden = !productionSyncConflict ||
+        location.hostname !== 'jnilats33.github.io' ||
+        !location.pathname.startsWith('/Dominion-Test/');
+      const counterButton = document.getElementById('task-counter-check-button');
+      if (counterButton) counterButton.hidden = productionSyncConflict ||
+        location.hostname !== 'jnilats33.github.io' ||
+        !location.pathname.startsWith('/Dominion-Test/');
+      const repairButton = document.getElementById('task-counter-repair-button');
+      if (repairButton) repairButton.hidden = productionSyncConflict ||
+        location.hostname !== 'jnilats33.github.io' ||
+        !location.pathname.startsWith('/Dominion-Test/');
+    }
+
+    // Selectable, copyable diagnostics. Presentation only; no persistence or Firebase calls.
+    function showTestDiagnosticReport(report) {
+      document.getElementById('test-diagnostic-report-overlay')?.remove();
+      const overlay = document.createElement('div');
+      overlay.id = 'test-diagnostic-report-overlay';
+      overlay.className = 'fixed inset-0 z-[120] bg-black/85 flex items-center justify-center p-3 sm:p-6';
+      const panel = document.createElement('section');
+      panel.className = 'bg-[#151923] border border-sky-500/40 rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-4xl max-h-[94vh] flex flex-col gap-3 text-slate-100';
+      const title = document.createElement('h2');
+      title.className = 'text-lg font-bold text-sky-200';
+      title.textContent = 'Dominion TEST – Diagnosebericht';
+      const field = document.createElement('textarea');
+      field.readOnly = true;
+      field.value = report;
+      field.setAttribute('aria-label', 'Markierbarer Diagnosebericht');
+      field.className = 'w-full min-h-[50vh] h-[68vh] max-h-[75vh] resize-y overflow-auto rounded-xl border border-slate-600 bg-slate-950 text-slate-100 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap';
+      field.style.userSelect = 'text';
+      const actions = document.createElement('div');
+      actions.className = 'flex flex-wrap justify-end gap-2';
+      const copy = document.createElement('button');
+      copy.type = 'button';
+      copy.className = 'px-4 py-2 rounded-lg bg-sky-700 hover:bg-sky-600 font-semibold';
+      copy.textContent = 'Alles kopieren';
+      copy.addEventListener('click', async () => {
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(report);
+          } else {
+            field.focus();
+            field.select();
+            if (!document.execCommand('copy')) throw new Error('Kopieren nicht unterstützt');
+          }
+          copy.textContent = 'Kopiert ✓';
+        } catch (_) {
+          field.focus();
+          field.select();
+          copy.textContent = 'Text markiert – Strg+C';
+        }
+      });
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 font-semibold';
+      close.textContent = 'Schließen';
+      close.addEventListener('click', () => overlay.remove());
+      actions.append(copy, close);
+      panel.append(title, field, actions);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+    }
+
+    // One-off, explicit, guarded repair of the seventh TEST task counter.
+    // Preserve the conflict draft and lock. Never replace unrelated fields.
+    async function repairSeventhCounterTest() {
+      const button = document.getElementById('sync-counter-seven-button');
+      if (button) button.disabled = true;
+      let phase = 'Sicherheitsprüfung';
+      try {
+        if (location.hostname !== 'jnilats33.github.io' ||
+            !location.pathname.startsWith('/Dominion-Test/') ||
+            firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM ||
+            !firebaseDbRef || !testAuthUser || testAuthRole !== 'Master' ||
+            currentRole !== 'Master' || !productionSyncConflict ||
+            pendingCollectionWrites.size || recoveryPending || deadlineTransactionPending)
+          throw new Error('TEST-Sicherheitsbedingungen nicht erfüllt.');
+        const draftText = localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY);
+        const draft = JSON.parse(draftText || 'null');
+        if (!draft?.drafts?.mgmt?.aufgaben || !Array.isArray(draft.drafts.activityFeed))
+          throw new Error('Konfliktentwurf unvollständig.');
+        const roomRef = firebaseDbRef;
+        const baseline = (await roomRef.once('value')).val();
+        const rawTasks = baseline?.mgmt?.aufgaben;
+        const normalized = baseline && mergeWithDefaults(sanitizeForFirebase(baseline));
+        if (!Array.isArray(rawTasks) || rawTasks.length !== 7 ||
+            Number(baseline.mgmtCounters?.aufgaben) !== 6 ||
+            normalized.mgmtCounters.aufgaben !== 7 ||
+            !sameConflictReviewValue('mgmt',draft.drafts.mgmt,normalized.mgmt) ||
+            !sameConflictReviewValue('activityFeed',draft.drafts.activityFeed,normalized.activityFeed))
+          throw new Error('Serverdaten, Zähler oder lokaler Entwurf weichen ab.');
+        const ids = rawTasks.map(t => t?.id);
+        const existing = rawTasks.map(t => t?.itemNumber).filter(Boolean).sort();
+        const expectedSix = Array.from({length:6},(_,i)=>'A-'+String(i+1).padStart(4,'0')).join('|');
+        const expectedSeven = expectedSix + '|A-0007';
+        const missing = rawTasks.filter(t=>!t?.itemNumber);
+        const needsNumber = missing.length === 1 && existing.join('|') === expectedSix;
+        const alreadyNumbered = missing.length === 0 && existing.join('|') === expectedSeven;
+        if (new Set(ids).size !== 7 || ids.some(id=>!id) ||
+            (!needsNumber && !alreadyNumbered))
+          throw new Error('Roh-Aufgabennummern nicht im erwarteten Zustand.');
+        const missingId = needsNumber ? missing[0].id : null;
+        if (!confirm('TEST: Den Aufgabenzähler 6 → 7' +
+            (needsNumber ? ' und die fehlende Nummer A-0007' : '') +
+            ' atomar auf Firebase reparieren? Lokaler Konflikt bleibt gesperrt.')) return;
+        recoveryPending = true;
+        phase = 'Atomare Firebase-Transaktion';
+        const result = await new Promise((resolve,reject) => {
+          roomRef.transaction(current => {
+            if (!current || !sameRemoteValue(current.mgmt,baseline.mgmt) ||
+                !sameRemoteValue(current.mgmtCounters,baseline.mgmtCounters) ||
+                !sameRemoteValue(current.activityFeed,baseline.activityFeed) ||
+                !sameRemoteValue(current.rewardLedger,baseline.rewardLedger) ||
+                !sameRemoteValue(current.deletedRewardKeys,baseline.deletedRewardKeys)) return;
+            const next = sanitizeForFirebase(current);
+            if (needsNumber) {
+              const target = next.mgmt.aufgaben.find(t=>t?.id===missingId);
+              if (!target || target.itemNumber) return;
+              target.itemNumber = 'A-0007';
+            }
+            next.mgmtCounters.aufgaben = 7;
+            return next;
+          },(error,committed)=>error ? reject(error) : resolve(committed),false);
+        });
+        if (!result) throw new Error('Serverstand inzwischen verändert. Keine Reparatur ausgeführt.');
+        phase = 'Frischen Serverstand verifizieren';
+        const verified = (await roomRef.once('value')).val();
+        const numbers = verified?.mgmt?.aufgaben?.map(t=>t?.itemNumber).sort().join('|');
+        if (Number(verified?.mgmtCounters?.aufgaben) !== 7 ||
+            numbers !== expectedSeven ||
+            !sameRemoteValue(verified.activityFeed,baseline.activityFeed) ||
+            !sameRemoteValue(verified.rewardLedger,baseline.rewardLedger))
+          throw new Error('Nachprüfung fehlgeschlagen; Konfliktsperre bleibt bestehen.');
+        showTestDiagnosticReport('TEST – ZÄHLER 7 REPARIERT UND GEPRÜFT\\n' +
+          'Server-Aufgaben: 7\\nServer-Zähler: 7\\nAufgabennummern: A-0001 bis A-0007\\n' +
+          'Konfliktsperre bleibt aktiv. Bitte Serverstand erneut prüfen.');
+      } catch (error) {
+        showTestDiagnosticReport('TEST – ZÄHLERREPARATUR NICHT BESTÄTIGT\\nPhase: '+
+          phase+'\\nGrund: '+(error?.message || String(error))+
+          '\\nKonfliktsperre unverändert. Bitte Bericht senden.');
+      } finally {
+        recoveryPending = false;
+        if (button) button.disabled = false;
+      }
+    }
+
+    // Explicitly approved TEST-only recovery. Preserve the draft and conflict lock
+    // even after a successful write; unlock only through a separate verification.
+    async function recoverOverdueTaskTest() {
+      const button = document.getElementById('sync-recovery-test-button');
+      if (button) button.disabled = true;
+      let phase = 'Sicherheitsprüfung';
+      try {
+        if (location.hostname !== 'jnilats33.github.io' ||
+            !location.pathname.startsWith('/Dominion-Test/') ||
+            firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM ||
+            !firebaseDbRef || !testAuthUser || testAuthRole !== 'Master' ||
+            currentRole !== 'Master' || !productionSyncConflict ||
+            pendingCollectionWrites.size || recoveryPending)
+          throw new Error('TEST-Sicherheitsbedingungen nicht erfüllt.');
+        const draftText = localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY);
+        const draft = JSON.parse(draftText || 'null');
+        if (!draft?.drafts?.mgmt?.aufgaben || !Array.isArray(draft.drafts.rewardLedger))
+          throw new Error('Konfliktentwurf unvollständig.');
+        const baseline = (await firebaseDbRef.once('value')).val();
+        const rawTasks = baseline?.mgmt?.aufgaben;
+        if (!Array.isArray(rawTasks) || rawTasks.length !== 6 ||
+            Number(baseline.mgmtCounters?.aufgaben) !== 5 ||
+            !Array.isArray(baseline.rewardLedger))
+          throw new Error('Serverbestand oder Zähler inzwischen verändert.');
+        const fresh = mergeWithDefaults(sanitizeForFirebase(baseline));
+        const localTasks = draft.drafts.mgmt.aufgaben;
+        const localLedger = draft.drafts.rewardLedger;
+        const localTask = localTasks.find(t => t?.title === 'Badge-Test 1');
+        const remoteTask = localTask && fresh.mgmt.aufgaben.find(t => t.id === localTask.id);
+        const rawTask = localTask && rawTasks.find(t => t.id === localTask.id);
+        const lateKey = localTask && 'task:' + localTask.id + ':late:' + (localTask.cycle || 0);
+        const extra = localLedger.filter(x => x?.id === lateKey);
+        const remoteKeys = new Set(baseline.rewardLedger.map(x => x?.id));
+        const normalizedTask = localTask && {...localTask, status:'open'};
+        if (normalizedTask) delete normalizedTask.history;
+        const otherTasksMatch = localTasks.length === fresh.mgmt.aufgaben.length &&
+          new Set(localTasks.map(t => t.id)).size === 6 &&
+          localTasks.every(t => t.id === localTask?.id ||
+            fresh.mgmt.aufgaben.some(v => v.id === t.id &&
+              sameConflictReviewValue('mgmt',{aufgaben:[t]},{aufgaben:[v]})));
+        const otherCategoriesMatch = ['kleidung','toys','strafen','belohnungen','regeln']
+          .every(k => sameRemoteValue(draft.drafts.mgmt[k],fresh.mgmt[k]));
+        const expectedNumbers = ['A-0001','A-0002','A-0003','A-0004','A-0005','A-0006'];
+        const normalizedNumbers = fresh.mgmt.aufgaben.map(t => t.itemNumber).sort();
+        const missingRaw = rawTasks.filter(t => !t?.itemNumber);
+        if (!localTask || !remoteTask || !rawTask || !otherTasksMatch ||
+            !otherCategoriesMatch || !sameConflictReviewValue('mgmt',
+              {aufgaben:[normalizedTask]},{aufgaben:[remoteTask]}) ||
+            localTask.status !== 'overdue' || remoteTask.status !== 'open' ||
+            !Array.isArray(localTask.history) || localTask.history.length !== 1 ||
+            localTask.history[0]?.event !== 'Frist überschritten' ||
+            extra.length !== 1 || extra[0].amount !== -5 ||
+            remoteKeys.has(lateKey) ||
+            !sameRemoteValue(localLedger.filter(x => x?.id !== lateKey), baseline.rewardLedger) ||
+            missingRaw.length !== 1 || !missingRaw[0]?.id ||
+            normalizedNumbers.join('|') !== expectedNumbers.join('|') ||
+            !sameConflictReviewValue('activityFeed', draft.drafts.activityFeed, fresh.activityFeed) ||
+            (draft.drafts.mgmtCounters &&
+              !sameRemoteValue(draft.drafts.mgmtCounters,fresh.mgmtCounters)))
+          throw new Error('Wiederherstellungsbedingungen nicht mehr vollständig erfüllt.');
+        if (!confirm('Dominion TEST: Genau den geprüften Verspätungsvorgang (Status, Verlauf, -5 Punkte) und die fehlende Aufgabennummer samt Zähler atomar auf Firebase speichern? Konfliktsperre bleibt zunächst aktiv.')) return;
+        if (localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) !== draftText ||
+            !productionSyncConflict || pendingCollectionWrites.size || recoveryPending)
+          throw new Error('Entwurf oder Schreibzustand hat sich verändert.');
+        phase = 'Atomare Servertransaktion';
+        const expected = sanitizeForFirebase(baseline);
+        const target = expected.mgmt.aufgaben.find(t => t.id === localTask.id);
+        target.status = 'overdue';
+        target.history = sanitizeForFirebase(localTask.history);
+        expected.rewardLedger.push(sanitizeForFirebase(extra[0]));
+        expected.mgmt.aufgaben.find(t => t.id === missingRaw[0].id).itemNumber =
+          fresh.mgmt.aufgaben.find(t => t.id === missingRaw[0].id).itemNumber;
+        expected.mgmtCounters.aufgaben = 6;
+        const result = await new Promise((resolve,reject) => {
+          firebaseDbRef.transaction(current => {
+            // Never write a full room against an unknown or stale baseline.
+            if (!current || !sameRemoteValue(current, baseline)) return;
+            return sanitizeForFirebase(expected);
+          }, (error, committed, snapshot) => {
+            if (error) reject(error); else resolve({committed,snapshot});
+          }, false);
+        });
+        if (!result.committed) throw new Error('Serverstand änderte sich oder Transaktion abgebrochen.');
+        phase = 'Ergebnis verifizieren';
+        if (!sameRemoteValue(result.snapshot?.val(), expected))
+          throw new Error('Transaktion bestätigt, Ergebnis nicht identisch. Nicht erneut ausführen.');
+        const verify = (await firebaseDbRef.once('value')).val();
+        if (!sameRemoteValue(verify, expected))
+          throw new Error('Serverstand nach Transaktion verändert. Nicht erneut ausführen.');
+        showTestDiagnosticReport('TEST – WIEDERHERSTELLUNG BESTÄTIGT\\n' +
+          'Badge-Test 1: overdue und Verlauf gespeichert\\n' +
+          'Verspätungsbuchung: -5 gespeichert\\n' +
+          'Aufgabennummer und Zähler: 6 gespeichert\\n' +
+          'Konfliktsperre und lokaler Entwurf bleiben vorerst erhalten.\\n' +
+          'Bitte diese Meldung mitteilen. Keine weiteren Aktionen ausführen.');
+      } catch (error) {
+        showTestDiagnosticReport('TEST – WIEDERHERSTELLUNG NICHT BESTÄTIGT\\n' +
+          'Schritt: ' + phase + '\\nGrund: ' + (error.message || String(error)) +
+          '\\nKonfliktsperre bleibt aktiv. Bitte Meldung mitteilen und nicht erneut klicken.');
+      } finally {
+        if (button) button.disabled = false;
+      }
+    }
+
+    // Read-only: fresh authoritative server snapshot versus preserved conflict draft.
+    async function inspectFreshConflictTest() {
+      const button = document.getElementById('sync-fresh-check-button');
+      if (button) button.disabled = true;
+      try {
+        if (location.hostname !== 'jnilats33.github.io' ||
+            !location.pathname.startsWith('/Dominion-Test/') ||
+            firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM ||
+            !firebaseDbRef || !testAuthUser || testAuthRole !== 'Master' ||
+            currentRole !== 'Master' || !productionSyncConflict)
+          throw new Error('TEST-Sicherheitsbedingungen nicht erfüllt.');
+        const draft = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+        if (!draft?.drafts || typeof draft.drafts !== 'object')
+          throw new Error('Gesicherter Konfliktentwurf fehlt.');
+        const raw = (await firebaseDbRef.once('value')).val();
+        if (!raw?.mgmt || !raw?.basics || !raw?.permissions)
+          throw new Error('Frischer Serverstand unvollständig.');
+        const fresh = mergeWithDefaults(sanitizeForFirebase(raw));
+        const localTasks = draft.drafts.mgmt?.aufgaben;
+        const serverTasks = fresh.mgmt?.aufgaben;
+        const lines = ['TEST – FRISCHER SERVERSTAND (NUR LESEN)',
+          'Konfliktsperre: ' + (productionSyncConflict ? 'aktiv' : 'inaktiv'),
+          'Lokale Aufgaben: ' + (Array.isArray(localTasks) ? localTasks.length : 'keine Liste'),
+          'Server-Aufgaben: ' + (Array.isArray(serverTasks) ? serverTasks.length : 'keine Liste'),
+          'Roher Server-Aufgabenzähler: ' + String(raw.mgmtCounters?.aufgaben ?? '(fehlt)'),
+          'Normalisierter Server-Aufgabenzähler: ' + String(fresh.mgmtCounters?.aufgaben ?? '(fehlt)')];
+        const localById = new Map((Array.isArray(localTasks) ? localTasks : []).map(t => [t.id, t]));
+        const serverById = new Map((Array.isArray(serverTasks) ? serverTasks : []).map(t => [t.id, t]));
+        for (const name of ['Badge-Test 1', 'Badge-test 2']) {
+          const l = [...localById.values()].filter(t => t.title === name);
+          const v = [...serverById.values()].filter(t => t.title === name);
+          lines.push(name + ': lokal=' + l.length + ', Server=' + v.length +
+            ', gleiche IDs=' + (l.length === v.length &&
+              l.every(t => v.some(remote => remote.id === t.id))) +
+            ', gleiche Inhalte=' + (l.length === v.length &&
+              l.every(t => v.some(remote => remote.id === t.id &&
+                sameConflictReviewValue('mgmt', {aufgaben:[t]}, {aufgaben:[remote]})))));
+        }
+        lines.push('Alle Aufgaben-IDs gleich: ' +
+          (localById.size === serverById.size &&
+            [...localById.keys()].every(id => serverById.has(id))));
+        lines.push('Alle Aufgabeninhalte gleich: ' +
+          (localById.size === serverById.size &&
+            [...localById].every(([id,task]) => serverById.has(id) &&
+              sameConflictReviewValue('mgmt', {aufgaben:[task]}, {aufgaben:[serverById.get(id)]}))));
+        for (const key of ['mgmt', 'activityFeed', 'mgmtCounters', 'rewardLedger']) {
+          const present = Object.prototype.hasOwnProperty.call(draft.drafts, key);
+          lines.push(key + ': ' + (present ?
+            (sameConflictReviewValue(key, draft.drafts[key], fresh[key]) ? 'identisch' : 'ABWEICHUNG') :
+            'nicht im Konfliktentwurf'));
+        }
+        // Show only field names and value types, not potentially private contents.
+        const differingFields = (a, b) => {
+          if (!a || typeof a !== 'object' || !b || typeof b !== 'object')
+            return ['(unterschiedliche Struktur)'];
+          return [...new Set([...Object.keys(a), ...Object.keys(b)])]
+            .filter(k => !sameRemoteValue(a[k] ?? null, b[k] ?? null))
+            .map(k => k + ' [lokal:' +
+              (a[k] === undefined ? 'fehlt' : Array.isArray(a[k]) ? 'Liste(' + a[k].length + ')' : typeof a[k]) +
+              ', Server:' +
+              (b[k] === undefined ? 'fehlt' : Array.isArray(b[k]) ? 'Liste(' + b[k].length + ')' : typeof b[k]) + ']');
+        };
+        const localBadge = [...localById.values()].find(t => t.title === 'Badge-Test 1');
+        const serverBadge = localBadge && serverById.get(localBadge.id);
+        if (localBadge && serverBadge)
+          lines.push('Badge-Test 1 – abweichende Felder: ' +
+            (differingFields(localBadge, serverBadge).join(', ') || '(nur Normalisierungsunterschied)'));
+        const localLedger = draft.drafts.rewardLedger;
+        const remoteLedger = fresh.rewardLedger;
+        lines.push('rewardLedger – Struktur: lokal=' +
+          (Array.isArray(localLedger) ? 'Liste(' + localLedger.length + ')' : typeof localLedger) +
+          ', Server=' + (Array.isArray(remoteLedger) ? 'Liste(' + remoteLedger.length + ')' : typeof remoteLedger));
+        if (Array.isArray(localLedger) && Array.isArray(remoteLedger)) {
+          const lid = new Set(localLedger.map(x => x?.id).filter(Boolean));
+          const sid = new Set(remoteLedger.map(x => x?.id).filter(Boolean));
+          lines.push('rewardLedger – nur lokale IDs: ' + [...lid].filter(id => !sid.has(id)).length +
+            ', nur Server-IDs: ' + [...sid].filter(id => !lid.has(id)).length);
+          if (localLedger.length === remoteLedger.length)
+            lines.push('rewardLedger – abweichende Positionen: ' +
+              localLedger.filter((x, i) => !sameRemoteValue(x, remoteLedger[i])).length);
+        }
+        // Detail only for the proven divergent task and ledger entry; no free text.
+        if (localBadge && serverBadge) {
+          lines.push('Badge-Test 1 – Status lokal: ' + String(localBadge.status ?? '(fehlt)') +
+            ', Server: ' + String(serverBadge.status ?? '(fehlt)'));
+          const localHistory = Array.isArray(localBadge.history) ? localBadge.history : [];
+          const serverHistory = Array.isArray(serverBadge.history) ? serverBadge.history : [];
+          lines.push('Badge-Test 1 – Verlauf lokal: ' + localHistory.length +
+            ', Server: ' + serverHistory.length);
+          for (const h of localHistory.slice(0, 5)) {
+            lines.push('Lokaler Verlauf – Felder: ' + Object.keys(h || {}).join(', ') +
+              ', Zeit: ' + String(h?.timestamp ?? h?.at ?? '(nicht vorhanden)') +
+              ', Status: ' + String(h?.status ?? '(nicht vorhanden)'));
+          }
+        }
+        if (Array.isArray(localLedger) && Array.isArray(remoteLedger)) {
+          const remoteIds = new Set(remoteLedger.map(x => x?.id));
+          const extra = localLedger.filter(x => x?.id && !remoteIds.has(x.id));
+          for (const x of extra.slice(0, 5)) {
+            lines.push('Nur lokaler Ledger-Eintrag – ID: ' + String(x.id) +
+              ', Betrag: ' + String(x.amount ?? '(fehlt)') +
+              ', Zeit: ' + String(x.timestamp ?? '(fehlt)') +
+              ', Felder: ' + Object.keys(x).join(', '));
+          }
+        }
+        // Check whether a narrowly scoped recovery could preserve all other server data.
+        // This is a plan only: no writes and no automatic unlocking.
+        const lateKey = localBadge && 'task:' + localBadge.id + ':late:' + (localBadge.cycle || 0);
+        const lateLocal = Array.isArray(localLedger) && localLedger.filter(x => x?.id === lateKey);
+        const lateServer = Array.isArray(remoteLedger) && remoteLedger.filter(x => x?.id === lateKey);
+        const serverRawTask = localBadge && Array.isArray(raw.mgmt?.aufgaben) &&
+          raw.mgmt.aufgaben.find(t => t?.id === localBadge.id);
+        const otherTasksEqual = localById.size === serverById.size &&
+          [...localById].every(([id, task]) => id === localBadge?.id ||
+            (serverById.has(id) &&
+              sameConflictReviewValue('mgmt', {aufgaben:[task]}, {aufgaben:[serverById.get(id)]})));
+        const mgmtOtherCategoriesEqual = ['kleidung','toys','strafen','belohnungen','regeln']
+          .every(key => sameRemoteValue(draft.drafts.mgmt?.[key], fresh.mgmt?.[key]));
+        const localTaskBase = localBadge && {...localBadge, status: serverBadge?.status};
+        if (localTaskBase) delete localTaskBase.history;
+        const onlyStatusAndHistory = !!localBadge && !!serverBadge &&
+          sameConflictReviewValue('mgmt', {aufgaben:[localTaskBase]}, {aufgaben:[serverBadge]});
+        const localLedgerWithoutLate = Array.isArray(localLedger) && lateKey ?
+          localLedger.filter(x => x?.id !== lateKey) : null;
+        const ledgerOnlyLate = Array.isArray(localLedgerWithoutLate) &&
+          Array.isArray(remoteLedger) &&
+          sameRemoteValue(localLedgerWithoutLate, remoteLedger);
+        const expectedLateEvent = !!localBadge && localBadge.status === 'overdue' &&
+          serverBadge?.status === 'open' &&
+          Array.isArray(localBadge.history) && localBadge.history.length === 1 &&
+          localBadge.history[0]?.event === 'Frist überschritten' &&
+          Array.isArray(lateLocal) && lateLocal.length === 1 &&
+          lateLocal[0]?.amount === -5 &&
+          Array.isArray(lateServer) && lateServer.length === 0;
+        const counterRepairNeeded = Array.isArray(raw.mgmt?.aufgaben) &&
+          raw.mgmt.aufgaben.length === 6 && Number(raw.mgmtCounters?.aufgaben) === 5;
+        lines.push('--- VORSCHAU EINER GEZIELTEN WIEDERHERSTELLUNG ---');
+        lines.push('Nur Badge-Test 1 abweichend: ' + otherTasksEqual);
+        lines.push('Andere Verwaltungskategorien identisch: ' + mgmtOtherCategoriesEqual);
+        lines.push('Badge-Test 1 nur Status/Verlauf verändert: ' + onlyStatusAndHistory);
+        lines.push('Ledger nur um diese Verspätungsbuchung ergänzt: ' + ledgerOnlyLate);
+        lines.push('Verspätungsvorgang vollständig plausibel: ' + expectedLateEvent);
+        lines.push('Zähler 5 bei sechs Aufgaben: ' + counterRepairNeeded);
+        lines.push('Rohaufgabe vorhanden: ' + !!serverRawTask);
+        lines.push('Wiederherstellungskandidat: ' +
+          (otherTasksEqual && mgmtOtherCategoriesEqual && onlyStatusAndHistory &&
+           ledgerOnlyLate && expectedLateEvent && counterRepairNeeded && !!serverRawTask ?
+           'JA – weitere technische Prüfung erforderlich' : 'NEIN – manuell untersuchen'));
+        lines.push('KEINE DATEN GESCHRIEBEN. Konfliktsperre unverändert.');
+        showTestDiagnosticReport(lines.join('\n'));
+      } catch (error) {
+        showTestDiagnosticReport('TEST-Serverprüfung abgebrochen: ' + (error.message || String(error)) +
+          '\nKEINE DATEN GESCHRIEBEN.');
+      } finally {
+        if (button) button.disabled = false;
+      }
+    }
+
+    // TEST-only follow-up after conflict resolution. Reads a fresh server snapshot.
+    async function inspectTaskCounterTest() {
+      const button = document.getElementById('task-counter-check-button');
+      if (button) button.disabled = true;
+      try {
+        if (location.hostname !== 'jnilats33.github.io' ||
+            !location.pathname.startsWith('/Dominion-Test/') ||
+            firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM ||
+            !firebaseDbRef || !testAuthUser || testAuthRole !== 'Master' ||
+            currentRole !== 'Master' || productionSyncConflict)
+          throw new Error('TEST-Sicherheitsbedingungen nicht erfüllt.');
+        const raw = (await firebaseDbRef.once('value')).val();
+        if (!raw || !Array.isArray(raw.mgmt?.aufgaben))
+          throw new Error('Serveraufgaben nicht verfügbar.');
+        const normalized = mergeWithDefaults(sanitizeForFirebase(raw));
+        const rawTasks = raw.mgmt.aufgaben;
+        const numberedTasks = normalized.mgmt.aufgaben;
+        const ids = rawTasks.map(t => t?.id);
+        const rawNumbers = rawTasks.map(t => t?.itemNumber || '(ohne Nummer)');
+        const numberedNumbers = numberedTasks.map(t => t?.itemNumber || '(ohne Nummer)');
+        const expected = numberedTasks.map((_, i) => 'A-' + String(i + 1).padStart(4, '0'));
+        const report = [
+          'TEST – Aufgabenzähler prüfen (NUR LESEN)',
+          'Serveraufgaben: ' + rawTasks.length,
+          'Roher Server-Zähler: ' + String(raw.mgmtCounters?.aufgaben ?? '(fehlt)'),
+          'Normalisierter Zähler: ' + String(normalized.mgmtCounters?.aufgaben ?? '(fehlt)'),
+          'Aufgaben-IDs eindeutig: ' + (new Set(ids).size === ids.length && ids.every(Boolean)),
+          'Rohe Nummern: ' + rawNumbers.join(', '),
+          'Normalisierte Nummern: ' + numberedNumbers.join(', '),
+          'Normalisierte Nummern vollständig A-0001 bis A-' + String(numberedTasks.length).padStart(4, '0') +
+            ': ' + (numberedNumbers.slice().sort().join('|') === expected.sort().join('|')),
+          'Konfliktsperre: ' + (productionSyncConflict ? 'aktiv' : 'inaktiv'),
+          'KEINE DATEN GESCHRIEBEN.'
+        ].join('\n');
+        alert(report);
+      } catch (error) {
+        alert('TEST-Aufgabenzählerprüfung abgebrochen: ' + (error.message || String(error)) +
+          '\nKEINE DATEN GESCHRIEBEN.');
+      } finally {
+        if (button) button.disabled = false;
+      }
+    }
+
+    // Explicit user-triggered TEST-only repair; guarded atomic root transaction.
+    async function repairTaskCounterTest() {
+      const button = document.getElementById('task-counter-repair-button');
+      if (button) button.disabled = true;
+      let phase = 'Sicherheitsprüfung';
+      try {
+        if (location.hostname !== 'jnilats33.github.io' ||
+            !location.pathname.startsWith('/Dominion-Test/') ||
+            firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM ||
+            !firebaseDbRef || !testAuthUser || testAuthRole !== 'Master' ||
+            currentRole !== 'Master' || productionSyncConflict ||
+            pendingCollectionWrites.size || recoveryPending)
+          throw new Error('TEST-Sicherheitsbedingungen nicht erfüllt oder Schreibvorgang aktiv.');
+        const baseline = (await firebaseDbRef.once('value')).val();
+        const tasks = baseline?.mgmt?.aufgaben;
+        if (!Array.isArray(tasks) || tasks.length !== 5 ||
+            Number(baseline.mgmtCounters?.aufgaben) !== 4)
+          throw new Error('Aufgabenanzahl oder Zähler nicht mehr wie geprüft.');
+        const missing = tasks.filter(t => !t?.itemNumber);
+        const numbered = tasks.filter(t => t?.itemNumber).map(t => t.itemNumber).sort();
+        if (missing.length !== 1 || !missing[0]?.id ||
+            new Set(tasks.map(t => t?.id)).size !== 5 ||
+            numbered.join('|') !== 'A-0001|A-0002|A-0003|A-0004')
+          throw new Error('IDs oder vorhandene Aufgabennummern weichen ab.');
+        const normalized = mergeWithDefaults(sanitizeForFirebase(baseline));
+        const normalizedMissing = normalized.mgmt.aufgaben.find(t => t.id === missing[0].id);
+        if (normalizedMissing?.itemNumber !== 'A-0005' ||
+            normalized.mgmtCounters?.aufgaben !== 5)
+          throw new Error('Normalisierung ergibt nicht A-0005 und Zähler 5.');
+        if (!confirm('Dominion TEST: Genau einer bestehenden Aufgabe A-0005 zuweisen und den Zähler von 4 auf 5 setzen? Alle übrigen Daten bleiben unverändert.')) return;
+        if (productionSyncConflict || pendingCollectionWrites.size || recoveryPending)
+          throw new Error('Zwischenzeitlich neuer Konflikt oder Schreibvorgang.');
+        phase = 'Atomare Firebase-Transaktion';
+        let rejection = 'Serverstand zwischenzeitlich verändert.';
+        const result = await new Promise((resolve,reject) => {
+          firebaseDbRef.transaction(current => {
+            if (!current ||
+                !sameRemoteValue(current.mgmt?.aufgaben, baseline.mgmt.aufgaben) ||
+                !sameRemoteValue(current.mgmtCounters, baseline.mgmtCounters)) return;
+            const next = sanitizeForFirebase(current);
+            const target = next.mgmt.aufgaben.find(t => t.id === missing[0].id);
+            if (!target || target.itemNumber) return;
+            target.itemNumber = 'A-0005';
+            next.mgmtCounters.aufgaben = 5;
+            return next;
+          }, (error,committed,snapshot) => {
+            if (error) reject(error); else resolve({committed,snapshot});
+          }, false);
+        });
+        if (!result.committed) throw new Error(rejection);
+        phase = 'Schreibergebnis prüfen';
+        const after = result.snapshot?.val();
+        const expected = sanitizeForFirebase(baseline);
+        expected.mgmt.aufgaben.find(t => t.id === missing[0].id).itemNumber = 'A-0005';
+        expected.mgmtCounters.aufgaben = 5;
+        if (!sameRemoteValue(after, expected))
+          throw new Error('Transaktion bestätigt, aber Ergebnis weicht ab. Bitte nicht wiederholen.');
+        alert('TEST-Reparatur erfolgreich: A-0005 gespeichert und Zähler 5. Bitte Aufgabenzähler erneut prüfen.');
+      } catch (error) {
+        alert('TEST-Reparatur nicht bestätigt. Schritt: ' + phase +
+          '. Grund: ' + (error.message || String(error)) +
+          '. Bitte diese Meldung mitteilen und nicht wiederholen.');
+      } finally {
+        if (button) button.disabled = false;
+      }
     }
 
     // Intentionally read-only: the review does not delete drafts, unlock
@@ -1358,6 +1930,12 @@
             ? 'Der lokale Konfliktentwurf ist nicht lesbar. Keine Änderungen vornehmen; Datenbestand sichern.'
             : 'Kein Konfliktentwurf gefunden.';
       panel.appendChild(info);
+      if (review.diagnostic) {
+        const diagnostic = document.createElement('pre');
+        diagnostic.className = 'text-xs whitespace-pre-wrap break-all mb-4 p-3 bg-black/30 rounded';
+        diagnostic.textContent = 'Schreibfehler-Diagnose (ohne Dateninhalte):\n' + JSON.stringify(review.diagnostic, null, 2);
+        panel.appendChild(diagnostic);
+      }
       for (const item of review.collections) {
         const section = document.createElement('section');
         section.className = 'border border-slate-700 rounded-xl p-3 mb-3';
@@ -1383,6 +1961,481 @@
       close.textContent = 'Schließen (keine Änderungen)';
       close.addEventListener('click',()=>backdrop.remove());
       panel.appendChild(close);
+      // TEST-only read-only preview for recovering the missing Push-Test 4 task.
+      if (productionSyncConflict && firebaseDbRef && testAuthUser &&
+          testAuthRole === 'Master' && currentRole === 'Master' &&
+          location.hostname === 'jnilats33.github.io' &&
+          location.pathname.startsWith('/Dominion-Test/') &&
+          firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM) {
+        const preview = document.createElement('button');
+        preview.type = 'button';
+        preview.className = 'ml-2 mt-2 px-4 py-2 rounded-lg border border-sky-500 text-sky-200 text-sm';
+        preview.textContent = 'Push-Test 4: Wiederherstellung prüfen (nur lesen)';
+        preview.addEventListener('click', async () => {
+          preview.disabled = true;
+          try {
+            const draft = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+            const localTasks = draft?.drafts?.mgmt?.aufgaben;
+            const live = (await firebaseDbRef.once('value')).val();
+            const serverTasks = live?.mgmt?.aufgaben;
+            if (!Array.isArray(localTasks) || !Array.isArray(serverTasks))
+              throw new Error('Entwurf oder Server-Aufgabenliste fehlt.');
+            const candidates = localTasks.filter(t => t?.title === 'Push-Test 4');
+            if (candidates.length !== 1 || !candidates[0].id)
+              throw new Error('Push-Test 4 im Entwurf nicht eindeutig.');
+            const task = candidates[0];
+            const localIds = new Set(localTasks.map(t => t?.id));
+            const serverIds = new Set(serverTasks.map(t => t?.id));
+            const missing = localTasks.filter(t => !serverIds.has(t?.id));
+            const serverOnly = serverTasks.filter(t => !localIds.has(t?.id));
+            // The raw server counter can lag behind display-assigned numbers.
+            // Normalize a deep copy for inspection; never mutate the live snapshot.
+            const numbered = mergeWithDefaults(sanitizeForFirebase(live));
+            const numberedTasks = numbered.mgmt?.aufgaben || [];
+            const usedNumbers = numberedTasks.map(t => t?.itemNumber).filter(Boolean);
+            const maxNumber = Math.max(0, Number(numbered.mgmtCounters?.aufgaben) || 0,
+              ...usedNumbers.map(n => /^A-\d+$/.test(n) ? Number(n.slice(2)) : 0));
+            const proposedNumber = 'A-' + String(maxNumber + 1).padStart(4,'0');
+            const safe = missing.length === 1 && missing[0].id === task.id &&
+              serverOnly.length === 0 && !serverIds.has(task.id) &&
+              !usedNumbers.includes(task.itemNumber) &&
+              serverTasks.every(t => localTasks.some(l => l.id === t.id));
+            alert([
+              'TEST – Wiederherstellungsvorschau (NUR LESEN)',
+              'Aufgabe: ' + task.title,
+              'ID: ' + task.id,
+              'Aufgaben Server / Lokal: ' + serverTasks.length + ' / ' + localTasks.length,
+              'Nur lokal vorhandene Aufgaben: ' + missing.length,
+              'Nur auf Server vorhandene Aufgaben: ' + serverOnly.length,
+              'Nummer im Entwurf: ' + (task.itemNumber || 'keine'),
+              'Serverzähler: ' + String(live.mgmtCounters?.aufgaben ?? 'fehlt'),
+              'Nächste freie Nummer nach Maximalwert: ' + proposedNumber,
+              'Eindeutige Wiederherstellungskandidatin: ' + (safe ? 'JA' : 'NEIN'),
+              'KEINE DATEN GESCHRIEBEN. KONFLIKTSPERRE UNVERÄNDERT.'
+            ].join('\n'));
+          } catch (error) {
+            alert('Vorschau fehlgeschlagen (keine Änderungen): ' + error.message);
+          } finally { preview.disabled = false; }
+        });
+        panel.appendChild(preview);
+      }
+      if (productionSyncConflict && firebaseDbRef && testAuthUser &&
+          testAuthRole === 'Master' && currentRole === 'Master' &&
+          location.hostname === 'jnilats33.github.io' &&
+          location.pathname.startsWith('/Dominion-Test/') &&
+          firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM) {
+        const restore = document.createElement('button');
+        restore.type = 'button';
+        restore.className = 'ml-2 mt-2 px-4 py-2 rounded-lg border border-amber-500 text-amber-200 text-sm';
+        restore.textContent = 'Push-Test 4 gezielt wiederherstellen';
+        restore.addEventListener('click', async () => {
+          if (!confirm('Nur Push-Test 4 in den isolierten TEST-Raum übertragen? Die Konfliktsperre bleibt bestehen.')) return;
+          restore.disabled = true;
+          try { await restorePushTest4Safely(); }
+          finally { restore.disabled = false; }
+        });
+        panel.appendChild(restore);
+      }
+      if (productionSyncConflict && firebaseDbRef && testAuthUser &&
+          testAuthRole === 'Master' && currentRole === 'Master' &&
+          location.hostname === 'jnilats33.github.io' &&
+          location.pathname.startsWith('/Dominion-Test/') &&
+          firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM) {
+        const audit = document.createElement('button');
+        audit.type = 'button';
+        audit.className = 'ml-2 mt-2 px-4 py-2 rounded-lg border border-sky-500 text-sky-200 text-sm';
+        audit.textContent = 'Abschlussprüfung nach Wiederherstellung (nur lesen)';
+        audit.addEventListener('click', async () => {
+          audit.disabled = true;
+          try {
+            const saved = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+            if (!saved?.drafts || typeof saved.drafts !== 'object')
+              throw new Error('Konfliktentwurf nicht lesbar.');
+            const raw = (await firebaseDbRef.once('value')).val();
+            if (!raw?.mgmt || !Array.isArray(raw.mgmt.aufgaben))
+              throw new Error('Server-Verwaltung nicht vollständig.');
+            const normalized = mergeWithDefaults(sanitizeForFirebase(raw));
+            const tasks = raw.mgmt.aufgaben;
+            const targetId = 'task-1795361950892-zvm0g';
+            const restored = tasks.filter(t => t?.id === targetId);
+            const draftTasks = saved.drafts.mgmt?.aufgaben;
+            const localTask = Array.isArray(draftTasks) ? draftTasks.find(t=>t?.id===targetId) : null;
+            const lines = [
+              'TEST – Abschlussprüfung (NUR LESEN)',
+              'Serveraufgaben: ' + tasks.length,
+              'Push-Test 4 auf Server (Anzahl): ' + restored.length,
+              'Nummer: ' + (restored[0]?.itemNumber || 'fehlt'),
+              'Server-Aufgabenzähler: ' + String(raw.mgmtCounters?.aufgaben ?? 'fehlt'),
+              'Wiederhergestellte Aufgabe inhaltlich gleich: ' +
+                (restored.length===1 && !!localTask && sameRemoteValue(restored[0],localTask)),
+              '--- Konfliktentwurf gegenüber Server (normalisiert) ---'
+            ];
+            const forbidden = new Set(['chat','chatV2','firebase','fcmToken','version']);
+            for (const key of Object.keys(saved.drafts).filter(k=>!forbidden.has(k)).sort()) {
+              if (key === 'mgmt') {
+                for (const category of MGMT_CATEGORIES.map(c=>c.id)) {
+                  const local = saved.drafts.mgmt?.[category] || [];
+                  const remote = normalized.mgmt?.[category] || [];
+                  lines.push('mgmt.' + category + ': ' +
+                    (sameRemoteValue(local,remote) ? 'GLEICH' : 'UNTERSCHIEDLICH') +
+                    ' (' + local.length + ' / ' + remote.length + ')');
+                }
+              } else {
+                lines.push(key + ': ' +
+                  (sameRemoteValue(saved.drafts[key],normalized[key]) ? 'GLEICH' : 'UNTERSCHIEDLICH'));
+              }
+            }
+            // Report only structural differences, never private values.
+            const fieldDiff = (a,b) => {
+              const left = a && typeof a === 'object' ? a : {};
+              const right = b && typeof b === 'object' ? b : {};
+              return [...new Set([...Object.keys(left),...Object.keys(right)])]
+                .filter(k => !sameRemoteValue(left[k],right[k])).sort();
+            };
+            lines.push('--- Aufgaben: Unterschiede je ID (nur Feldnamen) ---');
+            if (Array.isArray(draftTasks)) {
+              const localById = new Map(draftTasks.map(t=>[t.id,t]));
+              const serverById = new Map(normalized.mgmt.aufgaben.map(t=>[t.id,t]));
+              for (const id of new Set([...localById.keys(),...serverById.keys()])) {
+                const left = localById.get(id), right = serverById.get(id);
+                if (!left || !right) {
+                  lines.push((id===targetId?'Push-Test 4':'Andere Aufgabe')+': nur '+(left?'lokal':'Server'));
+                } else {
+                  const fields = fieldDiff(left,right);
+                  if (fields.length) lines.push((id===targetId?'Push-Test 4':'Andere Aufgabe')+
+                    ': abweichende Felder: '+fields.join(', '));
+                }
+              }
+            }
+            lines.push('--- Aufgabenzähler (nur Zahlen) ---');
+            lines.push('Lokal: '+String(saved.drafts.mgmtCounters?.aufgaben ?? 'nicht im Entwurf')+
+              ' / Server: '+String(raw.mgmtCounters?.aufgaben ?? 'fehlt'));
+            lines.push('--- Aktivitätsverlauf (nur Struktur) ---');
+            const localFeed = saved.drafts.activityFeed;
+            const serverFeed = normalized.activityFeed;
+            if (Array.isArray(localFeed) && Array.isArray(serverFeed)) {
+              lines.push('Einträge Lokal / Server: '+localFeed.length+' / '+serverFeed.length);
+              const identity = x => String(x?.id ?? '') || JSON.stringify([x?.timestamp,x?.type]);
+              const localKeys = localFeed.map(identity), serverKeys = serverFeed.map(identity);
+              lines.push('Nur lokal / nur Server (nach ID bzw. Zeit und Typ): '+
+                localKeys.filter(k=>!serverKeys.includes(k)).length+' / '+
+                serverKeys.filter(k=>!localKeys.includes(k)).length);
+              lines.push('Gleiche Reihenfolge: '+(localKeys.join('|')===serverKeys.join('|')));
+            } else lines.push('Mindestens eine Seite ist keine Liste.');
+            lines.push('--- Aktivitätsverlauf: Feldvergleich (ohne Inhalte) ---');
+            if (Array.isArray(localFeed) && Array.isArray(serverFeed)) {
+              const identity = x => String(x?.id ?? '') || JSON.stringify([x?.timestamp,x?.type]);
+              const remoteGroups = new Map();
+              for (const entry of serverFeed) {
+                const key = identity(entry);
+                if (!remoteGroups.has(key)) remoteGroups.set(key,[]);
+                remoteGroups.get(key).push(entry);
+              }
+              let equal = 0, changed = 0, missing = 0;
+              const changedFields = new Map();
+              for (const entry of localFeed) {
+                const group = remoteGroups.get(identity(entry));
+                if (!group?.length) { missing++; continue; }
+                const remoteEntry = group.shift();
+                if (sameRemoteValue(entry,remoteEntry)) { equal++; continue; }
+                changed++;
+                for (const field of fieldDiff(entry,remoteEntry))
+                  changedFields.set(field,(changedFields.get(field)||0)+1);
+              }
+              const extraRemote = [...remoteGroups.values()].reduce((sum,g)=>sum+g.length,0);
+              lines.push('Inhaltlich gleich: '+equal);
+              lines.push('Gleiche Identität, abweichende Felder: '+changed);
+              lines.push('Nur lokal / nur Server: '+missing+' / '+extraRemote);
+              lines.push('Abweichende Feldnamen (Anzahl): '+
+                ([...changedFields].map(([k,n])=>k+' ('+n+')').join(', ') || 'keine'));
+            }
+            lines.push('--- Aufgaben: Vergleich ohne Nummerierung ---');
+            if (Array.isArray(draftTasks)) {
+              const withoutNumber = t => {
+                if (!t || typeof t !== 'object') return t;
+                const copy = {...t};
+                delete copy.itemNumber;
+                return copy;
+              };
+              const byId = new Map(normalized.mgmt.aufgaben.map(t=>[t.id,t]));
+              lines.push('Alle Aufgaben ohne itemNumber gleich: '+
+                (draftTasks.length===byId.size && draftTasks.every(t=>byId.has(t.id) &&
+                  sameRemoteValue(withoutNumber(t),withoutNumber(byId.get(t.id))))));
+            }
+            lines.push('--- Präzisionsprüfung (ohne private Inhalte) ---');
+            const kind = v => v === undefined ? 'fehlt' : v === null ? 'null' :
+              Array.isArray(v) ? 'Liste' : typeof v;
+            const describe = (a,b,prefix,depth=0) => {
+              if (sameRemoteValue(a,b)) return [];
+              if (depth >= 4 || a === null || b === null ||
+                  typeof a !== 'object' || typeof b !== 'object' ||
+                  Array.isArray(a) !== Array.isArray(b)) {
+                return [prefix+' ['+kind(a)+' / '+kind(b)+']'];
+              }
+              const keys = new Set([...Object.keys(a||{}),...Object.keys(b||{})]);
+              const differences = [];
+              for (const key of keys) {
+                if (sameRemoteValue(a?.[key],b?.[key])) continue;
+                // Field names only. Never report values or content.
+                differences.push(...describe(a?.[key],b?.[key],prefix+'.'+key,depth+1));
+              }
+              return differences.length ? differences : [prefix+' [Darstellungsunterschied]'];
+            };
+            if (Array.isArray(draftTasks)) {
+              const serverTasks = new Map(normalized.mgmt.aufgaben.map(t=>[t.id,t]));
+              let idx = 0;
+              for (const task of draftTasks) {
+                idx++;
+                const serverTask = serverTasks.get(task.id);
+                if (!serverTask) { lines.push('Aufgabe '+idx+': nicht auf Server'); continue; }
+                const differences = describe(task,serverTask,'Aufgabe '+idx);
+                if (differences.length) lines.push(...differences.slice(0,25));
+              }
+            }
+            if (Array.isArray(localFeed) && Array.isArray(serverFeed)) {
+              const identity = x => String(x?.id ?? '') || JSON.stringify([x?.timestamp,x?.type]);
+              const groups = new Map();
+              for (const item of serverFeed) {
+                const key=identity(item);
+                if(!groups.has(key)) groups.set(key,[]);
+                groups.get(key).push(item);
+              }
+              let idx=0;
+              for (const item of localFeed) {
+                idx++;
+                const group=groups.get(identity(item));
+                if (!group?.length) continue;
+                const other=group.shift();
+                if (!sameRemoteValue(item,other)) {
+                  lines.push('Aktivität '+idx+': '+describe(item,other,'Eintrag').slice(0,20).join(', '));
+                }
+              }
+            }
+            if (saved.drafts.mgmtCounters)
+              lines.push(...describe(saved.drafts.mgmtCounters,normalized.mgmtCounters,'Zähler').slice(0,20));
+            lines.push('--- Technische Gleichheitsprüfung (nur Metadaten) ---');
+            const shape = v => ({
+              type: v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v,
+              keys: v && typeof v === 'object' ? Object.keys(v).length : 0,
+              jsonLength: JSON.stringify(v)?.length ?? -1,
+              canonicalLength: JSON.stringify(canonicalRemoteValue(v))?.length ?? -1
+            });
+            const inspect = (label,a,b) => {
+              const ca = JSON.stringify(canonicalRemoteValue(a));
+              const cb = JSON.stringify(canonicalRemoteValue(b));
+              let at = 0;
+              while (at < Math.min(ca?.length ?? 0,cb?.length ?? 0) && ca[at]===cb[at]) at++;
+              lines.push(label+': '+JSON.stringify({
+                equal: ca===cb,
+                local: shape(a),server: shape(b),
+                firstDifferentCharacter: ca===cb ? -1 : at,
+                localIsArray: Array.isArray(a),serverIsArray: Array.isArray(b)
+              }));
+            };
+            if (Array.isArray(draftTasks)) {
+              const serverTasks = new Map(normalized.mgmt.aufgaben.map(t=>[t.id,t]));
+              draftTasks.forEach((t,i)=>{
+                const other = serverTasks.get(t.id);
+                if (other && !sameRemoteValue(t,other)) inspect('Aufgabe '+(i+1),t,other);
+              });
+            }
+            if (Array.isArray(localFeed) && Array.isArray(serverFeed)) {
+              const identity = x => String(x?.id ?? '') || JSON.stringify([x?.timestamp,x?.type]);
+              const groups = new Map();
+              for (const item of serverFeed) {
+                const key=identity(item);
+                if(!groups.has(key)) groups.set(key,[]);
+                groups.get(key).push(item);
+              }
+              localFeed.forEach((item,i)=>{
+                const group=groups.get(identity(item));
+                if (!group?.length) return;
+                const other=group.shift();
+                if (!sameRemoteValue(item,other)) inspect('Aktivität '+(i+1),item,other);
+              });
+            }
+            if (saved.drafts.mgmtCounters)
+              inspect('Zähler',saved.drafts.mgmtCounters,normalized.mgmtCounters);
+            lines.push('--- Fehlende Felder und Zähler (gezielt, nur lesen) ---');
+            const reportKeys = (label,local,remote) => {
+              if (!local || !remote || typeof local !== 'object' || typeof remote !== 'object') {
+                lines.push(label+': Vergleich nicht möglich'); return;
+              }
+              const lk=Object.keys(local), rk=Object.keys(remote);
+              const onlyLocal=lk.filter(k=>!Object.prototype.hasOwnProperty.call(remote,k));
+              const onlyRemote=rk.filter(k=>!Object.prototype.hasOwnProperty.call(local,k));
+              lines.push(label+' nur lokal vorhandene Feldnamen: '+(onlyLocal.join(', ')||'keine'));
+              lines.push(label+' nur auf Server vorhandene Feldnamen: '+(onlyRemote.join(', ')||'keine'));
+              for (const k of onlyLocal) {
+                const v=local[k];
+                lines.push(label+'.'+k+' lokal: '+(v===null?'null':Array.isArray(v)?'Liste ('+v.length+')':typeof v)+
+                  (v===null?' (leer)':''));
+              }
+            };
+            if (Array.isArray(draftTasks)) {
+              const byId = new Map(normalized.mgmt.aufgaben.map(t=>[t.id,t]));
+              draftTasks.forEach((task,i)=>{
+                const remote=byId.get(task.id);
+                if(remote && !sameRemoteValue(task,remote)) reportKeys('Aufgabe '+(i+1),task,remote);
+              });
+            }
+            if (Array.isArray(localFeed) && Array.isArray(serverFeed)) {
+              const identity=x=>String(x?.id??'')||JSON.stringify([x?.timestamp,x?.type]);
+              const groups=new Map();
+              for(const item of serverFeed) {
+                const k=identity(item);
+                if(!groups.has(k)) groups.set(k,[]);
+                groups.get(k).push(item);
+              }
+              localFeed.forEach((item,i)=>{
+                const group=groups.get(identity(item));
+                if(!group?.length)return;
+                const other=group.shift();
+                if(!sameRemoteValue(item,other))reportKeys('Aktivität '+(i+1),item,other);
+              });
+            }
+            const localCounters=saved.drafts.mgmtCounters||{};
+            const remoteCounters=normalized.mgmtCounters||{};
+            for(const key of new Set([...Object.keys(localCounters),...Object.keys(remoteCounters)])) {
+              if(!sameRemoteValue(localCounters[key],remoteCounters[key]))
+                lines.push('Zähler '+key+': lokal '+String(localCounters[key]??'fehlt')+
+                  ' / normalisierter Server '+String(remoteCounters[key]??'fehlt')+
+                  ' / roher Server '+String(raw.mgmtCounters?.[key]??'fehlt'));
+            }
+            lines.push('--- Aufgaben-Nummern: Rohserver / Lokal / Normalisiert ---');
+            if (Array.isArray(draftTasks)) {
+              const rawById=new Map((raw.mgmt?.aufgaben||[]).map(t=>[t.id,t]));
+              const normalizedById=new Map((normalized.mgmt?.aufgaben||[]).map(t=>[t.id,t]));
+              draftTasks.forEach((task,i)=>{
+                const rawTask=rawById.get(task.id);
+                const normTask=normalizedById.get(task.id);
+                lines.push('Aufgabe '+(i+1)+': lokal '+
+                  String(task.itemNumber??'(keine)')+' / Rohserver '+
+                  String(rawTask?.itemNumber??'(keine)')+' / normalisiert '+
+                  String(normTask?.itemNumber??'(keine)'));
+              });
+              const rawNums=(raw.mgmt?.aufgaben||[]).map(t=>t.itemNumber).filter(Boolean);
+              lines.push('Rohserver-Nummern eindeutig: '+(new Set(rawNums).size===rawNums.length));
+            }
+            lines.push('KEINE DATEN GESCHRIEBEN. KONFLIKTSPERRE BLEIBT AKTIV.');
+            const report = lines.join('\n');
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 z-[120] bg-black/90 flex items-center justify-center p-4';
+            const pane = document.createElement('section');
+            pane.className = 'bg-[#151923] border border-sky-500 rounded-xl p-5 w-full max-w-2xl text-slate-100';
+            const heading = document.createElement('h2');
+            heading.textContent = 'Abschlussprüfung – nur lesen';
+            heading.className = 'font-bold mb-3';
+            const pre = document.createElement('pre');
+            pre.className = 'text-xs whitespace-pre-wrap break-all max-h-[60vh] overflow-auto bg-black/30 p-3 rounded';
+            pre.textContent = report;
+            const copy = document.createElement('button');
+            copy.textContent = 'Bericht kopieren';
+            copy.className = 'mt-3 mr-3 px-3 py-2 rounded bg-sky-700';
+            copy.onclick = () => navigator.clipboard.writeText(report).then(()=>copy.textContent='Kopiert').catch(()=>copy.textContent='Bitte Text markieren');
+            const close = document.createElement('button');
+            close.textContent = 'Schließen';
+            close.className = 'mt-3 px-3 py-2 rounded border border-slate-600';
+            close.onclick = () => overlay.remove();
+            pane.append(heading,pre,copy,close);
+            overlay.appendChild(pane);
+            document.body.appendChild(overlay);
+          } catch(error) {
+            alert('Abschlussprüfung nicht möglich: ' + (error.message || String(error)));
+          } finally { audit.disabled = false; }
+        });
+        panel.appendChild(audit);
+      }
+      if (productionSyncConflict && firebaseDbRef && testAuthUser &&
+          testAuthRole === 'Master' && currentRole === 'Master' &&
+          location.hostname === 'jnilats33.github.io' &&
+          location.pathname.startsWith('/Dominion-Test/') &&
+          firebaseRoomPathPending === DEVELOPMENT_TEST_ROOM) {
+        const fixNumbers = document.createElement('button');
+        fixNumbers.type = 'button';
+        fixNumbers.className = 'ml-2 mt-2 px-4 py-2 rounded-lg border border-emerald-500 text-emerald-200 text-sm';
+        fixNumbers.textContent = 'Fehlende Aufgabennummern gezielt ergänzen (TEST)';
+        fixNumbers.addEventListener('click', async () => {
+          if (recoveryPending || pendingCollectionWrites.size) {
+            alert('Reparatur gesperrt: Noch ein Vorgang aktiv.'); return;
+          }
+          if (!confirm('Nur die zwei fehlenden Aufgabennummern A-0002 und A-0003 in TEST ergänzen? Konfliktsperre bleibt bestehen.')) return;
+          recoveryPending = true;
+          fixNumbers.disabled = true;
+          let failure = 'Unbekannte Abweichung';
+          try {
+            const draft = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+            const localTasks = draft?.drafts?.mgmt?.aufgaben;
+            if (!Array.isArray(localTasks) || localTasks.length !== 4)
+              throw new Error('Lokaler Aufgabenentwurf fehlt oder hat sich verändert.');
+            const baseline = (await firebaseDbRef.once('value')).val();
+            const tasks = baseline?.mgmt?.aufgaben;
+            if (!Array.isArray(tasks) || tasks.length !== 4 ||
+                Number(baseline.mgmtCounters?.aufgaben) !== 4)
+              throw new Error('Serveraufgaben oder Zähler nicht wie erwartet.');
+            const localById = new Map(localTasks.map(t=>[t.id,t]));
+            if (localById.size !== 4 || new Set(tasks.map(t=>t.id)).size !== 4 ||
+                tasks.some(t=>!localById.has(t.id)))
+              throw new Error('Aufgaben-IDs stimmen nicht überein.');
+            const expected = new Map();
+            const used = new Set();
+            for (const task of tasks) {
+              const local = localById.get(task.id);
+              const stripNumber = t => { const copy={...t}; delete copy.itemNumber; return copy; };
+              const normalizeOptionalEmptyFields = t => {
+                const copy = stripNumber(t);
+                // Firebase omits null/empty optional fields. Ignore only these
+                // two known empty defaults; compare all other task data strictly.
+                if (Array.isArray(copy.history) && copy.history.length === 0) delete copy.history;
+                if (copy.reminderMinutes === null) delete copy.reminderMinutes;
+                return copy;
+              };
+              if (!sameRemoteValue(normalizeOptionalEmptyFields(task),
+                                   normalizeOptionalEmptyFields(local)))
+                throw new Error('Inhaltliche Abweichung bei einer Aufgabe (nicht nur leere Zusatzfelder).');
+              if (task.itemNumber) {
+                if (task.itemNumber !== local.itemNumber || used.has(task.itemNumber))
+                  throw new Error('Bestehende Aufgabennummer weicht ab.');
+                used.add(task.itemNumber);
+              } else {
+                if (!['A-0002','A-0003'].includes(local.itemNumber))
+                  throw new Error('Unerwartete fehlende Nummer.');
+                expected.set(task.id,local.itemNumber);
+              }
+            }
+            if (expected.size !== 2 || used.size !== 2 ||
+                !used.has('A-0001') || !used.has('A-0004') ||
+                new Set(expected.values()).size !== 2)
+              throw new Error('Genau zwei erwartete Nummernlücken nicht bestätigt.');
+            const result = await new Promise((resolve,reject)=>{
+              firebaseDbRef.transaction(current=>{
+                if (!current || !sameRemoteValue(current.mgmt?.aufgaben,tasks) ||
+                    !sameRemoteValue(current.mgmtCounters,baseline.mgmtCounters)) {
+                  failure = 'Serverstand hat sich zwischenzeitlich verändert'; return;
+                }
+                const next = sanitizeForFirebase(current);
+                for (const task of next.mgmt.aufgaben) {
+                  if (expected.has(task.id)) task.itemNumber = expected.get(task.id);
+                }
+                return next;
+              },(error,committed,snapshot)=>{
+                if(error) reject(error); else resolve({committed,snapshot});
+              },false);
+            });
+            if (!result.committed) throw new Error(failure);
+            const saved=result.snapshot?.val();
+            if (!saved || saved.mgmt?.aufgaben?.length!==4 ||
+                Number(saved.mgmtCounters?.aufgaben)!==4 ||
+                saved.mgmt.aufgaben.some(t=>t.itemNumber!==localById.get(t.id)?.itemNumber))
+              throw new Error('Schreibvorgang bestätigt, Ergebnis bitte erneut prüfen.');
+            alert('TEST: Zwei fehlende Aufgabennummern erfolgreich ergänzt. Zähler 4. Konfliktsperre bleibt aktiv. Bitte Ergebnis melden.');
+          } catch(error) {
+            alert('Nummernreparatur nicht abgeschlossen: '+(error.message||String(error))+
+              '. Bitte Konfliktsperre nicht aufheben.');
+          } finally { recoveryPending=false; fixNumbers.disabled=false; }
+        });
+        panel.appendChild(fixNumbers);
+      }
       if (recoveryCandidate()) {
         const recover = document.createElement('button');
         recover.type = 'button';
@@ -1407,14 +2460,120 @@
         resolve.type = 'button';
         resolve.className = 'ml-2 mt-2 px-4 py-2 rounded-lg bg-emerald-700 text-white text-sm';
         resolve.textContent = 'Konflikt abschließen – Serverdaten übernehmen';
+        // TEST-only persistent diagnostic. No Firebase writes or changes to guards.
+        const resolveDiagnostic = document.createElement('pre');
+        resolveDiagnostic.className = 'mt-3 p-3 text-xs whitespace-pre-wrap break-words rounded-lg border border-amber-500/40 bg-black/40 text-amber-100';
+        resolveDiagnostic.setAttribute('role', 'status');
+        resolveDiagnostic.setAttribute('aria-live', 'polite');
+        resolveDiagnostic.textContent = 'Abschlussdiagnose: Noch keine Prüfung gestartet.';
+        let resolvePhase = 'nicht gestartet';
         resolve.addEventListener('click', async () => {
           if (!confirm('Den lokalen Konfliktentwurf verwerfen und die vorhandenen Serverdaten übernehmen? Es werden KEINE Daten auf Firebase gelöscht oder geändert.')) return;
           resolve.disabled = true;
+          resolvePhase = 'Firebase-Serverstand erneut lesen';
+          resolveDiagnostic.textContent = 'Abschlussdiagnose: Prüfe … ' + resolvePhase;
           try {
             if (pendingCollectionWrites.size) throw new Error('Noch ausstehende Änderungen. Bitte später erneut versuchen.');
             const snapshot = await firebaseDbRef.once('value');
             const raw = snapshot.val();
             if (!raw || !raw.mgmt || !raw.basics || !raw.permissions) throw new Error('Serverdaten nicht vollständig.');
+            // TEST-only final guard: compare fresh server state with the
+            // preserved local draft before discarding anything locally.
+            if (!productionSyncConflict || !testAuthUser ||
+                testAuthRole !== 'Master' || currentRole !== 'Master' ||
+                location.hostname !== 'jnilats33.github.io' ||
+                !location.pathname.startsWith('/Dominion-Test/') ||
+                firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM)
+              throw new Error('TEST-Sicherheitsbedingungen nicht erfüllt.');
+            const draft = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+            if (!draft?.drafts || typeof draft.drafts !== 'object')
+              throw new Error('Konfliktentwurf fehlt oder ist nicht lesbar.');
+            resolvePhase = 'Konfliktentwurf und Aufgabenbestand vergleichen';
+            resolveDiagnostic.textContent = 'Abschlussdiagnose: Prüfe … ' + resolvePhase;
+            const fresh = mergeWithDefaults(sanitizeForFirebase(raw));
+            const localTasks = draft.drafts.mgmt?.aufgaben;
+            const remoteTasks = fresh.mgmt?.aufgaben;
+            const localTaskCount = Array.isArray(localTasks) ? localTasks.length : 'keine Liste';
+            const serverTaskCount = Array.isArray(remoteTasks) ? remoteTasks.length : 'keine Liste';
+            const serverTaskCounter = raw.mgmtCounters?.aufgaben ?? 'nicht vorhanden';
+            const localTaskCounter = draft.drafts.mgmtCounters?.aufgaben ?? 'nicht im Entwurf';
+            const serverNumbers = Array.isArray(remoteTasks)
+              ? remoteTasks.map(t => String(t?.itemNumber ?? '(ohne Nummer)')) : [];
+            const rawServerNumbers = Array.isArray(raw.mgmt?.aufgaben)
+              ? raw.mgmt.aufgaben.map(t => String(t?.itemNumber ?? '(ohne Nummer)')) : [];
+            const serverMaxNumber = serverNumbers.reduce((max, number) =>
+              /^A-\d+$/.test(number) ? Math.max(max, Number(number.slice(2))) : max, 0);
+            // The fifth task was recovered without an itemNumber; the existing
+            // numbering helper assigns A-0005 in memory. Accept this exact
+            // historical TEST state only; do not change the Firebase counter.
+            const knownRecoveredFifthTask =
+              Array.isArray(raw.mgmt?.aufgaben) &&
+              Array.isArray(remoteTasks) &&
+              raw.mgmt.aufgaben.length === 5 &&
+              Number(raw.mgmtCounters?.aufgaben) === 4 &&
+              raw.mgmt.aufgaben.filter(t => !t?.itemNumber).length === 1 &&
+              raw.mgmt.aufgaben.filter(t => t?.itemNumber)
+                .map(t => t.itemNumber).sort().join('|') ===
+                'A-0001|A-0002|A-0003|A-0004' &&
+              remoteTasks.map(t => t?.itemNumber).sort().join('|') ===
+                'A-0001|A-0002|A-0003|A-0004|A-0005';
+            if (!Array.isArray(localTasks) || !Array.isArray(remoteTasks) ||
+                localTasks.length < 5 || localTasks.length !== remoteTasks.length ||
+                (Number(raw.mgmtCounters?.aufgaben) !== remoteTasks.length &&
+                 !knownRecoveredFifthTask))
+              throw new Error('Aufgabenbestand oder Zähler nicht mehr wie geprüft. ' +
+                'Lokal: ' + localTaskCount + ', Server: ' + serverTaskCount +
+                ', Server-Zähler: ' + serverTaskCounter +
+                ', lokaler Entwurfszähler: ' + localTaskCounter +
+                ', höchste normalisierte Aufgabennummer: ' + serverMaxNumber +
+                ', Servernummern: ' + serverNumbers.join(', ') +
+                ', rohe Servernummern: ' + rawServerNumbers.join(', ') + '.');
+            const omitKnownEmpty = (value, context) => {
+              if (Array.isArray(value))
+                return value.map(v=>omitKnownEmpty(v,context));
+              if (!value || typeof value !== 'object') return value;
+              const copy={};
+              for (const [key,v] of Object.entries(value)) {
+                if (context==='task' && key==='history' && Array.isArray(v) && v.length===0) continue;
+                if (context==='task' && key==='reminderMinutes' && v===null) continue;
+                if (context==='activity' && (key==='targetSubCategory'||key==='targetItemId') && v===null) continue;
+                copy[key]=omitKnownEmpty(v,context);
+              }
+              return copy;
+            };
+            const compareTask = (a,b) => sameRemoteValue(
+              omitKnownEmpty(a,'task'),omitKnownEmpty(b,'task'));
+            const byId=new Map(remoteTasks.map(t=>[t.id,t]));
+            if (byId.size!==remoteTasks.length || localTasks.some(t=>!byId.has(t.id) ||
+                !compareTask(t,byId.get(t.id))))
+              throw new Error('Aufgaben unterscheiden sich weiterhin vom Server.');
+            const expectedNumbers=new Set(remoteTasks.map((_,i)=>'A-'+String(i+1).padStart(4,'0')));
+            if (remoteTasks.some(t=>!expectedNumbers.delete(t.itemNumber)) ||
+                expectedNumbers.size!==0)
+              throw new Error('Aufgabennummern nicht eindeutig oder lückenlos.');
+            resolvePhase = 'Aktivitätsverlauf vergleichen';
+            resolveDiagnostic.textContent = 'Abschlussdiagnose: Prüfe … ' + resolvePhase;
+            const localFeed=draft.drafts.activityFeed;
+            const remoteFeed=fresh.activityFeed;
+            if (!Array.isArray(localFeed) || !Array.isArray(remoteFeed) ||
+                localFeed.length!==remoteFeed.length ||
+                localFeed.some((v,i)=>!sameRemoteValue(
+                  omitKnownEmpty(v,'activity'),omitKnownEmpty(remoteFeed[i],'activity'))))
+              throw new Error('Aktivitätsverlauf unterscheidet sich vom Server.');
+            resolvePhase = 'Weitere Entwurfsdaten vergleichen';
+            resolveDiagnostic.textContent = 'Abschlussdiagnose: Prüfe … ' + resolvePhase;
+            const excluded=new Set(['chat','chatV2','firebase','fcmToken','version','mgmt','activityFeed']);
+            for (const [key,value] of Object.entries(draft.drafts)) {
+              if (excluded.has(key)) continue;
+              if (!sameRemoteValue(value,fresh[key]))
+                throw new Error('Abweichung in '+key+'. Konflikt bleibt gesperrt.');
+            }
+            const categories=['kleidung','toys','strafen','belohnungen','regeln'];
+            if (categories.some(key=>!sameRemoteValue(
+              draft.drafts.mgmt?.[key],fresh.mgmt?.[key])))
+              throw new Error('Weitere Verwaltungskategorie weicht ab.');
+            resolvePhase = 'Geprüften Serverstand lokal übernehmen';
+            resolveDiagnostic.textContent = 'Abschlussdiagnose: Prüfe … ' + resolvePhase;
             const { chat: ignoredChat, chatV2: ignoredChatV2, ...remote } = raw;
             const liveChat = appState.chat || [];
             const nextState = mergeWithDefaults(remote);
@@ -1424,7 +2583,8 @@
             localStorage.removeItem(SYNC_CONFLICT_DRAFT_KEY);
             productionSyncConflict = false;
             productionRoomLoaded = true;
-            lastRemoteState = sanitizeForFirebase(remote);
+            lastRemoteRawState = sanitizeForFirebase(remote);
+            lastRemoteState = sanitizeForFirebase(nextState);
             appState = nextState;
             saveStateLocalOnly();
             updateSyncConflictReviewButton();
@@ -1434,14 +2594,94 @@
             showToast('Konflikt abgeschlossen. Serverdaten übernommen.', 'success');
           } catch (error) {
             resolve.disabled = false;
-            showToast('Konflikt nicht abgeschlossen: ' + error.message, 'error');
+            const detail = error instanceof Error ? error.message : String(error);
+            resolveDiagnostic.textContent = 'Abschluss NICHT erfolgt.\nPrüfschritt: ' +
+              resolvePhase + '\nGrund: ' + detail +
+              '\nKonfliktsperre bleibt bestehen. Bitte diese Diagnose kopieren.';
+            console.warn('TEST-Konfliktabschluss abgebrochen:', resolvePhase, detail);
+            showToast('Konflikt nicht abgeschlossen: ' + detail, 'error');
           }
         });
         panel.appendChild(resolve);
+        panel.appendChild(resolveDiagnostic);
       }
       backdrop.appendChild(panel);
       document.getElementById('sync-conflict-review-overlay')?.remove();
       document.body.appendChild(backdrop);
+    }
+
+    // TEST-only atomic root transaction: append exactly one missing task and
+    // advance its counter; never replace other collections or unlock drafts.
+    async function restorePushTest4Safely() {
+      if (!productionSyncConflict || !firebaseDbRef || !testAuthUser ||
+          testAuthRole !== 'Master' || currentRole !== 'Master' ||
+          location.hostname !== 'jnilats33.github.io' ||
+          !location.pathname.startsWith('/Dominion-Test/') ||
+          firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM ||
+          pendingCollectionWrites.size || recoveryPending) {
+        alert('Wiederherstellung gesperrt: Sicherheitsbedingungen nicht erfüllt.');
+        return;
+      }
+      recoveryPending = true;
+      let failure = 'Unbekannte Abweichung';
+      try {
+        const draft = JSON.parse(localStorage.getItem(SYNC_CONFLICT_DRAFT_KEY) || 'null');
+        const localTasks = draft?.drafts?.mgmt?.aufgaben;
+        if (!Array.isArray(localTasks)) throw new Error('Lokaler Konfliktentwurf fehlt.');
+        const matches = localTasks.filter(t => t?.id === 'task-1795361950892-zvm0g');
+        if (matches.length !== 1 || matches[0].title !== 'Push-Test 4' ||
+            matches[0].itemNumber !== 'A-0004') throw new Error('Gesicherte Aufgabe stimmt nicht überein.');
+        const task = sanitizeForFirebase(matches[0]);
+        // Fetch live state first, then compare it inside the transaction on every retry.
+        const baseline = (await firebaseDbRef.once('value')).val();
+        if (!baseline || !Array.isArray(baseline.mgmt?.aufgaben))
+          throw new Error('Serverdaten unvollständig.');
+        const originalTasks = baseline.mgmt.aufgaben;
+        const originalCounters = baseline.mgmtCounters || {};
+        const ids = new Set(originalTasks.map(t => t.id));
+        if (originalTasks.length !== 3 || ids.size !== 3 ||
+            ids.has(task.id) || localTasks.filter(t => !ids.has(t.id)).length !== 1 ||
+            originalTasks.some(t => !localTasks.some(l => l.id === t.id)))
+          throw new Error('Aufgabenbestand weicht von der geprüften Vorschau ab.');
+        const normalized = mergeWithDefaults(sanitizeForFirebase(baseline));
+        const numbers = normalized.mgmt.aufgaben.map(t => t.itemNumber);
+        if (new Set(numbers).size !== 3 ||
+            !['A-0001','A-0002','A-0003'].every(n => numbers.includes(n)) ||
+            Number(originalCounters.aufgaben) !== 1)
+          throw new Error('Aufgabennummern oder Zähler haben sich verändert.');
+        const result = await new Promise((resolve,reject) => {
+          firebaseDbRef.transaction(current => {
+            if (!current) { failure = 'Transaktionscache leer'; return; }
+            if (!sameRemoteValue(current.mgmt?.aufgaben,originalTasks) ||
+                !sameRemoteValue(current.mgmtCounters || {},originalCounters)) {
+              failure = 'Aufgaben oder Zähler zwischenzeitlich geändert'; return;
+            }
+            // Preserve every other field from the current transaction state.
+            const next = sanitizeForFirebase(current);
+            next.mgmt.aufgaben.push(task);
+            next.mgmtCounters = next.mgmtCounters || {};
+            next.mgmtCounters.aufgaben = 4;
+            return next;
+          },(error,committed,snapshot) => {
+            if (error) reject(error);
+            else resolve({committed,snapshot});
+          },false);
+        });
+        if (!result.committed) {
+          alert('NICHT übertragen: ' + failure + '. Konfliktsperre bleibt aktiv.');
+          return;
+        }
+        const saved = result.snapshot?.val();
+        if (!saved || !saved.mgmt?.aufgaben?.some(t => t.id === task.id) ||
+            Number(saved.mgmtCounters?.aufgaben) !== 4) {
+          alert('Schreibvorgang bestätigt, Ergebnis unklar. Bitte nichts weiter ändern.');
+          return;
+        }
+        alert('Push-Test 4 erfolgreich in TEST ergänzt. Zähler: 4. Konfliktsperre und Sicherung bleiben erhalten. Bitte Ergebnis melden.');
+      } catch (error) {
+        alert('Wiederherstellung abgebrochen: ' + (error.message || String(error)) +
+          '. Konfliktsperre bleibt bestehen.');
+      } finally { recoveryPending = false; }
     }
 
     // Explicit, one-record recovery for the isolated test room. No automatic
@@ -1752,33 +2992,78 @@
         const baseline = lastRemoteState[key] === undefined ? null : lastRemoteState[key];
         if (sameRemoteValue(value, baseline) || pendingCollectionWrites.has(key)) continue;
         const desired = sanitizeForFirebase(value);
-        const expected = sanitizeForFirebase(baseline);
+        // Preserve the exact Firebase baseline for the transaction precondition.
+        const rawBaseline = lastRemoteRawState && Object.prototype.hasOwnProperty.call(lastRemoteRawState, key)
+          ? lastRemoteRawState[key] : null;
+        const expected = sanitizeForFirebase(rawBaseline);
         const roomRef = firebaseDbRef;
         pendingCollectionWrites.set(key, {roomRef, desired});
-        roomRef.child(key).transaction(current => {
-          if (!sameRemoteValue(current, expected)) return;
-          return desired;
-        }, (error, committed) => {
+        let writePhase = 'vorabprüfung';
+        let observedMismatch = null;
+        const failWrite = (error) => {
           pendingCollectionWrites.delete(key);
-          if (error || !committed) {
-            console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
-            // Capture every outstanding local collection edit before locking sync.
-            // Otherwise an unrelated unsent edit could be lost on restart.
-            const draftSaved = saveSyncConflictDraft(key, error, true);
-            productionSyncConflict = true;
-            updateSyncConflictReviewButton();
-            productionRoomLoaded = false; // fail closed; snapshots must not auto-unlock
-            updateSyncIndicator(false);
-            showToast('Synchronisation gesperrt: ' + key + ' nicht gespeichert. ' +
-              (draftSaved ? 'Lokaler Konfliktentwurf gesichert.' : 'Lokale Sicherung fehlgeschlagen – bitte Daten sofort exportieren!'), 'error');
+          console.warn('Firebase Konflikt oder Speicherfehler in', key, error);
+          const diagnostic = {
+            at: new Date().toISOString(), collection: key, phase: writePhase,
+            errorCode: String(error?.code || 'none').slice(0, 100),
+            errorType: error ? (error.message === 'Serverstand vor Transaktion geändert' ? 'baseline-mismatch' : 'transaction-error') : 'transaction-not-committed',
+            expectedType: expected === null ? 'null' : Array.isArray(expected) ? 'array' : typeof expected,
+            observedType: observedMismatch === null ? 'not-captured' : observedMismatch,
+            pendingCollections: Array.from(pendingCollectionWrites.keys())
+          };
+          console.warn('TEST write diagnostic', diagnostic);
+          const draftSaved = saveSyncConflictDraft(key, error, true, diagnostic);
+          productionSyncConflict = true;
+          updateSyncConflictReviewButton();
+          productionRoomLoaded = false;
+          updateSyncIndicator(false);
+          showToast('Synchronisation gesperrt: ' + key + ' nicht gespeichert. ' +
+            (draftSaved ? 'Lokaler Konfliktentwurf gesichert.' : 'Lokale Sicherung fehlgeschlagen – bitte Daten sofort exportieren!'), 'error');
+        };
+        // Read the exact path first. Firebase transactions can initially receive
+        // null for an uncached location, even when that location exists remotely.
+        // The transaction still compares the live value to prevent lost updates.
+        roomRef.child(key).once('value').then(snapshot => {
+          if (!sameRemoteValue(snapshot.val(), expected)) {
+            observedMismatch = snapshot.val() === null ? 'null' : Array.isArray(snapshot.val()) ? 'array' : typeof snapshot.val();
+            failWrite(new Error('Serverstand vor Transaktion geändert'));
             return;
           }
-          if (roomRef !== firebaseDbRef) return;
-          if (lastRemoteState) lastRemoteState[key] = sanitizeForFirebase(desired);
-          // The local state may have changed while this write was in flight.
-          // Never retry an external conflict automatically.
-          if (!sameRemoteValue(appState[key], desired)) persistState();
-        }, false);
+          writePhase = 'transaktion';
+          let transactionAttempts = 0;
+          roomRef.child(key).transaction(current => {
+            transactionAttempts++;
+            // The RTDB SDK can call the updater first with an empty local
+            // cache. A pre-read has already confirmed the exact server value.
+            // Submit the candidate so Firebase can compare/retry it against
+            // the authoritative server state; never bypass the comparison
+            // when Firebase supplies an actual non-null value.
+            if (current == null && expected != null && transactionAttempts === 1) {
+              console.info('Firebase transaction: initial empty cache for', key);
+              return desired;
+            }
+            if (!sameRemoteValue(current, expected)) {
+              console.warn('Firebase transaction baseline mismatch', {
+                collection: key,
+                attempt: transactionAttempts,
+                currentIsNull: current == null,
+                expectedIsNull: expected == null
+              });
+              return;
+            }
+            return desired;
+          }, (error, committed) => {
+            if (error || !committed) {
+              failWrite(error);
+              return;
+            }
+            pendingCollectionWrites.delete(key);
+            if (roomRef !== firebaseDbRef) return;
+            if (lastRemoteState) lastRemoteState[key] = sanitizeForFirebase(desired);
+            if (lastRemoteRawState) lastRemoteRawState[key] = sanitizeForFirebase(desired);
+            if (!sameRemoteValue(appState[key], desired)) persistState();
+          }, false);
+        }).catch(failWrite);
       }
     }
 
@@ -1814,8 +3099,8 @@
      * Firebase Realtime Database & FCM Push Setup
      */
     function initFirebaseSync() {
-      const fbUrl = DEFAULT_FB_URL; // Production: fixed Firebase database
-      const roomRaw = DEFAULT_ROOM_CODE; // Production: fixed existing room
+      const fbUrl = DEFAULT_FB_URL; // Isolated test database room
+      const roomRaw = DEFAULT_ROOM_CODE; // Test room only
       const safeRoomPath = roomRaw.replace(/[.#$\[\]\/]/g, '_');
 
       try {
@@ -1905,6 +3190,7 @@
         }
         updateTestAuthPanel();
         updateAuthenticatedFirebaseSync();
+        loadPushPrefs();
         if (testAuthUser && testAuthRole === currentRole) registerTestPushToken().catch(e => console.warn("Push registration pending:", e.message));
       });
     }
@@ -1973,26 +3259,19 @@
     }
 
     async function registerTestPushToken() {
-      if (!testAuthUser || testAuthRole !== currentRole || !currentRole) return;
+      if (!testAuthUser || testAuthRole !== currentRole || !currentRole ||
+          !('Notification' in window) || Notification.permission !== 'granted') return;
       const prefs = getDevicePrefs();
-      if (!prefs.fcmToken || Notification.permission !== 'granted') return;
+      if (!prefs.fcmToken) return;
       if (!prefs.pushDeviceId) {
-        prefs.pushDeviceId = Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2, '0')).join('');
+        prefs.pushDeviceId = Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2,'0')).join('');
         saveDevicePrefs(prefs);
       }
-      const status = document.getElementById('test-push-registration-state');
-      try {
-        const fn = firebase.app().functions('europe-west1').httpsCallable('registerProductionPushDevice');
-        const result = await fn({ token: prefs.fcmToken, deviceId: prefs.pushDeviceId });
-        if (result.data?.registered !== true) throw new Error('Push-Server hat die Registrierung nicht bestätigt.');
-        if (status) status.textContent = '✓ Push-Gerät serverseitig registriert.';
-        setPushPermissionStatus('Push aktiv – serverseitig registriert', true);
-      } catch (error) {
-        if (status) status.textContent = 'Push-Server noch nicht erreichbar oder Registrierung fehlgeschlagen.';
-        setPushPermissionStatus('Push-Registrierung fehlgeschlagen', false);
-        console.warn('Secure push registration:', error.code || error.message);
-        throw error;
-      }
+      const result = await firebase.app().functions('europe-west1').httpsCallable('registerTestPushDevice')({
+        token:prefs.fcmToken,deviceId:prefs.pushDeviceId
+      });
+      if (result.data?.registered !== true) throw new Error('Test-Geräteregistrierung nicht bestätigt.');
+      setPushPermissionStatus('TEST Push registriert',true);
     }
 
     function setPushPermissionStatus(message, ok) {
@@ -2077,6 +3356,7 @@
       firebaseDbRef = firebase.database().ref('rooms/' + safeRoomPath);
       productionRoomLoaded = false;
       lastRemoteState = null;
+      lastRemoteRawState = null;
       appState.chat = []; // The previous chat is explicitly excluded from this release.
       saveStateLocalOnly();
       firebaseDbRef.child('chatV2').on('child_added', snapshot => {
@@ -2114,6 +3394,7 @@
           console.error('Produktiv-Snapshot unvollständig: Schreibzugriffe aus Sicherheitsgründen gesperrt.');
           productionRoomLoaded = false;
           lastRemoteState = null;
+          lastRemoteRawState = null;
           updateSyncIndicator(false);
           return;
         }
@@ -2163,7 +3444,8 @@
           }
           delete appState.fcmToken;
           appState.chat = liveChat;
-          lastRemoteState = sanitizeForFirebase(stateWithoutChats);
+          lastRemoteRawState = sanitizeForFirebase(stateWithoutChats);
+          lastRemoteState = sanitizeForFirebase(mergeWithDefaults(stateWithoutChats));
           productionRoomLoaded = !productionSyncConflict;
           updateSyncIndicator(!productionSyncConflict);
           saveStateLocalOnly();
@@ -2398,6 +3680,7 @@
       refreshAllUI();
       switchTab(startTab);
       updateTestAuthPanel();
+      loadPushPrefs();
     }
 
     function logoutRole() {
@@ -2423,6 +3706,42 @@
       localStorage.setItem(DEVICE_PREFS_KEY, JSON.stringify(prefs));
     }
 
+    let pushPrefs = null, pushPrefsRole = null, pushSaving = false;
+    async function loadPushPrefs() {
+      pushPrefs = null; pushPrefsRole = null; renderPushPrefs();
+      if (!testAuthUser || testAuthRole !== currentRole) return;
+      const role = currentRole;
+      try {
+        const response = await firebase.app().functions('europe-west1').httpsCallable('getTestPushPreferences')();
+        if (role !== currentRole || role !== testAuthRole) return;
+        pushPrefs = response.data.preferences; pushPrefsRole = role;
+      } catch(e) { console.warn('Push-Einstellungen:',e); }
+      renderPushPrefs();
+    }
+    function renderPushPrefs() {
+      const master = currentRole === 'Master';
+      const list = document.getElementById(master ? 'master-push-preferences-list' : 'push-preferences-list');
+      const status = document.getElementById(master ? 'master-push-preferences-status' : 'push-preferences-status');
+      if (!list || !status) return;
+      const ready = !!pushPrefs && pushPrefsRole === currentRole && testAuthRole === currentRole;
+      list.innerHTML = Object.entries(PUSH_EVENTS).map(([key,label]) =>
+        '<label class="flex items-center justify-between gap-2 rounded-lg bg-white/5 p-2 text-xs"><span>'+
+        escapeHtml(label)+'</span><input type="checkbox" data-push-event="'+key+'" '+
+        (ready && pushPrefs[key] ? 'checked ' : '')+(ready && !pushSaving ? '' : 'disabled ')+
+        'onchange="savePushPref(this.dataset.pushEvent,this.checked)"></label>').join('');
+      status.textContent = ready ? (pushSaving ? 'Speichert …' : '✓ Serverseitig geladen') :
+        'Firebase-Anmeldung und bereitgestellte Testfunktionen erforderlich.';
+    }
+    async function savePushPref(key,enabled) {
+      if (!Object.prototype.hasOwnProperty.call(PUSH_EVENTS,key) || pushSaving ||
+          !testAuthUser || testAuthRole !== currentRole || pushPrefsRole !== currentRole) return;
+      pushSaving = true; renderPushPrefs();
+      try {
+        const response = await firebase.app().functions('europe-west1').httpsCallable('setTestPushPreference')({event:key,enabled:!!enabled});
+        if (response.data?.saved && testAuthRole === currentRole && pushPrefsRole === currentRole) pushPrefs[key]=!!enabled;
+      } catch(e) { console.warn('Push-Einstellung nicht gespeichert:',e); showToast('Push-Einstellung nicht gespeichert.','error'); }
+      finally { pushSaving=false; renderPushPrefs(); }
+    }
     function hasPermission(category, action) {
       if (currentRole === 'Master') return true;
       if (category === 'username') return !!appState.permissions.username;
@@ -3626,7 +4945,7 @@
       const note = document.getElementById('shop-note').value.trim();
       if (!name) return;
 
-      const item = { id: 'shop-' + Date.now(), name, note, done: false };
+      const item = { id: 'shop-' + Date.now(), name, note, done: false, createdBy: currentRole };
       appState.einkauf.unshift(item);
       logActivity(`hat Einkaufsartikel hinzugefügt: „${name}“`, 'einkauf', null, item.id);
 
@@ -3641,6 +4960,7 @@
       const item = appState.einkauf.find(i => i.id === id);
       if (!item) return;
       item.done = !item.done;
+      item.lastEditedBy = currentRole;
       logActivity(`hat Einkaufsartikel ${item.done ? 'abgehakt' : 'wieder geöffnet'}: „${item.name}“`, 'einkauf', null, item.id);
       persistState();
       refreshAllUI();
@@ -3704,7 +5024,7 @@
       const measure = document.getElementById('penalty-measure').value.trim();
       if (!reason) return;
 
-      const entry = { id: 'pen-' + Date.now(), reason, measure: measure || 'Nach Ermessen', resolved: false };
+      const entry = { id: 'pen-' + Date.now(), reason, measure: measure || 'Nach Ermessen', resolved: false, createdBy: currentRole };
       appState.strafbuch.unshift(entry);
       logActivity(`hat Strafbuch-Eintrag angelegt: „${reason}“`, 'strafbuch', null, entry.id);
 
@@ -3719,6 +5039,7 @@
       const entry = appState.strafbuch.find(p => p.id === id);
       if (!entry) return;
       entry.resolved = !entry.resolved;
+      entry.lastEditedBy = currentRole;
       logActivity(`hat Strafbuch-Eintrag als ${entry.resolved ? 'erledigt' : 'offen'} markiert: „${entry.reason}“`, 'strafbuch', null, entry.id);
       persistState();
       refreshAllUI();
@@ -3802,7 +5123,7 @@
       if (!Number.isFinite(Number(amount)) || !amount) return false;
       if (!Array.isArray(appState.rewardLedger)) appState.rewardLedger = [];
       if (appState.rewardLedger.some(row => row.id === key) || (appState.deletedRewardKeys || []).includes(key)) return false;
-      appState.rewardLedger.push({ id: key, amount: Number(amount), description, timestamp: Date.now() });
+      appState.rewardLedger.push({ id: key, amount: Number(amount), description, timestamp: Date.now(), actorRole: currentRole });
       if (currentRole) showRewardToast(Number(amount));
       return true;
     }
@@ -3842,21 +5163,94 @@
         task.history = [];
       });
     }
+    // Deadline penalties are a single logical operation. Never persist the
+    // task status separately from its ledger entry.
+    let deadlineTransactionPending = false;
     function processTaskDeadlines() {
       migrateLegacyTasks();
-      let changed = false;
-      for (const task of appState.mgmt.aufgaben) {
-        if (task.assignee !== 'Daisy' || task.taskKind === 'personal' || task.status !== 'open' || !task.deadline) continue;
-        const deadlineTime = new Date(task.deadline).getTime();
-        if (!Number.isFinite(deadlineTime) || Date.now() <= deadlineTime) continue;
-        const key = 'task:' + task.id + ':late:' + (task.cycle || 0);
-        bookReward(key, -rewardAmount(task.minusPoints), 'Frist überschritten: ' + task.title);
-        task.status = 'overdue';
-        (task.history ||= []).push({ event: 'Frist überschritten', at: Date.now() });
-        changed = true;
-      }
-      if (changed) persistState();
-      return changed;
+      if (deadlineTransactionPending || !firebaseDbRef || !productionRoomLoaded ||
+          productionSyncConflict || isApplyingRemoteUpdate || recoveryPending ||
+          pendingCollectionWrites.size || !lastRemoteState || !lastRemoteRawState ||
+          firebaseRoomPathPending !== DEFAULT_ROOM_CODE) return false;
+      // Do not overwrite unsaved local task or ledger edits with a root transaction.
+      if (!sameRemoteValue(appState.mgmt, lastRemoteState.mgmt) ||
+          !sameRemoteValue(appState.rewardLedger, lastRemoteState.rewardLedger)) return false;
+      const now = Date.now();
+      const task = appState.mgmt.aufgaben.find(t =>
+        t.assignee === 'Daisy' && t.taskKind !== 'personal' &&
+        t.status === 'open' && t.deadline &&
+        Number.isFinite(new Date(t.deadline).getTime()) &&
+        now > new Date(t.deadline).getTime());
+      if (!task) return false;
+      const id = task.id;
+      const cycle = task.cycle || 0;
+      const key = 'task:' + id + ':late:' + cycle;
+      const amount = -rewardAmount(task.minusPoints);
+      const roomRef = firebaseDbRef;
+      deadlineTransactionPending = true;
+      (async () => {
+        try {
+          // Prime the SDK cache, then use a root transaction to update only
+          // mgmt and rewardLedger while retaining every other live field.
+          const baseline = (await roomRef.once('value')).val();
+          if (!baseline || roomRef !== firebaseDbRef || productionSyncConflict ||
+              !productionRoomLoaded || pendingCollectionWrites.size ||
+              !sameRemoteValue(baseline.mgmt, lastRemoteRawState?.mgmt) ||
+              !sameRemoteValue(baseline.rewardLedger, lastRemoteRawState?.rewardLedger))
+            return;
+          const serverTask = baseline.mgmt?.aufgaben?.find(t => t?.id === id);
+          if (!serverTask || serverTask.status !== 'open' ||
+              serverTask.deadline !== task.deadline ||
+              Number(serverTask.minusPoints || 0) !== Number(task.minusPoints || 0) ||
+              (serverTask.cycle || 0) !== cycle ||
+              !Array.isArray(baseline.rewardLedger) ||
+              baseline.rewardLedger.some(row => row?.id === key) ||
+              (baseline.deletedRewardKeys || []).includes(key)) return;
+          const eventTime = Date.now();
+          const actorRole = currentRole;
+          let changed = false;
+          const result = await new Promise((resolve,reject) => {
+            roomRef.transaction(current => {
+              changed = false;
+              if (!current || !sameRemoteValue(current.mgmt, baseline.mgmt) ||
+                  !sameRemoteValue(current.rewardLedger, baseline.rewardLedger) ||
+                  !sameRemoteValue(current.mgmtCounters, baseline.mgmtCounters)) return;
+              const target = current.mgmt?.aufgaben?.find(t => t?.id === id);
+              if (!target || target.status !== 'open' ||
+                  target.deadline !== task.deadline ||
+                  (target.cycle || 0) !== cycle ||
+                  !Array.isArray(current.rewardLedger) ||
+                  current.rewardLedger.some(row => row?.id === key) ||
+                  (current.deletedRewardKeys || []).includes(key)) return;
+              const next = sanitizeForFirebase(current);
+              const nextTask = next.mgmt.aufgaben.find(t => t.id === id);
+              nextTask.status = 'overdue';
+              (nextTask.history ||= []).push({event:'Frist überschritten',at:eventTime});
+              if (amount) next.rewardLedger.push({
+                id:key, amount, description:'Frist überschritten: ' + nextTask.title,
+                timestamp:eventTime, actorRole
+              });
+              changed = true;
+              return next;
+            },(error,committed,snapshot)=>{
+              if (error) reject(error); else resolve({committed,snapshot});
+            },false);
+          });
+          if (result.committed && changed) {
+            // Listener applies the authoritative server snapshot. Do not
+            // locally re-book the penalty or call persistState().
+            console.info('TEST: Fristüberschreitung atomar gespeichert', id);
+          } else {
+            console.info('TEST: Fristüberschreitung nicht geschrieben; Serverstand erneut prüfen', id);
+          }
+        } catch (error) {
+          console.warn('TEST: atomare Fristbuchung fehlgeschlagen; keine lokale Teilbuchung',error);
+          showToast('Fristbuchung nicht bestätigt. Bitte Synchronisation prüfen.','error');
+        } finally {
+          deadlineTransactionPending = false;
+        }
+      })();
+      return false;
     }
     function updateTaskForm() {
       const assignee = document.getElementById('task-assignee').value;
@@ -3889,8 +5283,12 @@
       document.getElementById('task-minus').value = 0;
       updateTaskForm();
     }
-    function saveTask() {
+    // New tasks must be committed together with their number, counter and activity.
+    // Existing task edits retain their previous path until separately reviewed.
+    let taskCreationPending = false;
+    async function saveTask() {
       if (currentRole !== 'Master' && (!hasPermission('aufgaben', 'add') || document.getElementById('task-kind').value !== 'personal')) return;
+      if (taskCreationPending) return;
       const title = document.getElementById('task-title').value.trim();
       const desc = document.getElementById('task-desc').value.trim();
       const assignee = document.getElementById('task-assignee').value;
@@ -3903,10 +5301,90 @@
       const task = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
       if (editingTaskId && (!task || currentRole !== 'Master' || task.status !== 'open')) return;
       const values = { title, desc, assignee, deadline, reminderMinutes, taskKind: kind, plusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-plus').value) : 0, minusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-minus').value) : 0 };
-      if (task) Object.assign(task, values);
-      else tasks.unshift({ id: 'task-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), taskV26: true, status: 'open', cycle: 0, history: [], done: false, createdBy: currentRole, ...values });
-      logActivity('hat Aufgabe angelegt/bearbeitet: „' + title + '“', 'aufgaben');
-      closeTaskDialog(); persistState(); refreshAllUI(); showToast('Aufgabe gespeichert.');
+      if (task) {
+        Object.assign(task, values);
+        logActivity('hat Aufgabe angelegt/bearbeitet: „' + title + '“', 'aufgaben');
+        closeTaskDialog(); persistState(); refreshAllUI(); showToast('Aufgabe gespeichert.');
+        return;
+      }
+      // Never fall back to local-only creation or independent collection writes.
+      if (location.hostname !== 'jnilats33.github.io' ||
+          !location.pathname.startsWith('/Dominion/') ||
+          firebaseRoomPathPending !== DEFAULT_ROOM_CODE ||
+          !firebaseDbRef || !productionRoomLoaded || productionSyncConflict ||
+          isApplyingRemoteUpdate || recoveryPending || deadlineTransactionPending ||
+          pendingCollectionWrites.size || !lastRemoteState || !lastRemoteRawState ||
+          !testAuthUser || testAuthRole !== currentRole ||
+          !sameRemoteValue(appState.mgmt,lastRemoteState.mgmt) ||
+          !sameRemoteValue(appState.mgmtCounters,lastRemoteState.mgmtCounters) ||
+          !sameRemoteValue(appState.activityFeed,lastRemoteState.activityFeed)) {
+        showToast('Aufgabe nicht angelegt: Synchronisation erst prüfen.', 'error');
+        return;
+      }
+      taskCreationPending = true;
+      const button = document.getElementById('task-save-btn');
+      if (button) button.disabled = true;
+      const roomRef = firebaseDbRef;
+      const stamp = Date.now();
+      const taskId = 'task-' + stamp + '-' + Math.random().toString(36).slice(2,7);
+      const activityId = 'act-' + stamp + '-' + Math.random().toString(36).slice(2,6);
+      const actorRole = currentRole;
+      const actorName = getDisplayName(actorRole);
+      try {
+        const baseline = (await roomRef.once('value')).val();
+        if (!baseline || roomRef !== firebaseDbRef || productionSyncConflict ||
+            !productionRoomLoaded || pendingCollectionWrites.size ||
+            !sameRemoteValue(baseline.mgmt,lastRemoteRawState.mgmt) ||
+            !sameRemoteValue(baseline.mgmtCounters,lastRemoteRawState.mgmtCounters) ||
+            !sameRemoteValue(baseline.activityFeed,lastRemoteRawState.activityFeed))
+          throw new Error('Serverstand inzwischen verändert. Bitte erneut prüfen.');
+        const rawTasks = baseline.mgmt?.aufgaben;
+        const counter = Number(baseline.mgmtCounters?.aufgaben);
+        if (!Array.isArray(rawTasks) || !Number.isSafeInteger(counter) || counter < 0 ||
+            !Array.isArray(baseline.activityFeed))
+          throw new Error('Server-Aufgaben, Zähler oder Verlauf nicht vollständig.');
+        const numbers = rawTasks.map(t=>t?.itemNumber);
+        const ids = rawTasks.map(t=>t?.id);
+        if (new Set(ids).size !== ids.length || ids.some(id=>!id) ||
+            new Set(numbers).size !== numbers.length ||
+            numbers.some(n=>typeof n !== 'string' || !/^A-[0-9]+$/.test(n)) ||
+            Math.max(0,...numbers.map(n=>Number(n.slice(2)))) !== counter)
+          throw new Error('Aufgabennummern und Zähler sind nicht konsistent.');
+        const newNumber = 'A-' + String(counter+1).padStart(4,'0');
+        const newTask = {id:taskId,itemNumber:newNumber,taskV26:true,status:'open',
+          cycle:0,history:[],done:false,createdBy:actorRole,...values};
+        const activity = {id:activityId,actorRole,actorName,
+          action:'hat Aufgabe angelegt/bearbeitet: „'+title+'“',
+          targetTab:'aufgaben',targetSubCategory:null,permissionKey:'aufgaben',
+          targetItemId:null,timestamp:stamp};
+        const committed = await new Promise((resolve,reject)=>{
+          roomRef.transaction(current=>{
+            if (!current || !sameRemoteValue(current.mgmt,baseline.mgmt) ||
+                !sameRemoteValue(current.mgmtCounters,baseline.mgmtCounters) ||
+                !sameRemoteValue(current.activityFeed,baseline.activityFeed) ||
+                !sameRemoteValue(current.rewardLedger,baseline.rewardLedger) ||
+                !sameRemoteValue(current.deletedRewardKeys,baseline.deletedRewardKeys))
+              return;
+            const next = sanitizeForFirebase(current);
+            if (next.mgmt.aufgaben.some(t=>t?.id===taskId || t?.itemNumber===newNumber) ||
+                next.activityFeed.some(e=>e?.id===activityId)) return;
+            next.mgmt.aufgaben.unshift(newTask);
+            next.mgmtCounters.aufgaben = counter+1;
+            next.activityFeed.unshift(activity);
+            next.activityFeed = next.activityFeed.slice(0,100);
+            return next;
+          },(error,done)=>error ? reject(error) : resolve(done),false);
+        });
+        if (!committed) throw new Error('Transaktion nicht bestätigt; keine Aufgabe lokal angelegt.');
+        closeTaskDialog();
+        showToast('Aufgabe '+newNumber+' atomar gespeichert.');
+      } catch(error) {
+        console.warn('TEST: atomare Aufgabenanlage fehlgeschlagen',error);
+        showToast('Aufgabe nicht angelegt: '+(error?.message || String(error)), 'error');
+      } finally {
+        taskCreationPending = false;
+        if (button) button.disabled = false;
+      }
     }
     function editTask(id) {
       if (currentRole !== 'Master') return;
@@ -3933,14 +5411,14 @@
       processTaskDeadlines();
       const timestamp = Date.now();
       task.reportedAt = timestamp;
-      task.status = 'review';
+      task.status = 'review'; task.lastEditedBy = currentRole;
       (task.history ||= []).push({ event: 'Zur Prüfung eingereicht', at: timestamp });
       persistState(); refreshAllUI(); showToast('Zur Prüfung eingereicht.');
     }
     function completeMasterTask(id) {
       const task = appState.mgmt.aufgaben.find(t => t.id === id);
       if (!task || (task.taskKind !== 'personal' && task.assignee !== 'Master') || task.status === 'done' || (currentRole !== 'Master' && (currentRole !== 'Daisy' || task.assignee !== 'Daisy' || !hasPermission('aufgaben', 'visible')))) return;
-      task.status = 'done'; task.done = true;
+      task.status = 'done'; task.done = true; task.lastEditedBy = currentRole;
       (task.history ||= []).push({ event: 'Erledigt', at: Date.now() });
       persistState(); refreshAllUI();
     }
@@ -3954,19 +5432,19 @@
         if (!Number.isFinite(new Date(deadline).getTime()) || new Date(deadline).getTime() <= Date.now()) return showToast('Neue Deadline muss in der Zukunft liegen.', 'error');
         task.cycle = (task.cycle || 0) + 1;
         task.deadline = deadline;
-        task.status = 'open';
+        task.status = 'open'; task.lastEditedBy = currentRole;
         task.reportedAt = null;
         (task.history ||= []).push({ event: 'Frist verlängert', at: Date.now(), deadline });
       } else if (decision === 'accept') {
         bookReward('task:' + task.id + ':completed', rewardAmount(task.plusPoints), 'Aufgabe erfüllt: ' + task.title);
-        task.status = 'done'; task.done = true;
+        task.status = 'done'; task.done = true; task.lastEditedBy = currentRole;
         (task.history ||= []).push({ event: 'Erfüllt bestätigt', at: Date.now() });
       } else if (decision === 'reject') {
         const lateKey = 'task:' + task.id + ':late:' + (task.cycle || 0);
         if (!(appState.rewardLedger || []).some(row => row.id === lateKey)) {
           bookReward('task:' + task.id + ':rejected:' + (task.cycle || 0), -rewardAmount(task.minusPoints), 'Nicht erfüllt: ' + task.title);
         }
-        task.status = 'rejected'; task.done = false;
+        task.status = 'rejected'; task.done = false; task.lastEditedBy = currentRole;
         (task.history ||= []).push({ event: 'Endgültig nicht erfüllt', at: Date.now() });
       } else return;
       persistState(); refreshAllUI();
@@ -4603,6 +6081,7 @@
       document.getElementById('settings-panel-entwicklung').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'entwicklung');
       if (isMaster && activeSettingsSubTab === 'entwicklung') renderDevelopmentPanel();
       document.getElementById('settings-panel-benachrichtigungen').classList.toggle('hidden', isMaster || activeSettingsSubTab !== 'benachrichtigungen');
+      renderPushPrefs();
       const authParent = document.getElementById(isMaster ? 'settings-panel-sicherheit' : 'settings-panel-benachrichtigungen');
       let authPanel = document.getElementById('test-firebase-auth-panel');
       if (authParent && !authPanel) {
@@ -4995,6 +6474,9 @@
       loadState();
       updateLoginLabels();
       initFirebaseSync();
+      // Also initialize the TEST-only counter button on a clean reload,
+      // when there is no conflict and no conflict-state transition.
+      updateSyncConflictReviewButton();
     });
   </script>
 </body>
