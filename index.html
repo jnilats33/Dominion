@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dominion – v2.12</title>
+  <title>Dominion – v2.13</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -282,15 +282,19 @@
             <h3 class="font-display text-sm font-bold text-[#e5b55c] flex items-center gap-2">
               <span>🚀</span> Update-News: Dominion <span id="dashboard-version-news"></span>
             </h3>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Version 2.12</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#c9973e]/15 text-[#e5b55c] border border-[#c9973e]/30">Version 2.13</span>
           </div>
-          <p class="text-[11px] text-slate-400">Stand: 23.11.2026 · Produktivübernahme des stabilisierten Entwicklungsstands.</p>
-          <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
-            <div><h4 class="font-semibold text-[#e5b55c] mb-1">Synchronisation &amp; Datensicherheit</h4><ul class="list-disc pl-4 space-y-1"><li>Konflikterkennung und gesicherte Prüfung von Firebase-Datenständen verbessert.</li><li>Neue Aufgaben werden mit Aufgabennummer, Zähler und Aktivitätseintrag in einer gemeinsamen Transaktion gespeichert.</li><li>Fristüberschreitungen und zugehörige Punktebuchungen werden gemeinsam verarbeitet.</li></ul></div>
-            <div><h4 class="font-semibold text-[#e5b55c] mb-1">Push &amp; Alltag</h4><ul class="list-disc pl-4 space-y-1"><li>Push-Benachrichtigungen bei neuen Aufgaben zwischen Master und Daisy erfolgreich in beide Richtungen getestet.</li><li>Aufgabenformulare, Erinnerungsauswahl und Dashboard-Einstellungen aus dem Entwicklungsstand übernommen.</li></ul></div>
-            <div><h4 class="font-semibold text-[#e5b55c] mb-1">Noch offen</h4><ul class="list-disc pl-4 space-y-1"><li>Der rote Menüzähler für neue Aufgaben wird noch nicht zuverlässig angezeigt; Nachbesserung folgt.</li><li>Weitere Funktionen werden nach der Produktivübernahme im Alltag überprüft.</li></ul></div>
-          </div>
-          <details class="group border-t border-slate-800 pt-3">
+          <details id="dashboard-news-current" class="group border-t border-slate-800 pt-3" open>
+            <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
+              <span>📰 Aktuelles Update – Änderungen anzeigen</span>
+              <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
+            </summary>
+            <div class="mt-3 space-y-3">
+          <p class="text-[11px] text-slate-400">Stand: 25.11.2026 · Version 2.13</p>
+          <div class="space-y-3 text-xs text-slate-300"><div><h4 class="font-semibold text-[#e5b55c]">Anmeldung und Push</h4><ul class="list-disc pl-4"><li>Getrennte dauerhafte Firebase-Sitzungen für beide Rollen.</li><li>Automatische Push-Registrierung und mehrere Geräte pro Rolle.</li><li>Benachrichtigungseinstellungen und differenzierte Aufgabenmeldungen.</li></ul></div><div><h4 class="font-semibold text-[#e5b55c]">Aufgaben und Verwaltung</h4><ul class="list-disc pl-4"><li>Transaktionaler Aufgabenabschluss, Korrektur und Rücknahme mit Punkteausgleich.</li><li>Lesebestätigungen für Antragsentscheidungen und erweiterte Menüzähler.</li></ul></div><div><h4 class="font-semibold text-[#e5b55c]">Dashboard</h4><ul class="list-disc pl-4"><li>Rollen- und Ereignisfilter im Activity Stream.</li><li>Update-News und Historie mit gespeicherter Ansicht.</li></ul></div><p>Offen: zeitgesteuerte Erinnerungen, Aufgabenrückmeldungen mit Anhängen und weitere Stabilitätsprüfungen.</p></div>
+            </div>
+          </details>
+          <details id="dashboard-news-history" class="group border-t border-slate-800 pt-3">
             <summary class="cursor-pointer select-none flex items-center justify-between gap-2 text-xs font-semibold text-[#e5b55c] hover:text-white">
               <span>📚 Frühere Updates und Änderungen anzeigen</span>
               <span class="group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
@@ -299,7 +303,7 @@
               <div class="overflow-x-auto rounded-xl border border-slate-800">
                 <table class="w-full min-w-[340px] text-left border-collapse">
                   <thead class="bg-white/[0.05] text-slate-400"><tr><th scope="col" class="px-3 py-2 w-28">Version / Datum</th><th scope="col" class="px-3 py-2">Änderungen im Einzelnen</th></tr></thead>
-                  <tbody><tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.11<div class="font-normal text-[10px] text-slate-500 mt-1">22.11.2026</div></th><td class="px-3 py-3"><ul class="list-disc pl-4 space-y-1"><li>Aufgaben in einem gemeinsamen Pop-up anlegen und bearbeiten.</li><li>Erinnerungsvorlauf für Aufgaben und Kalendertermine wählbar.</li><li>Push-Backend für Aufgaben und Termine weiter vorbereitet; anschließende TEST-Phase bestätigte Aufgaben-Push in beide Richtungen.</li><li>Versionshistorie und Update-News erweitert.</li></ul></td></tr>                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.10<div class="font-normal text-[10px] text-slate-500 mt-1">22.11.2026</div></th><td class="px-3 py-3"><ul class="list-disc pl-4 space-y-1"><li>Erinnerungsauswahl für Aufgaben und Kalendertermine.</li><li>Speicherung und nachträgliche Bearbeitung der Erinnerungszeiten.</li><li>Erweiterte Update-News und tabellarische Versionshistorie.</li><li>Push-Backend für neue Aufgaben und Terminänderungen vorbereitet, noch nicht deployt.</li></ul></td></tr>
+                  <tbody><tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c]">v2.12<div class="font-normal text-[10px] text-slate-500">23.11.2026</div></th><td class="px-3 py-3">Synchronisationsprüfung, atomare Aufgabenerstellung, Fristüberschreitungen und Punktebuchungen; Aufgabenformulare und Dashboard-Einstellungen.</td></tr><tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.11<div class="font-normal text-[10px] text-slate-500 mt-1">22.11.2026</div></th><td class="px-3 py-3"><ul class="list-disc pl-4 space-y-1"><li>Aufgaben in einem gemeinsamen Pop-up anlegen und bearbeiten.</li><li>Erinnerungsvorlauf für Aufgaben und Kalendertermine wählbar.</li><li>Push-Backend für Aufgaben und Termine weiter vorbereitet; anschließende TEST-Phase bestätigte Aufgaben-Push in beide Richtungen.</li><li>Versionshistorie und Update-News erweitert.</li></ul></td></tr>                <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.10<div class="font-normal text-[10px] text-slate-500 mt-1">22.11.2026</div></th><td class="px-3 py-3"><ul class="list-disc pl-4 space-y-1"><li>Erinnerungsauswahl für Aufgaben und Kalendertermine.</li><li>Speicherung und nachträgliche Bearbeitung der Erinnerungszeiten.</li><li>Erweiterte Update-News und tabellarische Versionshistorie.</li><li>Push-Backend für neue Aufgaben und Terminänderungen vorbereitet, noch nicht deployt.</li></ul></td></tr>
                 <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.9<div class="font-normal text-[10px] text-slate-500 mt-1">21.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Kalender</strong><ul class="list-disc pl-4 space-y-1"><li>Termin-Pop-ups zur Anlage und Bearbeitung eingeführt.</li><li>Termine mit Start- und Enddatum sowie Uhrzeiten, auch über mehrere Tage, unterstützt.</li><li>Gemeinsame Termine für Master und Daisy als verknüpfte Einträge angelegt.</li><li>Getrennte Plus- und Minuspunkte für Erfüllung und Nichterfüllung vorgesehen; Buchung erst nach Bestätigung.</li></ul></div><div><strong class="text-slate-200">Dashboard &amp; Ansicht</strong><ul class="list-disc pl-4 space-y-1"><li>Dashboard-Bereiche lassen sich in der gewünschten Reihenfolge sortieren.</li><li>Einzelne Statistik-Kacheln sind in den Ansichtseinstellungen ein- und ausblendbar.</li><li>Zwei neue Kacheln: eingelöste Belohnungen und zu erwartende Bestrafungen.</li></ul></div><div><strong class="text-slate-200">Neue Inhalte</strong><ul class="list-disc pl-4 space-y-1"><li>Menüzähler für neue beziehungsweise ungelesene Inhalte ergänzt.</li><li>Kennzeichnung neuer Inhalte in den betroffenen Bereichen überarbeitet.</li></ul></div><div><strong class="text-slate-200">Chat &amp; Medien</strong><ul class="list-disc pl-4 space-y-1"><li>Chat- und Audioverhalten überarbeitet.</li><li>Bilder-Upload für Toys und Kleidung wiederhergestellt beziehungsweise weiter abgesichert.</li></ul></div><div><strong class="text-slate-200">Synchronisation &amp; Datenbestand</strong><ul class="list-disc pl-4 space-y-1"><li>Abgleich von lokalem Zustand und Firebase-Serverbestand geprüft.</li><li>Schreibkonflikte werden gesperrt und ein lokaler Konfliktentwurf wird gesichert.</li><li>Konfliktprüfung ohne Schreibzugriff auf Serverdaten ergänzt.</li><li>Test-Strafennummern bleiben bei der lokalen Nummerierung erhalten, um unbeabsichtigte Abweichungen zu vermeiden.</li><li>Konflikt kann nach bewusster Bestätigung durch Übernahme des aktuellen Serverstands abgeschlossen werden.</li><li>Eine zwischenzeitlich geprüfte gezielte Strafennummern-Reparatur wurde wegen nicht erfüllter Sicherheitsbedingungen nicht durchgeführt.</li></ul></div></td></tr>
                 <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.8<div class="font-normal text-[10px] text-slate-500 mt-1">20.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Punkte &amp; Verwaltung</strong><ul class="list-disc pl-4 space-y-1"><li>Punktebuchungen und Löschfunktion überarbeitet.</li><li>Verbesserungen an Dashboard und Benachrichtigungen.</li><li>Synchronisationsverhalten untersucht und verbessert.</li></ul></div></td></tr>
                 <tr class="border-b border-slate-800/80 align-top"><th scope="row" class="text-left px-3 py-3 font-semibold text-[#e5b55c] whitespace-nowrap">v2.7<div class="font-normal text-[10px] text-slate-500 mt-1">19.11.2026</div></th><td class="px-3 py-3 space-y-3"><div><strong class="text-slate-200">Belohnungen &amp; Strafen</strong><ul class="list-disc pl-4 space-y-1"><li>Punktewerte für Belohnungen und Strafen direkt im Formular.</li><li>Löschfunktion für Punktebuchungen eingeführt; Fehler später in v2.8 behoben.</li><li>Bonus-Hinweise für Daisy ergänzt.</li></ul></div><div><strong class="text-slate-200">Dashboard</strong><ul class="list-disc pl-4 space-y-1"><li>Bereiche „Heute“ und „Nächste Termine &amp; Deadlines“ mit Rollenfilter ergänzt.</li></ul></div></td></tr>
@@ -367,6 +371,8 @@
               <span>🔮</span>
             </div>
             <div id="stat-toys" class="text-2xl font-bold text-white">0</div>
+            <div id="stat-toys-action" class="hidden mt-1 text-xs font-semibold text-amber-300"></div>
+            <div id="stat-toys-decision" class="hidden mt-1 text-xs font-semibold text-sky-300"></div>
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
 
@@ -376,6 +382,8 @@
               <span>👗</span>
             </div>
             <div id="stat-kleidung" class="text-2xl font-bold text-white">0</div>
+            <div id="stat-kleidung-action" class="hidden mt-1 text-xs font-semibold text-amber-300"></div>
+            <div id="stat-kleidung-decision" class="hidden mt-1 text-xs font-semibold text-sky-300"></div>
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
 
@@ -385,16 +393,22 @@
               <span>📜</span>
             </div>
             <div id="stat-regeln" class="text-2xl font-bold text-white">0</div>
+            <div id="stat-regeln-action" class="hidden mt-1 text-xs font-semibold text-amber-300"></div>
+            <div id="stat-regeln-decision" class="hidden mt-1 text-xs font-semibold text-sky-300"></div>
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
           <div onclick="jumpToTarget('verwaltung','belohnungen')" data-dashboard-permission="belohnungen" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Belohnungen</span><span>🎁</span></div>
             <div id="stat-belohnungen" class="text-2xl font-bold text-white">0</div>
+            <div id="stat-belohnungen-action" class="hidden mt-1 text-xs font-semibold text-amber-300"></div>
+            <div id="stat-belohnungen-decision" class="hidden mt-1 text-xs font-semibold text-sky-300"></div>
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
           <div onclick="jumpToTarget('verwaltung','strafen')" data-dashboard-permission="strafen" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
             <div class="flex items-center justify-between text-slate-400 text-xs mb-1"><span>Strafen</span><span>⚡</span></div>
             <div id="stat-strafen" class="text-2xl font-bold text-white">0</div>
+            <div id="stat-strafen-action" class="hidden mt-1 text-xs font-semibold text-amber-300"></div>
+            <div id="stat-strafen-decision" class="hidden mt-1 text-xs font-semibold text-sky-300"></div>
             <div class="text-[11px] text-[#c9973e] mt-1">Gesamtbestand</div>
           </div>
           <div onclick="switchTab('rewards')" data-dashboard-permission="belohnungen" data-dashboard-metric="eingeloeste-belohnungen" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-[#c9973e]/50 transition">
@@ -434,6 +448,11 @@
             </button>
             <div class="flex items-center gap-2 shrink-0">
               <span id="feed-count-badge" class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 border border-slate-800 text-slate-300">0 Einträge</span>
+              <div class="flex items-center gap-1" role="group" aria-label="Activity Stream nach handelnder Rolle filtern">
+                <button type="button" id="activity-role-master" onclick="toggleActivityStreamRole('Master')" aria-pressed="true" title="Ereignisse von Master anzeigen oder ausblenden" class="px-2 py-1.5 rounded-lg text-xs font-bold transition">♛</button>
+                <button type="button" id="activity-role-daisy" onclick="toggleActivityStreamRole('Daisy')" aria-pressed="true" title="Ereignisse von Daisy anzeigen oder ausblenden" class="px-2 py-1.5 rounded-lg text-xs font-bold transition">🌸</button>
+              </div>
+              <button type="button" onclick="openActivityStreamSettings()" title="Activity-Stream-Ansicht einstellen" aria-label="Activity-Stream-Ansicht einstellen" class="px-2 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">⚙️</button>
               <button type="button" id="dashboard-feed-pin" onclick="toggleDashboardSectionPin('feed')" aria-pressed="false" aria-label="Aktivitäts-Stream geöffnet halten" title="Aktivitäts-Stream geöffnet halten" class="px-2 py-1.5 rounded-lg text-slate-400 hover:text-[#e5b55c] hover:bg-white/5 transition">📌</button>
             </div>
           </div>
@@ -492,12 +511,22 @@
             <button onclick="clearChatAttachment()" class="text-xs text-rose-400 hover:text-rose-300 px-2 py-1">Entfernen ✕</button>
           </div>
 
+          <!-- Emoji-Auswahl: rein lokal, keine Änderungen am Chat-Datenmodell -->
+          <div id="chat-emoji-picker" class="hidden px-3 py-3 bg-black/40 border-t border-slate-800" aria-label="Emoji-Auswahl">
+            <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-400">Emoji auswählen</span><button type="button" onclick="toggleChatEmojiPicker(false)" class="text-xs text-slate-400 hover:text-white" aria-label="Emoji-Auswahl schließen">✕</button></div>
+            <div class="flex gap-2 mb-2" role="group" aria-label="Emoji-Kategorie">
+              <button type="button" id="chat-emoji-tab-alltag" onclick="showChatEmojiCategory('alltag')" class="px-3 py-1.5 rounded-lg text-xs bg-[#c9973e]/20 text-[#e5b55c] border border-[#c9973e]/40" aria-pressed="true">😊 Smileys &amp; Alltag</button>
+              <button type="button" id="chat-emoji-tab-dominion" onclick="showChatEmojiCategory('dominion')" class="px-3 py-1.5 rounded-lg text-xs bg-white/5 text-slate-300 border border-slate-700" aria-pressed="false">👑 Dominion</button>
+            </div>
+            <div id="chat-emoji-options" class="grid grid-cols-8 sm:grid-cols-12 gap-1 max-h-36 overflow-y-auto"></div>
+          </div>
           <!-- Chat Input Bar -->
           <div class="p-3 bg-black/40 border-t border-slate-800 flex items-center gap-2">
             <label class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 cursor-pointer transition shrink-0" title="Bild anhängen">
               📷
               <input id="chat-image-input" type="file" accept="image/*" class="hidden" onchange="handleChatImageSelect(event)" />
             </label>
+            <button type="button" id="chat-emoji-btn" onclick="toggleChatEmojiPicker()" aria-label="Emojis auswählen" aria-expanded="false" aria-controls="chat-emoji-picker" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 transition shrink-0" title="Emojis">😊</button>
             <button id="chat-mic-btn" onclick="toggleVoiceRecording()" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 transition shrink-0" title="Sprachnachricht">
               🎙️
             </button>
@@ -511,6 +540,17 @@
         </div>
       </section>
 
+      <!-- Ideengeber: ausschließlich lokale Formularhilfe, ohne Server-Schreibzugriff -->
+      <div id="dominion-ideas-dialog" class="hidden fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm overflow-y-auto p-4" role="dialog" aria-modal="true" aria-labelledby="dominion-ideas-title" onclick="if(event.target===this)closeDominionIdeas()">
+        <div class="max-w-lg mx-auto my-10 rounded-2xl border border-amber-500/30 bg-[#202331] p-5 shadow-2xl space-y-4">
+          <div class="flex items-center justify-between"><h3 id="dominion-ideas-title" class="font-semibold text-amber-200">💡 Ideengeber</h3><button type="button" onclick="closeDominionIdeas()" aria-label="Schließen" class="px-3 py-1 rounded-lg bg-white/10">✕</button></div>
+          <div id="dominion-ideas-progress" class="text-xs text-slate-400"></div>
+          <h4 id="dominion-ideas-name" class="font-semibold text-lg text-white"></h4>
+          <p id="dominion-ideas-description" class="text-sm text-slate-300"></p>
+          <p class="text-xs text-slate-500">Ein Vorschlag füllt nur das Formular aus. Gespeichert wird erst mit dem regulären Speichern-Button.</p>
+          <div class="flex flex-wrap gap-2"><button type="button" onclick="nextDominionIdea()" class="px-3 py-2 rounded-xl bg-white/10 text-sm">🔀 Andere Idee</button><button type="button" onclick="applyDominionIdea()" class="px-3 py-2 rounded-xl gold-gradient text-sm font-semibold">Übernehmen</button></div>
+        </div>
+      </div>
       <!-- ==================== 3. KALENDER ==================== -->
       <section id="tab-kalender" class="hidden space-y-4 animate-fade">
         <div class="glass-card rounded-2xl p-5 space-y-4">
@@ -651,10 +691,14 @@
             <!-- Rendered dynamically -->
           </div>
 
+          <button id="mgmt-popup-launch" type="button" onclick="openMgmtPopup()" class="hidden mb-4 px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">＋ Neuen Eintrag anlegen</button>
+          <div id="mgmt-popup-backdrop" class="hidden fixed inset-0 z-[90] bg-black/75 backdrop-blur-sm" onclick="closeMgmtPopup()"></div>
           <!-- Add Item Box -->
           <div id="mgmt-add-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-slate-800">
+            <div id="mgmt-popup-header" class="hidden col-span-1 sm:col-span-3 flex items-center justify-between gap-3"><h3 id="mgmt-popup-heading" class="text-lg font-semibold text-amber-300">Neuer Eintrag</h3><button type="button" onclick="closeMgmtPopup()" class="px-3 py-2 rounded-lg bg-white/10 text-sm" aria-label="Schließen">✕</button></div>
             <input id="mgmt-title" type="text" placeholder="Bezeichnung..." class="px-3.5 py-2.5 text-sm" />
             <input id="mgmt-desc" type="text" placeholder="Details / Beschreibung..." class="px-3.5 py-2.5 text-sm" /><label id="mgmt-points-wrap" class="hidden text-xs text-slate-300">Punktwert<input id="mgmt-points" type="number" min="0" step="1" value="0" class="w-full mt-1 px-3 py-2 rounded-lg" /></label>
+            <button id="mgmt-ideas-button" type="button" onclick="openDominionIdeas(activeMgmtCategory)" class="hidden sm:col-span-3 col-span-1 text-left text-xs px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 hover:bg-amber-500/20">💡 Ideen ansehen – 10 Vorschläge</button>
             <div class="flex gap-2"><button id="mgmt-submit-button" onclick="addMgmtItem()" class="flex-1 px-4 py-2.5 rounded-xl gold-gradient font-semibold text-sm">Anlegen</button><button id="mgmt-cancel-edit" onclick="cancelMgmtEdit()" class="hidden px-3 py-2.5 rounded-xl bg-white/10 text-slate-300 text-sm">Abbrechen</button></div>
             <div id="mgmt-bonus-hint" class="hidden sm:col-span-3 text-xs text-emerald-300"></div>
             <div id="mgmt-image-controls" class="hidden sm:col-span-3 col-span-1 space-y-2">
@@ -666,8 +710,8 @@
               <input id="mgmt-image-file" type="file" accept="image/*" class="hidden" onchange="handleMgmtImageSelect(event)" />
               <input id="mgmt-image-camera" type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMgmtImageSelect(event)" />
               <div id="mgmt-gallery" class="hidden"></div>
-              <div id="mgmt-image-preview" class="hidden">
-                <img id="mgmt-image-preview-img" alt="Bildvorschau" class="rounded-xl max-h-48 w-auto border border-slate-700" />
+              <div id="mgmt-image-preview" class="hidden w-full min-w-0 overflow-hidden">
+                <img id="mgmt-image-preview-img" alt="Bildvorschau" class="block w-40 h-40 max-w-full object-contain rounded-xl border-2 border-[#e8b95c] bg-slate-900" />
               </div>
             </div>
           </div>
@@ -685,6 +729,7 @@
             <div class="max-w-xl mx-auto my-4 sm:my-10 rounded-2xl border border-slate-700 bg-[#202331] shadow-2xl p-5 sm:p-6 space-y-4">
               <div class="flex items-center justify-between gap-3"><h3 id="task-dialog-title" class="text-lg font-semibold text-white">Neue Aufgabe anlegen</h3><button type="button" onclick="closeTaskDialog()" aria-label="Schließen" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300">✕</button></div>
               <div id="tasks-form" class="space-y-3">
+            <button type="button" onclick="openDominionIdeas('aufgaben')" class="w-full text-left text-xs px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 hover:bg-amber-500/20">💡 Ideen für Aufgaben ansehen</button>
             <input id="task-title" placeholder="Neue Aufgabe" class="w-full px-3 py-2.5"/>
             <textarea id="task-desc" placeholder="Beschreibung (optional)" class="w-full px-3 py-2.5"></textarea>
             <div class="grid grid-cols-2 gap-2">
@@ -748,7 +793,12 @@
                 <p class="text-xs text-slate-400">Wähle die Kacheln der Übersicht aus. Daisy sieht nur freigegebene Bereiche.</p>
                 <div id="dashboard-metric-visibility-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
               </div>
-              <p class="text-[11px] text-slate-500">Diese Ansicht wird für deine Rolle auf diesem Gerät gespeichert.</p>
+              <div class="border-t border-slate-800 pt-4 space-y-3">
+                <h3 class="font-semibold text-sm text-white">📜 Activity Stream</h3>
+                <p class="text-xs text-slate-400">Ereignisarten und handelnde Rolle auswählen. Master legt zusätzlich fest, was Daisy überhaupt sehen darf.</p>
+                <div id="activity-stream-filter-settings" class="space-y-3"></div>
+              </div>
+              <p class="text-[11px] text-slate-500">Deine persönliche Auswahl wird auf diesem Gerät gespeichert; Masters Freigaben für Daisy werden synchronisiert.</p>
             </div>
           </div>
 
@@ -871,8 +921,10 @@
                     <th class="p-3.5">Bereich</th>
                     <th class="p-3.5 text-center">Sichtbar</th>
                     <th class="p-3.5 text-center">Hinzufügen</th>
-                    <th class="p-3.5 text-center">Bearbeiten</th>
-                    <th class="p-3.5 text-center">Löschen</th>
+                    <th class="p-3.5 text-center">Eigene bearbeiten</th>
+                    <th class="p-3.5 text-center">Fremde bearbeiten</th>
+                    <th class="p-3.5 text-center">Eigene löschen</th>
+                    <th class="p-3.5 text-center">Fremde löschen</th>
                   </tr>
                 </thead>
                 <tbody id="permissions-matrix-body" class="divide-y divide-slate-800">
@@ -888,7 +940,7 @@
               <h3 class="font-semibold text-sm text-white">🔔 Benachrichtigungen auf diesem Gerät</h3>
               <p class="text-xs text-slate-300">Erlaube Benachrichtigungen für dieses Smartphone. Die Zustellung bei geschlossener App wird separat getestet.</p>
               <span id="daisy-push-status-pill" class="inline-block text-[11px] px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">Nicht geprüft</span>
-              <div><button onclick="requestPushPermissions()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs shadow">🔔 Push-Benachrichtigungen aktivieren</button></div>
+              <div><button data-push-activation onclick="requestPushPermissions()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs shadow">🔔 Push-Benachrichtigungen aktivieren</button></div>
             </div>
           </div>
 
@@ -949,7 +1001,7 @@
               <p class="text-xs text-slate-300 leading-relaxed">
                 Aktiviere Push-Benachrichtigungen, um den Service Worker zu registrieren und Benachrichtigungen im Hintergrund zu erlauben.
               </p>
-              <button onclick="requestPushPermissions()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs shadow">
+              <button data-push-activation onclick="requestPushPermissions()" class="px-5 py-2.5 rounded-xl gold-gradient font-semibold text-xs shadow">
                 🔔 Push-Benachrichtigungen aktivieren
               </button>
             </div>
@@ -1047,11 +1099,11 @@
      * DOMINION APP v2.3 - STATE, MIGRATION & FCM PUSH ENGINE
      * =========================================================================
      */
-    const APP_VERSION = '2.12';
+    const APP_VERSION = '2.13';
     const STORAGE_KEY = 'dominion_app_state_v2';
     const LEGACY_KEYS = [];
     const DEVICE_PREFS_KEY = 'dominion_device_prefs_v2';
-    const PUSH_EVENTS = {chat:'Neue Chatnachrichten',task:'Neue Aufgaben',taskReview:'Aufgaben zur Prüfung',calendar:'Kalendertermine',shopping:'Einkaufsliste',rewards:'Belohnungen und Einlösungen',penalty:'Strafbuch'};
+    const PUSH_EVENTS = {chat:'Neue Chatnachrichten',task:'Neue Aufgaben',taskReview:'Aufgaben zur Prüfung',taskDone:'Aufgabe erledigt',taskRejected:'Aufgabe nicht erledigt',taskWithdrawn:'Aufgabe zurückgezogen',taskCorrected:'Aufgabenabschluss korrigiert',calendar:'Kalendertermine',shopping:'Einkaufsliste',rewards:'Belohnungen und Einlösungen',penalty:'Strafbuch'};
     const SYNC_CONFLICT_DRAFT_KEY = 'dominion_sync_conflict_draft_v1';
     const DEFAULT_FB_URL = 'https://dominionapp-45bfa-default-rtdb.europe-west1.firebasedatabase.app';
     const DEFAULT_ROOM_CODE = 'D+W Connection';
@@ -1117,7 +1169,12 @@
           visible: true,
           add: cat.id === 'einkauf' || cat.id === 'kalender',
           edit: cat.id === 'einkauf' || cat.id === 'aufgaben',
-          delete: false
+          delete: false,
+          editOwn: cat.id === 'einkauf' || cat.id === 'aufgaben',
+          editOthers: cat.id === 'einkauf' || cat.id === 'aufgaben',
+          deleteOwn: false,
+          deleteOthers: false,
+          reviewRequired: false
         };
       });
       return perms;
@@ -1141,6 +1198,7 @@
           feedLimit: 20
         },
         permissions: createDefaultPermissions(),
+        mgmtApplications: [],
         chat: [
           {
             id: 'msg-welcome-1',
@@ -1815,7 +1873,9 @@
         const ids = rawTasks.map(t => t?.id);
         const rawNumbers = rawTasks.map(t => t?.itemNumber || '(ohne Nummer)');
         const numberedNumbers = numberedTasks.map(t => t?.itemNumber || '(ohne Nummer)');
-        const expected = numberedTasks.map((_, i) => 'A-' + String(i + 1).padStart(4, '0'));
+        const counter = Number(raw.mgmtCounters?.aufgaben);
+        const numeric = rawNumbers.map(n=>/^A-[0-9]+$/.test(n)?Number(n.slice(2)):NaN);
+        const consistent = Number.isSafeInteger(counter) && counter >= 0 && numeric.every(n=>Number.isSafeInteger(n) && n>0 && n<=counter) && new Set(numeric).size===numeric.length && new Set(ids).size===ids.length && ids.every(Boolean);
         const report = [
           'TEST – Aufgabenzähler prüfen (NUR LESEN)',
           'Serveraufgaben: ' + rawTasks.length,
@@ -1824,8 +1884,8 @@
           'Aufgaben-IDs eindeutig: ' + (new Set(ids).size === ids.length && ids.every(Boolean)),
           'Rohe Nummern: ' + rawNumbers.join(', '),
           'Normalisierte Nummern: ' + numberedNumbers.join(', '),
-          'Normalisierte Nummern vollständig A-0001 bis A-' + String(numberedTasks.length).padStart(4, '0') +
-            ': ' + (numberedNumbers.slice().sort().join('|') === expected.sort().join('|')),
+          'Nummern und Zähler konsistent (Lücken zulässig): ' + consistent,
+          'Nächste Nummer: ' + (consistent ? 'A-'+String(counter+1).padStart(4,'0') : '(gesperrt)'),
           'Konfliktsperre: ' + (productionSyncConflict ? 'aktiv' : 'inaktiv'),
           'KEINE DATEN GESCHRIEBEN.'
         ].join('\n');
@@ -3109,7 +3169,7 @@
           if (currentApp.options.databaseURL !== fbUrl) {
             currentApp.delete().then(() => {
               firebase.initializeApp({ ...FIREBASE_WEB_CONFIG, databaseURL: fbUrl });
-              attachFirebaseListener(safeRoomPath);
+              initFirebaseSync();
             });
             return;
           }
@@ -3124,9 +3184,9 @@
       }
     }
 
-    function initTestAppCheck() {
+    function initTestAppCheck(app = firebase.app()) {
       try {
-        firebase.appCheck().activate(
+        app.appCheck().activate(
           new firebase.appCheck.ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
           true
         );
@@ -3170,27 +3230,82 @@
 
     // Firebase Auth is separate from the existing Dominion role/PIN UI.
     // A verified custom claim, not the selected UI role, establishes identity.
-    function initTestAuth() {
-      firebase.auth().onAuthStateChanged(async (user) => {
-        testAuthUser = null;
-        testAuthRole = null;
-        if (user) {
-          try {
-            const result = await user.getIdTokenResult();
-            const role = result.claims.dominionTestRole;
-            if (role === 'Master' || role === 'Daisy') {
-              testAuthUser = user;
-              testAuthRole = role;
-            }
-          } catch (error) {
-            console.warn('Firebase Auth claims could not be checked:', error);
-          }
+    const roleApps = new Map();
+    const verifiedSessions = new Map();
+    let activeAuthApp = null, authBusy = false, authReady = false;
+    let pushRegistrationQueue = Promise.resolve();
+    function roleWriteBusy() {
+      return authBusy || pendingCollectionWrites.size || recoveryPending || deadlineTransactionPending || taskCreationPending || taskClosurePending || redemptionPending || mgmtDecisionPending || mgmtReadReceiptPending || developmentBalancePending || developmentImportPending || pushSaving;
+    }
+    function roleFirebaseApp() {
+      if (!activeAuthApp || !testAuthUser || testAuthRole !== currentRole) throw new Error('Keine passende Firebase-Sitzung.');
+      return activeAuthApp;
+    }
+    // Callable Functions may request an FCM token from their own Firebase app.
+    // Configure that instance with the project-page worker before invoking them.
+    async function prepareRoleCallable(app) {
+      if ('Notification' in window && Notification.permission === 'granted' &&
+          'serviceWorker' in navigator && firebase.messaging.isSupported()) {
+        const registration = swRegistration || await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+        swRegistration = registration;
+        await app.messaging().getToken({vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: registration});
+      }
+      if (app !== roleFirebaseApp()) throw new Error('Rolle während Firebase-Aufruf gewechselt.');
+      return app.functions('europe-west1');
+    }
+    function activateRoleSession() {
+      const app = roleApps.get(currentRole);
+      const user = app && verifiedSessions.get(app);
+      const next = user && app.auth().currentUser === user ? app : null;
+      if (activeAuthApp !== next || testAuthUser !== (next ? user : null)) {
+        detachRoleSync();
+        activeAuthApp = next;
+        testAuthUser = next ? user : null;
+        testAuthRole = next ? currentRole : null;
+        setPushPermissionStatus('Registrierung wird geprüft', false);
+      }
+      updateTestAuthPanel();
+      updateAuthenticatedFirebaseSync();
+      loadPushPrefs();
+      registerTestPushToken().catch(e => console.warn('Push registration pending:', e.message));
+    }
+    async function initTestAuth() {
+      try {
+        const legacy = firebase.app();
+        const existing = await new Promise((resolve,reject) => {
+          const stop = legacy.auth().onAuthStateChanged(user => { stop(); resolve(user); }, reject);
+        });
+        let legacyRole = null;
+        if (existing) {
+          const claims = (await existing.getIdTokenResult()).claims;
+          if (['Master','Daisy'].includes(claims.dominionTestRole)) legacyRole = claims.dominionTestRole;
         }
-        updateTestAuthPanel();
-        updateAuthenticatedFirebaseSync();
-        loadPushPrefs();
-        if (testAuthUser && testAuthRole === currentRole) registerTestPushToken().catch(e => console.warn("Push registration pending:", e.message));
-      });
+        for (const role of ['Master','Daisy']) {
+          // Keep existing default session on this device; use named apps otherwise.
+          const name = 'dominion-prod-auth-' + role;
+          const named = firebase.apps.find(a => a.name === name) || firebase.initializeApp(legacy.options,name);
+          initTestAppCheck(named);
+          // A stable mapping prevents a later logout from changing the session namespace.
+          const key = 'dominion-prod-legacy-auth-role';
+          let owner = localStorage.getItem(key);
+          if (!owner && legacyRole) { owner = legacyRole; localStorage.setItem(key,owner); }
+          const app = owner === role ? legacy : named;
+          roleApps.set(role,app);
+          await app.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+          let revision = 0;
+          app.auth().onIdTokenChanged(async user => {
+            const seq = ++revision;
+            let verified = null;
+            try { if (user && (await user.getIdTokenResult()).claims.dominionTestRole === role) verified = user; }
+            catch(e) { console.warn('Firebase role verification failed:',e); }
+            if (seq !== revision || app.auth().currentUser !== user) return;
+            if (verified) verifiedSessions.set(app,verified); else verifiedSessions.delete(app);
+            if (currentRole === role && !authBusy) activateRoleSession();
+          });
+        }
+        authReady = true;
+        activateRoleSession();
+      } catch(e) { console.warn('Firebase session initialization failed:',e); updateSyncIndicator(false); }
     }
 
     function updateTestAuthPanel() {
@@ -3201,7 +3316,7 @@
       el.innerHTML = `
         <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
           <div class="font-semibold text-sm text-slate-100">🔐 Firebase-Anmeldung</div>
-          <p class="text-xs text-slate-400">Zusätzliche sichere Anmeldung für die spätere Push-Zustellung. Deine normale Dominion-Anmeldung bleibt unverändert.</p>
+          <p class="text-xs text-slate-400">Firebase-Sitzungen bleiben je Rolle auf diesem Browser gespeichert. Rollenwechsel meldet Firebase nicht ab. Auf gemeinsam genutzten Geräten nur eigene Konten speichern.</p>
           <p class="text-xs ${matched ? 'text-emerald-300' : 'text-amber-300'}">${matched ? '✓ Firebase-Konto für ' + currentRole + ' bestätigt' : otherRole ? 'Anderes Firebase-Konto angemeldet (' + testAuthRole + '). Bitte abmelden und das Konto für ' + currentRole + ' verwenden.' : 'Für ' + currentRole + ' noch nicht bei Firebase angemeldet.'}</p>
           ${matched || otherRole ? '<button type="button" onclick="signOutTestFirebase()" class="px-3 py-2 text-xs rounded-lg bg-white/10 text-slate-100">Firebase-Konto abmelden</button>' : `
             <form onsubmit="signInTestFirebase(event)" class="space-y-2">
@@ -3217,21 +3332,21 @@
       event.preventDefault();
       const email = document.getElementById('test-auth-email')?.value.trim();
       const password = document.getElementById('test-auth-password')?.value;
-      if (!email || !password || !currentRole) return;
+      if (!email || !password || !currentRole || !authReady || authBusy) return;
       const intendedRole = currentRole;
+      const app = roleApps.get(intendedRole);
+      authBusy = true;
       try {
-        const credential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const credential = await app.auth().signInWithEmailAndPassword(email, password);
         const claims = (await credential.user.getIdTokenResult(true)).claims;
         if (claims.dominionTestRole !== intendedRole) {
-          await firebase.auth().signOut();
-          testAuthUser = null;
-          testAuthRole = null;
+          await app.auth().signOut();
+          verifiedSessions.delete(app);
           updateTestAuthPanel();
           showToast('Dieses Firebase-Konto gehört nicht zur Rolle ' + intendedRole + '.', 'error');
           return;
         }
-        testAuthUser = credential.user;
-        testAuthRole = intendedRole;
+        verifiedSessions.set(app,credential.user);
         updateTestAuthPanel();
         showToast('Firebase-Anmeldung für ' + intendedRole + ' erfolgreich!', 'success');
         registerTestPushToken().catch(e => console.warn('Push registration pending:', e.message));
@@ -3239,40 +3354,58 @@
         console.warn('Firebase sign-in failed:', error.code || error.message);
         showToast('Firebase-Anmeldung fehlgeschlagen. E-Mail und Passwort prüfen.', 'error');
       } finally {
+        authBusy = false;
+        activateRoleSession();
         const passwordInput = document.getElementById('test-auth-password');
         if (passwordInput) passwordInput.value = '';
       }
     }
 
     async function signOutTestFirebase() {
+      if (roleWriteBusy() || !activeAuthApp) return;
+      const app = activeAuthApp;
+      authBusy = true;
       try {
-        await firebase.auth().signOut();
-        testAuthUser = null;
-        testAuthRole = null;
-        updateTestAuthPanel();
-        showToast('Firebase-Konto abgemeldet.');
-      } catch (error) {
-        showToast('Firebase-Abmeldung fehlgeschlagen.', 'error');
-      }
+        await app.auth().signOut();
+        verifiedSessions.delete(app);
+        showToast('Firebase-Konto dieser Rolle abgemeldet.');
+      } catch(error) { showToast('Firebase-Abmeldung fehlgeschlagen.','error'); }
+      finally { authBusy = false; activateRoleSession(); }
     }
 
-    async function registerTestPushToken() {
+    function registerTestPushToken() {
+      const role = currentRole;
+      const app = activeAuthApp;
+      const run = pushRegistrationQueue.catch(()=>{}).then(()=> {
+        if (role !== currentRole || app !== activeAuthApp) return;
+        return registerActivePushToken();
+      });
+      pushRegistrationQueue = run;
+      return run;
+    }
+    async function registerActivePushToken() {
       if (!testAuthUser || testAuthRole !== currentRole || !currentRole ||
           !('Notification' in window) || Notification.permission !== 'granted') return;
+      const registrationRole = currentRole;
       const prefs = getDevicePrefs();
       if (!prefs.fcmToken) return;
       if (!prefs.pushDeviceId) {
         prefs.pushDeviceId = Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2,'0')).join('');
         saveDevicePrefs(prefs);
       }
-      const result = await firebase.app().functions('europe-west1').httpsCallable('registerTestPushDevice')({
+      const result = await (await prepareRoleCallable(roleFirebaseApp())).httpsCallable('registerProductionPushDevice')({
         token:prefs.fcmToken,deviceId:prefs.pushDeviceId
       });
       if (result.data?.registered !== true) throw new Error('Test-Geräteregistrierung nicht bestätigt.');
-      setPushPermissionStatus('TEST Push registriert',true);
+      if (currentRole === registrationRole && testAuthRole === registrationRole && testAuthUser) {
+        setPushPermissionStatus('TEST Push registriert',true);
+      }
     }
 
     function setPushPermissionStatus(message, ok) {
+      for (const button of document.querySelectorAll('[data-push-activation]')) {
+        button.textContent = ok ? '✓ Push aktiv – erneut registrieren' : '🔔 Push-Benachrichtigungen aktivieren';
+      }
       for (const id of ['push-status-pill', 'daisy-push-status-pill']) {
         const pill = document.getElementById(id);
         if (pill) {
@@ -3333,17 +3466,17 @@
 
     // Database listeners start only after Firebase has restored a verified session.
     // This avoids permission errors when the database rules become restrictive.
+    function detachRoleSync() {
+      if (firebaseDbRef) { firebaseDbRef.off(); firebaseDbRef.child('chatV2').off(); }
+      firebaseDbRef = null;
+      productionRoomLoaded = false;
+      lastRemoteState = null;
+      lastRemoteRawState = null;
+      updateSyncIndicator(false);
+    }
     function updateAuthenticatedFirebaseSync() {
-      const verified = !!testAuthUser && ['Master', 'Daisy'].includes(testAuthRole);
-      if (!verified) {
-        productionRoomLoaded = false;
-        lastRemoteState = null;
-        if (firebaseDbRef) { firebaseDbRef.off(); firebaseDbRef.child('chatV2').off(); }
-        firebaseDbRef = null;
-        updateSyncIndicator(false);
-        return;
-      }
-      if (firebaseRoomPathPending) attachFirebaseListener(firebaseRoomPathPending);
+      if (!testAuthUser || testAuthRole !== currentRole || !currentRole) { detachRoleSync(); return; }
+      if (!firebaseDbRef && firebaseRoomPathPending) attachFirebaseListener(firebaseRoomPathPending);
     }
 
     function attachFirebaseListener(safeRoomPath) {
@@ -3351,13 +3484,15 @@
         firebaseDbRef.off();
         firebaseDbRef.child('chatV2').off();
       }
-      firebaseDbRef = firebase.database().ref('rooms/' + safeRoomPath);
+      firebaseDbRef = roleFirebaseApp().database().ref('rooms/' + safeRoomPath);
+      const listenerRef = firebaseDbRef;
       productionRoomLoaded = false;
       lastRemoteState = null;
       lastRemoteRawState = null;
       appState.chat = []; // The previous chat is explicitly excluded from this release.
       saveStateLocalOnly();
       firebaseDbRef.child('chatV2').on('child_added', snapshot => {
+        if (firebaseDbRef !== listenerRef) return;
         const message = snapshot.val();
         if (!message || !message.id) return;
         appState.chat = mergeChatMessages(appState.chat, [message]);
@@ -3370,6 +3505,7 @@
       });
 
       firebaseDbRef.on('value', (snapshot) => {
+        if (firebaseDbRef !== listenerRef) return;
         const remoteData = snapshot.val();
         if (!remoteData) {
           // Fail closed: NEVER initialize an absent production room with default data.
@@ -3490,6 +3626,136 @@
       if (roleKey === 'Master') return appState.basics.masterName || 'Master';
       if (roleKey === 'Daisy') return appState.basics.daisyName || 'Daisy';
       return roleKey;
+    }
+
+    // Quick role toggles apply only after all permission and event-type filters.
+    const ACTIVITY_ROLE_FILTER_KEY = 'dominion-prod-activity-roles-v1:';
+    function getActivityStreamRoleFilter() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(ACTIVITY_ROLE_FILTER_KEY + currentRole) || '{}');
+        return {Master:saved.Master !== false,Daisy:saved.Daisy !== false};
+      } catch (_) { return {Master:true,Daisy:true}; }
+    }
+    function toggleActivityStreamRole(role) {
+      if (!['Master','Daisy'].includes(role)) return;
+      const selected = getActivityStreamRoleFilter();
+      selected[role] = !selected[role];
+      try { localStorage.setItem(ACTIVITY_ROLE_FILTER_KEY + currentRole,JSON.stringify(selected)); }
+      catch (_) { showToast('Rollenfilter konnte nicht gespeichert werden.','error'); return; }
+      renderDashboard();
+    }
+    function updateActivityStreamRoleButtons(selected) {
+      for (const role of ['Master','Daisy']) {
+        const button = document.getElementById('activity-role-' + role.toLowerCase());
+        if (!button) continue;
+        const enabled = selected[role];
+        button.setAttribute('aria-pressed',String(enabled));
+        button.classList.toggle('bg-[#c9973e]/25',enabled);
+        button.classList.toggle('text-[#e5b55c]',enabled);
+        button.classList.toggle('border',enabled);
+        button.classList.toggle('border-[#c9973e]/50',enabled);
+        button.classList.toggle('bg-white/5',!enabled);
+        button.classList.toggle('text-slate-500',!enabled);
+        button.classList.toggle('opacity-50',!enabled);
+      }
+    }
+
+    // Stream permissions: synchronized Master allowance, separate local role preferences.
+    const ACTIVITY_FILTER_KEY = 'dominion-prod-activity-filter-v1';
+    const ACTIVITY_EVENT_TYPES = [
+      {id:'created',label:'Neu angelegt',actors:['Master','Daisy']},
+      {id:'changed',label:'Geändert / bearbeitet',actors:['Master','Daisy']},
+      {id:'deleted',label:'Gelöscht',actors:['Master','Daisy']},
+      {id:'completed',label:'Erledigt / Status geändert',actors:['Master','Daisy']},
+      {id:'submitted',label:'Antrag gestellt / erneut eingereicht',actors:['Daisy']},
+      {id:'revision',label:'Zur Nachbesserung zurückverwiesen',actors:['Master']},
+      {id:'approved',label:'Antrag freigegeben',actors:['Master']},
+      {id:'rejected',label:'Antrag abgelehnt',actors:['Master']},
+      {id:'other',label:'Sonstige Aktivitäten',actors:['Master','Daisy']}
+    ];
+    const ACTIVITY_FILTER_CATEGORIES = [
+      {id:'kleidung',label:'Kleidung'}, {id:'toys',label:'Toys'},
+      {id:'strafen',label:'Strafen'}, {id:'belohnungen',label:'Belohnungen'},
+      {id:'regeln',label:'Regeln'}, {id:'aufgaben',label:'Aufgaben'},
+      {id:'chat',label:'Chat'}, {id:'kalender',label:'Kalender'},
+      {id:'einkauf',label:'Einkauf'}, {id:'strafbuch',label:'Strafbuch'},
+      {id:'rewards',label:'Rewards'}, {id:'einstellungen',label:'Einstellungen'}
+    ];
+    function activityEventType(item) {
+      if (String(item.id || '').startsWith('application-feed-')) {
+        const action = String(item.action || '');
+        if (action.startsWith('Antrag gestellt')) return 'submitted';
+        if (action.startsWith('Zur Nachbesserung')) return 'revision';
+        if (action.startsWith('Antrag freigegeben')) return 'approved';
+        if (action.startsWith('Antrag abgelehnt')) return 'rejected';
+      }
+      const action = String(item.action || '').toLowerCase();
+      if (/gelöscht|entfernt/.test(action)) return 'deleted';
+      if (/hinzugefügt|angelegt|erstellt|eingetragen/.test(action)) return 'created';
+      if (/erledigt|abgeschlossen|geöffnet|status/.test(action)) return 'completed';
+      if (/geändert|bearbeitet|aktualisiert|angepasst/.test(action)) return 'changed';
+      return 'other';
+    }
+    function activityEventCategory(item) {
+      return item.targetTab === 'verwaltung' ? item.targetSubCategory : item.targetTab;
+    }
+    function activityFilterKey(cat,type,actor) { return cat + ':' + type + ':' + actor; }
+    function getActivityLocalPrefs() {
+      try { return JSON.parse(localStorage.getItem(ACTIVITY_FILTER_KEY + ':' + currentRole) || '{}') || {}; }
+      catch (_) { return {}; }
+    }
+    function setActivityLocalPref(cat,type,actor,enabled) {
+      const prefs = getActivityLocalPrefs();
+      prefs[activityFilterKey(cat,type,actor)] = enabled;
+      try { localStorage.setItem(ACTIVITY_FILTER_KEY + ':' + currentRole,JSON.stringify(prefs)); }
+      catch (_) { showToast('Ansicht konnte nicht gespeichert werden.','error'); return; }
+      renderActivityStreamFilterSettings();
+      renderDashboard();
+    }
+    function activityMasterAllowed(cat,type,actor) {
+      return appState.activityStreamAllowed?.[activityFilterKey(cat,type,actor)] !== false;
+    }
+    function setActivityMasterAllowed(cat,type,actor,enabled) {
+      if (currentRole !== 'Master') return;
+      if (!appState.activityStreamAllowed) appState.activityStreamAllowed = {};
+      appState.activityStreamAllowed[activityFilterKey(cat,type,actor)] = enabled;
+      persistState();
+      renderActivityStreamFilterSettings();
+      renderDashboard();
+    }
+    function isActivityStreamEventEnabled(item) {
+      const cat = activityEventCategory(item),type = activityEventType(item),actor = item.actorRole;
+      if (!cat || !['Master','Daisy'].includes(actor)) return true;
+      const key = activityFilterKey(cat,type,actor);
+      if (currentRole === 'Daisy' && !activityMasterAllowed(cat,type,actor)) return false;
+      return getActivityLocalPrefs()[key] !== false;
+    }
+    function renderActivityStreamFilterSettings() {
+      const box = document.getElementById('activity-stream-filter-settings');
+      if (!box || !currentRole) return;
+      const prefs = getActivityLocalPrefs();
+      const categories = ACTIVITY_FILTER_CATEGORIES.filter(c =>
+        currentRole === 'Master' || (c.id !== 'einstellungen' && hasPermission(c.id,'visible')));
+      box.innerHTML = categories.map(cat => {
+        const types = ACTIVITY_EVENT_TYPES.filter(type =>
+          !['submitted','revision','approved','rejected'].includes(type.id) ||
+          ['kleidung','toys','strafen','belohnungen','regeln'].includes(cat.id));
+        const rows = types.flatMap(type => type.actors.map(actor => ({type,actor})))
+          .filter(row => currentRole === 'Master' || activityMasterAllowed(cat.id,row.type.id,row.actor));
+        if (!rows.length) return '';
+        return `<details class="rounded-xl border border-slate-800 bg-white/[0.03] p-3">
+          <summary class="cursor-pointer text-sm font-semibold text-amber-200">${cat.label}</summary>
+          <div class="mt-3 space-y-2">${rows.map(row => {
+            const key = activityFilterKey(cat.id,row.type.id,row.actor);
+            return `<div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/70 pb-2 text-xs">
+              <span>${row.type.label} · von ${row.actor}</span>
+              <div class="flex items-center gap-3">
+                ${currentRole === 'Master' ? `<label class="flex items-center gap-1 text-slate-400">Daisy erlaubt <input type="checkbox" class="accent-amber-500" onchange="setActivityMasterAllowed('${cat.id}','${row.type.id}','${row.actor}',this.checked)" ${activityMasterAllowed(cat.id,row.type.id,row.actor) ? 'checked' : ''}></label>` : ''}
+                <label class="flex items-center gap-1">Anzeigen <input type="checkbox" class="accent-amber-500" onchange="setActivityLocalPref('${cat.id}','${row.type.id}','${row.actor}',this.checked)" ${prefs[key] !== false ? 'checked' : ''}></label>
+              </div>
+            </div>`;
+          }).join('')}</div></details>`;
+      }).join('');
     }
 
     function logActivity(actionText, targetTab, targetSubCategory = null, targetItemId = null) {
@@ -3677,13 +3943,15 @@
 
       refreshAllUI();
       switchTab(startTab);
-      updateTestAuthPanel();
-      loadPushPrefs();
+      activateRoleSession();
     }
 
     function logoutRole() {
+      if (roleWriteBusy()) { showToast('Bitte laufende Speicherung abwarten.','error'); return; }
       masterToDaisyBypass = currentRole === 'Master';
       currentRole = null;
+      activateRoleSession();
+      setPushPermissionStatus('Nicht geprüft', false);
       document.getElementById('main-app').classList.add('hidden');
       document.getElementById('bottom-nav').classList.add('hidden');
       document.getElementById('role-screen').classList.remove('hidden');
@@ -3710,7 +3978,7 @@
       if (!testAuthUser || testAuthRole !== currentRole) return;
       const role = currentRole;
       try {
-        const response = await firebase.app().functions('europe-west1').httpsCallable('getTestPushPreferences')();
+        const response = await (await prepareRoleCallable(roleFirebaseApp())).httpsCallable('getProductionPushPreferences')();
         if (role !== currentRole || role !== testAuthRole) return;
         pushPrefs = response.data.preferences; pushPrefsRole = role;
       } catch(e) { console.warn('Push-Einstellungen:',e); }
@@ -3733,12 +4001,25 @@
     async function savePushPref(key,enabled) {
       if (!Object.prototype.hasOwnProperty.call(PUSH_EVENTS,key) || pushSaving ||
           !testAuthUser || testAuthRole !== currentRole || pushPrefsRole !== currentRole) return;
+      const savingRole = currentRole;
       pushSaving = true; renderPushPrefs();
       try {
-        const response = await firebase.app().functions('europe-west1').httpsCallable('setTestPushPreference')({event:key,enabled:!!enabled});
-        if (response.data?.saved && testAuthRole === currentRole && pushPrefsRole === currentRole) pushPrefs[key]=!!enabled;
+        const response = await (await prepareRoleCallable(roleFirebaseApp())).httpsCallable('setProductionPushPreference')({event:key,enabled:!!enabled});
+        if (response.data?.saved && savingRole === currentRole && testAuthRole === currentRole && pushPrefsRole === currentRole) pushPrefs[key]=!!enabled;
       } catch(e) { console.warn('Push-Einstellung nicht gespeichert:',e); showToast('Push-Einstellung nicht gespeichert.','error'); }
       finally { pushSaving=false; renderPushPrefs(); }
+    }
+    function canChangeEntry(category, action, entry) {
+      if (entry?.masterLocked === true) return false;
+      if (currentRole === 'Master') return true;
+      if (!entry || !['edit','delete'].includes(action)) return false;
+      if (entry.masterLocked === true) return false;
+      const permissions = appState.permissions?.[category];
+      if (!permissions || !permissions.visible) return false;
+      // Unknown authorship is treated as foreign; never infer from assignee or owner.
+      const own = entry.createdBy === currentRole;
+      const field = action + (own ? 'Own' : 'Others');
+      return typeof permissions[field] === 'boolean' ? permissions[field] : !!permissions[action];
     }
     function hasPermission(category, action) {
       if (currentRole === 'Master') return true;
@@ -3789,8 +4070,44 @@
       menuNewHighlights[tab] = new Set(ids);
       badgeSave(tab, badgeItems(tab).map(x => String(x.id)));
     }
+    function mgmtAttentionCount(cat) {
+      return (appState.mgmtApplications || []).filter(a =>
+        a.category === cat && a.item &&
+        ((currentRole === 'Master' && a.status === 'pending') ||
+         (currentRole === 'Daisy' && a.status === 'revision' && a.item.createdBy === 'Daisy') ||
+         isMgmtDecisionUnread(a))
+      ).length;
+    }
+    function updateMgmtNavigationBadges() {
+      const categories = MGMT_CATEGORIES.filter(cat => cat.id !== 'aufgaben' &&
+        (currentRole === 'Master' || hasPermission(cat.id,'visible')));
+      let total = 0;
+      for (const cat of categories) {
+        const count = mgmtAttentionCount(cat.id);
+        total += count;
+        const button = document.querySelector('#verwaltung-subtabs [data-mgmt-category="' + cat.id + '"]');
+        if (!button) continue;
+        const badge = button.querySelector('.dominion-mgmt-count');
+        if (badge) {
+          badge.textContent = count > 99 ? '99+' : String(count);
+          badge.classList.toggle('hidden', count === 0);
+        }
+      }
+      const button = document.querySelector('.nav-btn[data-tab="verwaltung"]');
+      if (!button) return;
+      button.classList.add('relative');
+      let badge = button.querySelector('.dominion-menu-count');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'dominion-menu-count absolute top-0 right-0 min-w-[17px] h-[17px] px-1 rounded-full bg-rose-600 text-white text-[10px] leading-[17px] text-center font-bold shadow pointer-events-none hidden';
+        button.appendChild(badge);
+      }
+      badge.textContent = total > 99 ? '99+' : String(total);
+      badge.classList.toggle('hidden', total === 0);
+    }
     function badgeRefresh() {
       if (!currentRole) return;
+      updateMgmtNavigationBadges();
       if (menuLastRole !== currentRole) {
         menuLastRole = currentRole;
         menuNewHighlights = {chat:new Set(), kalender:new Set(), aufgaben:new Set()};
@@ -3964,7 +4281,30 @@
       console.warn('Dashboard-Bereiche konnten nicht geladen werden:', err);
     }
 
+    const DASHBOARD_NEWS_PREF_KEY = 'dominion-prod-dashboard-news-v1';
+    function restoreDashboardNewsPreferences() {
+      if (!currentRole) return;
+      const role = currentRole;
+      let prefs = {};
+      try { prefs = JSON.parse(localStorage.getItem(DASHBOARD_NEWS_PREF_KEY) || '{}')[role] || {}; } catch (err) {}
+      for (const [id, defaultOpen] of [['dashboard-news-current', true], ['dashboard-news-history', false]]) {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.preferenceRole === role) continue;
+        el.dataset.preferenceRole = role;
+        el.open = typeof prefs[id] === 'boolean' ? prefs[id] : defaultOpen;
+        el.ontoggle = () => {
+          if (currentRole !== role || el.dataset.preferenceRole !== role) return;
+          try {
+            const all = JSON.parse(localStorage.getItem(DASHBOARD_NEWS_PREF_KEY) || '{}');
+            all[role] = { ...all[role], [id]: el.open };
+            localStorage.setItem(DASHBOARD_NEWS_PREF_KEY, JSON.stringify(all));
+          } catch (err) { console.warn('Update-News-Ansicht konnte nicht gespeichert werden:', err); }
+        };
+      }
+    }
+
     function updateDashboardSectionsUI() {
+      restoreDashboardNewsPreferences();
       for (const section of ['feed', 'events']) {
         const pref = dashboardSectionPreferences[section];
         const content = document.getElementById('dashboard-' + section + '-content');
@@ -4178,6 +4518,61 @@
       });
     }
 
+    // TEST-only local read receipts. A decision is acknowledged only when its own history entry is opened.
+    function mgmtDecisionReadKey(a) {
+      return 'dominion-prod-decision-read:Daisy:' + a.id + ':' + String(a.decidedAt || 0);
+    }
+    function isMgmtDecisionUnread(a) {
+      if (currentRole !== 'Daisy' || a.item?.createdBy !== 'Daisy' ||
+          !['approved','rejected'].includes(a.status)) return false;
+      if (a.readByDaisyAt && Number(a.readByDaisyAt) >= Number(a.decidedAt || 0)) return false;
+      try { return localStorage.getItem(mgmtDecisionReadKey(a)) !== '1'; }
+      catch (err) { return true; }
+    }
+    let mgmtReadReceiptPending = false;
+    async function acknowledgeMgmtDecision(id) {
+      if (currentRole !== 'Daisy' || mgmtReadReceiptPending) return;
+      const a = (appState.mgmtApplications || []).find(x => x.id === id);
+      if (!a || !isMgmtDecisionUnread(a)) return;
+      if (location.hostname !== 'jnilats33.github.io' ||
+          !location.pathname.startsWith('/Dominion/') ||
+          firebaseRoomPathPending !== DEFAULT_ROOM_CODE ||
+          !firebaseDbRef || !productionRoomLoaded || productionSyncConflict ||
+          !testAuthUser || testAuthRole !== 'Daisy' || isApplyingRemoteUpdate) {
+        showToast('Lesebestätigung nicht gespeichert: Produktiv-Synchronisation prüfen.', 'error');
+        return;
+      }
+      mgmtReadReceiptPending = true;
+      try {
+        const decidedAt = Number(a.decidedAt || 0);
+        const result = await new Promise((resolve,reject) => {
+          firebaseDbRef.child('mgmtApplications').transaction(current => {
+            if (!Array.isArray(current)) return;
+            const entry = current.find(x => x && x.id === id);
+            if (!entry || entry.item?.createdBy !== 'Daisy' ||
+                !['approved','rejected'].includes(entry.status) ||
+                Number(entry.decidedAt || 0) !== decidedAt) return;
+            if (Number(entry.readByDaisyAt || 0) >= decidedAt && decidedAt > 0) return;
+            entry.readByDaisyAt = Date.now();
+            return current;
+          },(error,committed,snapshot) => error ? reject(error) : resolve({committed,snapshot}),false);
+        });
+        const confirmed = result.committed ||
+          (result.snapshot?.val() || []).some(x => x && x.id === id &&
+            Number(x.decidedAt || 0) === decidedAt &&
+            Number(x.readByDaisyAt || 0) >= decidedAt);
+        if (!confirmed) throw new Error('Serverstand geändert; bitte erneut versuchen.');
+        try { localStorage.setItem(mgmtDecisionReadKey(a),'1'); } catch (err) {}
+        showToast('Entscheidung als gelesen gespeichert.');
+        renderDashboard();
+        renderMgmtApplications();
+      } catch (err) {
+        showToast('Lesebestätigung nicht gespeichert: ' + (err.message || String(err)), 'error');
+      } finally {
+        mgmtReadReceiptPending = false;
+      }
+    }
+
     function renderDashboard() {
       updateDashboardMetricPermissions();
       updateDashboardVisibilityUI();
@@ -4201,15 +4596,64 @@
       document.getElementById('stat-regeln').textContent = (appState.mgmt.regeln || []).length;
       document.getElementById('stat-belohnungen').textContent = (appState.mgmt.belohnungen || []).length;
       document.getElementById('stat-strafen').textContent = (appState.mgmt.strafen || []).length;
+      // Role-specific action counts: requests awaiting the current role, not catalog totals.
+      for (const cat of ['kleidung','toys','strafen','belohnungen','regeln']) {
+        const count = (appState.mgmtApplications || []).filter(a =>
+          a.category === cat && a.item &&
+          ((currentRole === 'Master' && a.status === 'pending') ||
+           (currentRole === 'Daisy' && a.status === 'revision' && a.item.createdBy === 'Daisy'))
+        ).length;
+        const badge = document.getElementById('stat-' + cat + '-action');
+        if (badge) {
+          badge.classList.toggle('hidden', count === 0);
+          badge.textContent = count ? '● ' + count + ' zur Bearbeitung' : '';
+        }
+      }
+      for (const cat of ['kleidung','toys','strafen','belohnungen','regeln']) {
+        const unread = (appState.mgmtApplications || []).filter(a =>
+          a.category === cat && isMgmtDecisionUnread(a)).length;
+        const badge = document.getElementById('stat-' + cat + '-decision');
+        if (badge) {
+          badge.classList.toggle('hidden', unread === 0);
+          badge.textContent = unread ? '● ' + unread + ' neue Entscheidung' + (unread === 1 ? '' : 'en') : '';
+        }
+      }
+      updateMgmtNavigationBadges();
       const redemptions = (appState.rewardLedger || []).filter(row => row && row.redemption);
       document.getElementById('stat-eingeloeste-belohnungen').textContent = redemptions.filter(row => row.redemption.mode === 'belohnungen' && row.redemption.status === 'completed').length;
       document.getElementById('stat-erwartete-bestrafungen').textContent = redemptions.filter(row => row.redemption.mode === 'strafen' && row.redemption.status !== 'completed').length;
 
       const limit = parseInt(appState.basics.feedLimit || 20, 10);
-      const rawFeed = appState.activityFeed || [];
-      const visibleFeed = currentRole === 'Daisy'
-        ? rawFeed.filter(item => isActivityVisibleForDaisy(item))
-        : rawFeed;
+      // Derive request lifecycle events from authoritative application history.
+      // No extra Firebase writes, and old requests become visible as well.
+      const applicationFeed = (appState.mgmtApplications || []).flatMap(a => {
+        if (!a || !a.id || !a.category) return [];
+        const events = Array.isArray(a.history) && a.history.length
+          ? a.history : [{action:a.status === 'pending' ? 'submitted' : a.status, role:a.status === 'pending' ? 'Daisy' : 'Master',at:a.decidedAt || a.createdAt}];
+        const names = {submitted:'Antrag gestellt',pending:'Antrag gestellt',
+          revision:'Zur Nachbesserung zurückverwiesen',approved:'Antrag freigegeben',
+          rejected:'Antrag abgelehnt'};
+        return events.filter(e => e && names[e.action] && Number(e.at || 0) > 0).map((e,i) => ({
+          id:'application-feed-' + a.id + '-' + i,
+          actorRole:e.role || (e.action === 'submitted' ? 'Daisy' : 'Master'),
+          action:names[e.action] + ': „' + (a.item?.title || 'Eintrag') + '“' +
+            (e.comment ? ' – ' + e.comment : ''),
+          targetTab:'verwaltung',targetSubCategory:a.category,
+          targetItemId:a.item?.id || null,permissionKey:a.category,
+          timestamp:Number(e.at)
+        }));
+      });
+      const reviewedItemIds = new Set((appState.mgmtApplications || []).map(a => String(a.item?.id || '')));
+      const rawFeed = [...applicationFeed, ...(appState.activityFeed || []).filter(e =>
+        !(e.targetTab === 'verwaltung' && reviewedItemIds.has(String(e.targetItemId || '')) &&
+          typeof e.action === 'string' && e.action.includes('hinzugefügt:'))
+      )].sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+      const selectedActors = getActivityStreamRoleFilter();
+      updateActivityStreamRoleButtons(selectedActors);
+      const visibleFeed = rawFeed.filter(item =>
+        (currentRole !== 'Daisy' || isActivityVisibleForDaisy(item)) &&
+        isActivityStreamEventEnabled(item) &&
+        (item.actorRole !== 'Master' && item.actorRole !== 'Daisy' || selectedActors[item.actorRole]));
       const feedItems = visibleFeed.slice(0, limit);
       document.getElementById('feed-count-badge').textContent = `${feedItems.length} Einträge`;
 
@@ -4544,6 +4988,57 @@
       }
     }
 
+    const CHAT_EMOJI_CATEGORIES = {
+      alltag: ['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😍','🥰','😘','😉','😎','🥳','🤩','😇','🙂','🙃','😋','😜','🤔','😏','😢','😭','😡','😱','🥺','😴','🤗','🤭','🙈','❤️','💕','💋','💖','💔','👍','👎','👏','🙌','🙏','💪','🤝','👋','👌','🔥','🎉','🎁','🌹','🌞','☕','🍀','💯','✨','💐','🐱','🐶','💌','💃','🕺','😈','💜','🫶'],
+      dominion: ['👑','😈','😇','🖤','❤️‍🔥','⛓️','🔒','🔑','🫦','💋','🧎','🙇','🎀','🪢','🕯️','🥀','🫶','🌹','💌','🎁','🖤','💜','🔥','✨']
+    };
+    const CHAT_EMOJIS = [...new Set(Object.values(CHAT_EMOJI_CATEGORIES).flat())];
+    let chatEmojiCategory = 'alltag';
+    function showChatEmojiCategory(category) {
+      if (!Object.prototype.hasOwnProperty.call(CHAT_EMOJI_CATEGORIES, category)) return;
+      chatEmojiCategory = category;
+      const options = document.getElementById('chat-emoji-options');
+      if (!options) return;
+      options.replaceChildren();
+      CHAT_EMOJI_CATEGORIES[category].forEach(emoji => {
+        const choice = document.createElement('button');
+        choice.type = 'button';
+        choice.textContent = emoji;
+        choice.title = emoji;
+        choice.setAttribute('aria-label', 'Emoji ' + emoji + ' einfügen');
+        choice.className = 'text-xl rounded-lg hover:bg-white/10 p-1.5';
+        choice.addEventListener('click', () => insertChatEmoji(emoji));
+        options.appendChild(choice);
+      });
+      for (const key of Object.keys(CHAT_EMOJI_CATEGORIES)) {
+        const tab = document.getElementById('chat-emoji-tab-' + key);
+        if (!tab) continue;
+        const selected = key === category;
+        tab.setAttribute('aria-pressed', String(selected));
+        tab.className = selected
+          ? 'px-3 py-1.5 rounded-lg text-xs bg-[#c9973e]/20 text-[#e5b55c] border border-[#c9973e]/40'
+          : 'px-3 py-1.5 rounded-lg text-xs bg-white/5 text-slate-300 border border-slate-700';
+      }
+    }
+    function toggleChatEmojiPicker(force) {
+      const panel = document.getElementById('chat-emoji-picker');
+      const button = document.getElementById('chat-emoji-btn');
+      if (!panel || !button) return;
+      const show = typeof force === 'boolean' ? force : panel.classList.contains('hidden');
+      if (show) showChatEmojiCategory(chatEmojiCategory);
+      panel.classList.toggle('hidden', !show);
+      button.setAttribute('aria-expanded', String(show));
+    }
+    function insertChatEmoji(emoji) {
+      const input = document.getElementById('chat-input');
+      if (!input || !CHAT_EMOJIS.includes(emoji)) return;
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? start;
+      input.setRangeText(emoji, start, end, 'end');
+      input.dispatchEvent(new Event('input', {bubbles:true}));
+      input.focus();
+    }
+
     function sendChatMessage() {
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
@@ -4558,6 +5053,7 @@
       });
 
       input.value = '';
+      toggleChatEmojiPicker(false);
       clearChatAttachment();
       persistChat(appState.chat[appState.chat.length - 1]);
       renderChat();
@@ -4754,8 +5250,8 @@
             </div>
             <div class="flex flex-wrap gap-1.5 w-full sm:w-auto sm:justify-end min-w-0">
               ${currentRole === 'Master' && ownerRole === 'Daisy' && !ev.confirmed && ((ev.pointsPlus != null ? Number(ev.pointsPlus) : Math.max(0,Number(ev.points || 0))) > 0 || (ev.pointsMinus != null ? Number(ev.pointsMinus) : Math.max(0,-Number(ev.points || 0))) > 0) ? `<button onclick="confirmCalendarEvent('${ev.id}','fulfilled')" class="p-2 rounded-lg bg-emerald-500/15 text-emerald-300 text-xs" title="Termin erfüllt">✓ Erfüllt</button><button onclick="confirmCalendarEvent('${ev.id}','unfulfilled')" class="p-2 rounded-lg bg-rose-500/15 text-rose-300 text-xs" title="Termin nicht erfüllt">✕ Nicht erfüllt</button>` : ''}
-              ${hasPermission('kalender','edit') || currentRole === 'Master' ? `<button onclick="editCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-slate-700/50 text-slate-200 text-xs" title="Termin bearbeiten">✎</button>` : ''}
-              ${canDelete ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
+              ${canChangeEntry('kalender','edit',ev) ? `<button onclick="editCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-slate-700/50 text-slate-200 text-xs" title="Termin bearbeiten">✎</button>` : ''}
+              ${canChangeEntry('kalender','delete',ev) ? `<button onclick="deleteCalendarEvent('${ev.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs transition">🗑️</button>` : ''}
             </div>
           </div>
         `;
@@ -4806,9 +5302,8 @@
       persistState(); refreshAllUI(); showToast(owners.length === 2 ? 'Zwei verknüpfte Termine gespeichert.' : 'Termin gespeichert.');
     }
     function editCalendarEvent(id) {
-      if (currentRole !== 'Master' && !hasPermission('kalender','edit')) return;
       const ev = appState.kalender.find(x => x.id === id);
-      if (!ev) return;
+      if (!ev || !canChangeEntry('kalender','edit',ev)) return;
       calendarEditingId = id;
       document.getElementById('cal-title').value = ev.title;
       document.getElementById('cal-date').value = ev.date;
@@ -4867,12 +5362,13 @@
     function cancelCalendarEdit() { closeCalendarDialog(); }
     function submitCalendarDialog() { if (calendarEditingId) saveCalendarEdit(); else addCalendarEvent(); }
     function saveCalendarEdit() {
-      if (!calendarEditingId || currentRole !== 'Master' && !hasPermission('kalender','edit')) return;
+      if (!calendarEditingId) return;
       const ev = appState.kalender.find(x => x.id === calendarEditingId);
       const data = calendarFormData();
-      if (!ev || !data) return;
+      if (!ev || !data || !canChangeEntry('kalender','edit',ev)) return;
       const pair = !!ev.groupId && document.getElementById('cal-edit-pair').checked;
       const targets = pair ? appState.kalender.filter(x => x.groupId === ev.groupId) : [ev];
+      if (!targets.every(x => canChangeEntry('kalender','edit',x))) { showToast('Keine Berechtigung für alle verknüpften Termine.', 'error'); return; }
       targets.forEach(x => {
         x.title=data.title; x.date=data.date; x.time=data.time; x.endDate=data.endDate; x.endTime=data.endTime; x.reminderMinutes=data.reminderMinutes; x.lastEditedBy=currentRole;
         if (x.owner === 'Daisy' && currentRole === 'Master' && !x.confirmed && x.id === ev.id) { x.pointsPlus=data.pointsPlus; x.pointsMinus=data.pointsMinus; delete x.points; }
@@ -4896,11 +5392,12 @@
       persistState(); refreshAllUI(); showToast(amount ? 'Termin bestätigt. Punkte gebucht.' : 'Termin ohne Punkte bestätigt.');
     }
     function deleteCalendarEvent(id) {
-      if (!hasPermission('kalender', 'delete')) return;
       const ev = appState.kalender.find(e => e.id === id);
+      if (!canChangeEntry('kalender','delete',ev)) return;
       if (!ev) return;
       const pair = !!ev.groupId && confirm('Auch den verknüpften Termin löschen?\nOK = beide, Abbrechen = nur diesen Termin');
       const ids = appState.kalender.filter(e => e.id === id || pair && e.groupId === ev.groupId).map(e => e.id);
+      if (!appState.kalender.filter(e => ids.includes(e.id)).every(e => canChangeEntry('kalender','delete',e))) { showToast('Keine Löschberechtigung für alle Termine.', 'error'); return; }
       if (!confirm('Wirklich ' + ids.length + ' Termin(e) löschen? Bereits gebuchte Punkte bleiben in der Historie.')) return;
       appState.kalender = appState.kalender.filter(e => !ids.includes(e.id));
       logActivity('hat Termin gelöscht: „' + ev.title + '“', 'kalender');
@@ -4921,7 +5418,7 @@
 
       list.innerHTML = appState.einkauf.map(item => `
         <div id="item-${item.id}" class="p-3 rounded-xl bg-white/[0.03] border border-slate-800 flex items-center justify-between gap-3">
-          <div onclick="${canEdit ? `toggleShoppingItem('${item.id}')` : ''}" class="flex items-center gap-3 flex-1 ${canEdit ? 'cursor-pointer' : ''}">
+          <div onclick="${canChangeEntry('einkauf','edit',item) ? `toggleShoppingItem('${item.id}')` : ''}" class="flex items-center gap-3 flex-1 ${canChangeEntry('einkauf','edit',item) ? 'cursor-pointer' : ''}">
             <div class="w-5 h-5 rounded-md border flex items-center justify-center text-xs ${
               item.done ? 'bg-emerald-500 border-emerald-500 text-black font-bold' : 'border-slate-500'
             }">
@@ -4932,7 +5429,7 @@
               ${item.note ? `<div class="text-[11px] text-slate-400">${escapeHtml(item.note)}</div>` : ''}
             </div>
           </div>
-          ${canDelete ? `<button onclick="deleteShoppingItem('${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
+          ${canChangeEntry('einkauf','delete',item) ? `<button onclick="deleteShoppingItem('${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
         </div>
       `).join('');
     }
@@ -4954,9 +5451,8 @@
     }
 
     function toggleShoppingItem(id) {
-      if (!hasPermission('einkauf', 'edit')) return;
       const item = appState.einkauf.find(i => i.id === id);
-      if (!item) return;
+      if (!item || !canChangeEntry(catId, 'edit', item)) return;
       item.done = !item.done;
       item.lastEditedBy = currentRole;
       logActivity(`hat Einkaufsartikel ${item.done ? 'abgehakt' : 'wieder geöffnet'}: „${item.name}“`, 'einkauf', null, item.id);
@@ -4965,8 +5461,8 @@
     }
 
     function deleteShoppingItem(id) {
-      if (!hasPermission('einkauf', 'delete')) return;
       const item = appState.einkauf.find(i => i.id === id);
+      if (!canChangeEntry('einkauf', 'delete', item)) return;
       appState.einkauf = appState.einkauf.filter(i => i.id !== id);
       if (item) logActivity(`hat Einkaufsartikel gelöscht: „${item.name}“`, 'einkauf');
       persistState();
@@ -4974,10 +5470,12 @@
     }
 
     function clearCompletedShopping() {
-      if (!hasPermission('einkauf', 'delete') && currentRole !== 'Master') {
+      if (currentRole !== 'Master' && !(appState.permissions?.einkauf?.deleteOwn || appState.permissions?.einkauf?.deleteOthers || appState.permissions?.einkauf?.delete)) {
         showToast('Keine Löschberechtigung.', 'error');
         return;
       }
+      const completed = appState.einkauf.filter(i => i.done);
+      if (!completed.every(i => canChangeEntry('einkauf','delete',i))) { showToast('Keine Löschberechtigung für alle erledigten Artikel.', 'error'); return; }
       appState.einkauf = appState.einkauf.filter(i => !i.done);
       logActivity('hat erledigte Einkaufsartikel bereinigt', 'einkauf');
       persistState();
@@ -5009,8 +5507,8 @@
             ${entry.redemptionId && entry.completedAt ? `<p class="text-xs text-slate-400 mt-1">Eingelöst: ${new Date(entry.createdAt).toLocaleDateString('de-DE')} · Erfüllt: ${new Date(entry.completedAt).toLocaleDateString('de-DE')}</p>` : ''}
           </div>
           <div class="flex items-center gap-1.5">
-            ${canEdit ? `<button onclick="togglePenaltyResolved('${entry.id}')" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-slate-200">${entry.resolved ? 'Öffnen' : '✓ Erledigt'}</button>` : ''}
-            ${canDelete ? `<button onclick="deletePenaltyEntry('${entry.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
+            ${canChangeEntry('strafbuch','edit',entry) ? `<button onclick="togglePenaltyResolved('${entry.id}')" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-slate-200">${entry.resolved ? 'Öffnen' : '✓ Erledigt'}</button>` : ''}
+            ${canChangeEntry('strafbuch','delete',entry) ? `<button onclick="deletePenaltyEntry('${entry.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs">🗑️</button>` : ''}
           </div>
         </div>
       `).join('');
@@ -5033,9 +5531,8 @@
     }
 
     function togglePenaltyResolved(id) {
-      if (!hasPermission('strafbuch', 'edit')) return;
       const entry = appState.strafbuch.find(p => p.id === id);
-      if (!entry) return;
+      if (!entry || !canChangeEntry('strafbuch', 'edit', entry)) return;
       entry.resolved = !entry.resolved;
       entry.lastEditedBy = currentRole;
       logActivity(`hat Strafbuch-Eintrag als ${entry.resolved ? 'erledigt' : 'offen'} markiert: „${entry.reason}“`, 'strafbuch', null, entry.id);
@@ -5044,8 +5541,8 @@
     }
 
     function deletePenaltyEntry(id) {
-      if (!hasPermission('strafbuch', 'delete')) return;
       const entry = appState.strafbuch.find(p => p.id === id);
+      if (!canChangeEntry('strafbuch', 'delete', entry)) return;
       appState.strafbuch = appState.strafbuch.filter(p => p.id !== id);
       if (entry) logActivity(`hat Strafbuch-Eintrag gelöscht: „${entry.reason}“`, 'strafbuch');
       persistState();
@@ -5166,10 +5663,10 @@
     let deadlineTransactionPending = false;
     function processTaskDeadlines() {
       migrateLegacyTasks();
-      if (deadlineTransactionPending || !firebaseDbRef || !productionRoomLoaded ||
+      if (taskClosurePending || deadlineTransactionPending || !firebaseDbRef || !productionRoomLoaded ||
           productionSyncConflict || isApplyingRemoteUpdate || recoveryPending ||
           pendingCollectionWrites.size || !lastRemoteState || !lastRemoteRawState ||
-          firebaseRoomPathPending !== DEFAULT_ROOM_CODE) return false;
+          firebaseRoomPathPending !== DEVELOPMENT_TEST_ROOM) return false;
       // Do not overwrite unsaved local task or ledger edits with a root transaction.
       if (!sameRemoteValue(appState.mgmt, lastRemoteState.mgmt) ||
           !sameRemoteValue(appState.rewardLedger, lastRemoteState.rewardLedger)) return false;
@@ -5285,7 +5782,7 @@
     // Existing task edits retain their previous path until separately reviewed.
     let taskCreationPending = false;
     async function saveTask() {
-      if (currentRole !== 'Master' && (!hasPermission('aufgaben', 'add') || document.getElementById('task-kind').value !== 'personal')) return;
+      if (!editingTaskId && currentRole !== 'Master' && (!hasPermission('aufgaben', 'add') || document.getElementById('task-kind').value !== 'personal')) return;
       if (taskCreationPending) return;
       const title = document.getElementById('task-title').value.trim();
       const desc = document.getElementById('task-desc').value.trim();
@@ -5297,7 +5794,7 @@
       if (new Date(deadline).getTime() <= Date.now()) return showToast('Deadline muss in der Zukunft liegen.', 'error');
       const tasks = appState.mgmt.aufgaben;
       const task = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
-      if (editingTaskId && (!task || currentRole !== 'Master' || task.status !== 'open')) return;
+      if (editingTaskId && (!task || task.status !== 'open' || !canChangeEntry('aufgaben','edit',task))) return;
       const values = { title, desc, assignee, deadline, reminderMinutes, taskKind: kind, plusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-plus').value) : 0, minusPoints: kind === 'reward' ? rewardAmount(document.getElementById('task-minus').value) : 0 };
       if (task) {
         Object.assign(task, values);
@@ -5346,7 +5843,9 @@
         if (new Set(ids).size !== ids.length || ids.some(id=>!id) ||
             new Set(numbers).size !== numbers.length ||
             numbers.some(n=>typeof n !== 'string' || !/^A-[0-9]+$/.test(n)) ||
-            Math.max(0,...numbers.map(n=>Number(n.slice(2)))) !== counter)
+            numbers.some(n=>!Number.isSafeInteger(Number(n.slice(2))) || Number(n.slice(2)) < 1 || Number(n.slice(2)) > counter) ||
+            new Set(numbers.map(n=>Number(n.slice(2)))).size !== numbers.length ||
+            !Number.isSafeInteger(counter+1))
           throw new Error('Aufgabennummern und Zähler sind nicht konsistent.');
         const newNumber = 'A-' + String(counter+1).padStart(4,'0');
         const newTask = {id:taskId,itemNumber:newNumber,taskV26:true,status:'open',
@@ -5385,9 +5884,8 @@
       }
     }
     function editTask(id) {
-      if (currentRole !== 'Master') return;
       const t = appState.mgmt.aufgaben.find(t => t.id === id);
-      if (!t || t.status !== 'open') return;
+      if (!t || t.status !== 'open' || !canChangeEntry('aufgaben','edit',t)) return;
       editingTaskId = id;
       document.getElementById('task-title').value = t.title;
       document.getElementById('task-desc').value = t.desc || '';
@@ -5420,8 +5918,100 @@
       (task.history ||= []).push({ event: 'Erledigt', at: Date.now() });
       persistState(); refreshAllUI();
     }
+
+    let taskClosurePending = false;
+    function openTaskClosure(id) {
+      if (currentRole !== 'Master' || taskClosurePending) return;
+      const task = appState.mgmt.aufgaben.find(t => t.id === id);
+      if (!task) return;
+      document.getElementById('task-closure-dialog')?.remove();
+      const dialog = document.createElement('div');
+      dialog.id = 'task-closure-dialog';
+      dialog.className = 'fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4';
+      dialog.innerHTML = `<section class="w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-600 p-5 space-y-4">
+        <h2 class="font-bold text-lg">Aufgabe abschließen</h2>
+        <p class="text-sm text-slate-300"></p>
+        <label class="block"><input type="radio" name="task-closure" value="done" checked> 🟢 Aufgabe erledigt</label>
+        <label class="block"><input type="radio" name="task-closure" value="rejected"> 🔴 Aufgabe nicht erledigt</label>
+        <label class="block"><input type="radio" name="task-closure" value="withdraw"> ⚪ Aufgabe zurückziehen</label>
+        <label class="block text-sm">Kommentar an Daisy (optional)<textarea class="w-full rounded-lg bg-slate-800 p-2 mt-2" rows="3" maxlength="2000"></textarea></label>
+        <p class="text-xs text-slate-300" data-summary></p>
+        <div class="flex justify-end gap-2"><button data-cancel class="px-3 py-2 rounded-lg bg-white/10">Abbrechen</button><button data-submit class="px-3 py-2 rounded-lg gold-gradient text-black">Abschluss bestätigen</button></div>
+      </section>`;
+      if (['done','rejected'].includes(task.status)) {
+        dialog.querySelector('h2').textContent = 'Abschluss korrigieren';
+        dialog.querySelector('input[value="'+task.status+'"]').checked = true;
+        dialog.querySelector('textarea').value = task.closureComment || '';
+      }
+      dialog.querySelector('p').textContent = (task.number || '') + ' · ' + task.title;
+      const choice = () => dialog.querySelector('input:checked').value;
+      const summary = () => { dialog.querySelector('[data-summary]').textContent = ({done:'Belohnungspunkte werden gebucht. Bisherige Minuspunkte bleiben erhalten.',rejected:'Keine Belohnungspunkte und keine neuen Minuspunkte. Bisherige Minuspunkte bleiben erhalten.',withdraw:'Aufgabe entfernen und sämtliche zugehörigen Punktebuchungen rückgängig machen.'})[choice()]; };
+      dialog.addEventListener('change',summary); summary();
+      dialog.querySelector('[data-cancel]').onclick = () => { if (!taskClosurePending) dialog.remove(); };
+      dialog.querySelector('[data-submit]').onclick = async () => {
+        const button = dialog.querySelector('[data-submit]');
+        button.disabled = true;
+        try { if (await closeTaskAtomically(id,choice(),dialog.querySelector('textarea').value.trim())) dialog.remove(); }
+        finally { button.disabled = false; }
+      };
+      document.body.appendChild(dialog);
+    }
+    async function closeTaskAtomically(id, decision, comment) {
+      if (currentRole !== 'Master' || testAuthRole !== 'Master' || !testAuthUser ||
+          !['done','rejected','withdraw'].includes(decision) || taskClosurePending ||
+          location.hostname !== 'jnilats33.github.io' || !location.pathname.startsWith('/Dominion/') ||
+          firebaseRoomPathPending !== DEFAULT_ROOM_CODE || !firebaseDbRef || !productionRoomLoaded ||
+          productionSyncConflict || isApplyingRemoteUpdate || recoveryPending || deadlineTransactionPending ||
+          taskCreationPending || mgmtDecisionPending || pendingCollectionWrites.size || !lastRemoteState ||
+          !['mgmt','rewardLedger','deletedRewardKeys','activityFeed'].every(k => sameRemoteValue(appState[k],lastRemoteState[k]))) {
+        showToast('Abschluss gesperrt: Synchronisation zuerst prüfen.','error'); return false;
+      }
+      taskClosurePending = true;
+      const roomRef = firebaseDbRef, timestamp = Date.now();
+      try {
+        const baseline = (await roomRef.once('value')).val();
+        if (!baseline || roomRef !== firebaseDbRef || productionSyncConflict || pendingCollectionWrites.size ||
+            !['mgmt','rewardLedger','deletedRewardKeys','activityFeed'].every(k => sameRemoteValue(baseline[k],lastRemoteRawState?.[k]))) throw new Error('Serverstand geändert.');
+        const result = await new Promise((resolve,reject) => roomRef.transaction(current => {
+          if (!current || !sameRemoteValue(current,baseline)) return;
+          const next = sanitizeForFirebase(current);
+          const tasks = next.mgmt?.aufgaben;
+          if (!Array.isArray(tasks)) return;
+          const task = tasks.find(t => t.id === id);
+          if (!task) return;
+          const prefix = 'task:' + id + ':', key = prefix + 'completed';
+          const ledger = next.rewardLedger || [];
+          if (!Array.isArray(ledger)) return;
+          const related = row => typeof row?.id === 'string' && row.id.startsWith(prefix);
+          const removed = ledger.filter(row => related(row) && (decision === 'withdraw' || (decision === 'rejected' && Number(row.amount)>0)));
+          next.rewardLedger = ledger.filter(row => !removed.includes(row));
+          if (decision === 'done' && task.assignee === 'Daisy' && task.taskKind === 'reward' &&
+              rewardAmount(task.plusPoints) && !next.rewardLedger.some(row => row.id === key) &&
+              !(next.deletedRewardKeys || []).includes(key)) {
+            next.rewardLedger.push({id:key,amount:rewardAmount(task.plusPoints),description:'Aufgabe erfüllt: '+task.title,timestamp,actorRole:'Master'});
+          }
+          const label = {done:'Aufgabe erledigt',rejected:'Aufgabe nicht erledigt',withdraw:'Aufgabe zurückgezogen'}[decision];
+          if (decision === 'withdraw') {
+            next.mgmt.aufgaben = tasks.filter(t => t.id !== id);
+          } else {
+            task.status = decision; task.done = decision === 'done'; task.lastEditedBy = 'Master';
+            task.closureComment = comment; task.closedAt = timestamp;
+            (task.history ||= []).push({event:label,at:timestamp,comment});
+          }
+          next.activityFeed = [{id:'task-close-'+id+'-'+timestamp,actorRole:'Master',actorName:'Master',
+            action:label+': „'+task.title+'“'+(comment?' – '+comment:''),targetTab:'aufgaben',
+            permissionKey:'aufgaben',targetItemId:decision==='withdraw'?null:id,timestamp,
+            ...(decision==='withdraw'?{eventType:'taskWithdrawn',withdrawnTaskId:id,recipientRole:task.assignee}:{})},...(next.activityFeed || [])].slice(0,100);
+          return next;
+        },(error,committed)=>error?reject(error):resolve(committed),false));
+        if (!result) throw new Error('Serverstand geändert; keine Buchung vorgenommen.');
+        showToast('Aufgabenabschluss auf TEST-Server gespeichert.'); return true;
+      } catch(error) { showToast('Abschluss nicht ausgeführt: '+error.message,'error'); return false; }
+      finally { taskClosurePending = false; }
+    }
     function reviewTask(id, decision) {
       if (currentRole !== 'Master') return;
+      if (decision !== 'extend') { openTaskClosure(id); return; }
       const task = appState.mgmt.aufgaben.find(t => t.id === id);
       if (!task || task.assignee !== 'Daisy' || task.taskKind === 'personal' || !['review','overdue'].includes(task.status)) return;
       if (decision === 'extend') {
@@ -5433,18 +6023,7 @@
         task.status = 'open'; task.lastEditedBy = currentRole;
         task.reportedAt = null;
         (task.history ||= []).push({ event: 'Frist verlängert', at: Date.now(), deadline });
-      } else if (decision === 'accept') {
-        bookReward('task:' + task.id + ':completed', rewardAmount(task.plusPoints), 'Aufgabe erfüllt: ' + task.title);
-        task.status = 'done'; task.done = true; task.lastEditedBy = currentRole;
-        (task.history ||= []).push({ event: 'Erfüllt bestätigt', at: Date.now() });
-      } else if (decision === 'reject') {
-        const lateKey = 'task:' + task.id + ':late:' + (task.cycle || 0);
-        if (!(appState.rewardLedger || []).some(row => row.id === lateKey)) {
-          bookReward('task:' + task.id + ':rejected:' + (task.cycle || 0), -rewardAmount(task.minusPoints), 'Nicht erfüllt: ' + task.title);
-        }
-        task.status = 'rejected'; task.done = false; task.lastEditedBy = currentRole;
-        (task.history ||= []).push({ event: 'Endgültig nicht erfüllt', at: Date.now() });
-      } else return;
+      }
       persistState(); refreshAllUI();
     }
     function renderTasks() {
@@ -5453,9 +6032,9 @@
       const list = document.getElementById('task-list');
       if (!permitted) { list.innerHTML = ''; return; }
       const form = document.getElementById('tasks-form');
-      form.classList.toggle('hidden', currentRole !== 'Master' && !hasPermission('aufgaben','add'));
+      form.classList.toggle('hidden', !editingTaskId && currentRole !== 'Master' && !hasPermission('aufgaben','add'));
       const assignee = document.getElementById('task-assignee');
-      if (currentRole === 'Daisy') { assignee.disabled = false; document.getElementById('task-kind').value = 'personal'; } else assignee.disabled = false;
+      if (currentRole === 'Daisy') { assignee.disabled = false; if (!editingTaskId) document.getElementById('task-kind').value = 'personal'; } else assignee.disabled = false;
       updateTaskForm();
       const labels = { open: ['Offen','text-sky-300','border-sky-800'], review: ['Zur Prüfung','text-amber-300','border-amber-800'], overdue: ['Frist überschritten','text-rose-300','border-rose-800'], done: ['Erfüllt','text-emerald-300','border-emerald-800'], rejected: ['Nicht erfüllt','text-slate-400','border-slate-700'] };
       list.innerHTML = appState.mgmt.aufgaben.map(t => {
@@ -5463,13 +6042,13 @@
         const style = labels[status];
         const personal = t.taskKind === 'personal' || (t.assignee === 'Master' && t.taskKind !== 'reward');
         const buttons = personal
-          ? ((currentRole === 'Master' || (currentRole === 'Daisy' && t.assignee === 'Daisy')) && status !== 'done' ? '<button onclick="completeMasterTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-emerald-900/40 text-emerald-200">Erledigt</button>' : '')
+          ? ((currentRole === 'Daisy' && t.assignee === 'Daisy') && !['done','rejected'].includes(status) ? '<button onclick="completeMasterTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-emerald-900/40 text-emerald-200">Erledigt</button>' : '')
           : (currentRole === 'Daisy' && ['open','overdue'].includes(status) ? '<button onclick="reportTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-amber-900/40 text-amber-200">Erledigt melden</button>' : '');
         const reviewButtons = !personal && currentRole === 'Master' && t.assignee === 'Daisy' && ['review','overdue'].includes(status)
-          ? ['accept','reject','extend'].map((d,i) => '<button onclick="reviewTask(\'' + t.id + '\',\'' + d + '\')" class="px-3 py-1 rounded-lg bg-white/10">' + ['Erfüllt','Nicht erfüllt','Frist verlängern'][i] + '</button>').join('')
+          ? ['extend'].map((d,i) => '<button onclick="reviewTask(\'' + t.id + '\',\'' + d + '\')" class="px-3 py-1 rounded-lg bg-white/10">' + ['Frist verlängern'][i] + '</button>').join('')
           : '';
-        const edit = currentRole === 'Master' && status === 'open' ? '<button onclick="editTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-white/10">Bearbeiten</button>' : '';
-        return '<div class="rounded-xl border ' + style[2] + ' bg-white/[0.03] p-3 space-y-2"><div class="flex flex-wrap justify-between gap-2"><strong class="text-sm">' + escapeHtml(t.title) + '</strong>' + badgeMark("aufgaben",t.id) + '<span class="text-xs ' + style[1] + '">' + style[0] + '</span></div><p class="text-xs text-slate-400">' + escapeHtml(t.desc || '') + '</p><div class="text-xs text-slate-400">Für: ' + escapeHtml(getDisplayName(t.assignee || 'Master')) + ' · Frist: ' + (t.deadline ? new Date(t.deadline).toLocaleString('de-DE') : 'Keine (Altbestand)') + '</div>' + (t.assignee === 'Daisy' ? '<div class="text-xs text-slate-400">+' + rewardAmount(t.plusPoints) + ' / −' + rewardAmount(t.minusPoints) + ' Punkte pro Fristversäumnis</div>' : '') + (t.reportedAt ? '<div class="text-xs text-amber-300">Gemeldet: ' + new Date(t.reportedAt).toLocaleString('de-DE') + '</div>' : '') + '<div class="flex flex-wrap gap-2 text-xs">' + buttons + reviewButtons + edit + '</div></div>';
+        const edit = canChangeEntry('aufgaben','edit',t) && status === 'open' ? '<button onclick="editTask(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-white/10">Bearbeiten</button>' : '';
+        return '<div class="rounded-xl border ' + style[2] + ' bg-white/[0.03] p-3 space-y-2"><div class="flex flex-wrap justify-between gap-2"><strong class="text-sm">' + escapeHtml(t.title) + '</strong>' + badgeMark("aufgaben",t.id) + '<span class="text-xs ' + style[1] + '">' + style[0] + '</span></div><p class="text-xs text-slate-400">' + escapeHtml(t.desc || '') + '</p><div class="text-xs text-slate-400">Für: ' + escapeHtml(getDisplayName(t.assignee || 'Master')) + ' · Frist: ' + (t.deadline ? new Date(t.deadline).toLocaleString('de-DE') : 'Keine (Altbestand)') + '</div>' + (t.assignee === 'Daisy' ? '<div class="text-xs text-slate-400">+' + rewardAmount(t.plusPoints) + ' / −' + rewardAmount(t.minusPoints) + ' Punkte pro Fristversäumnis</div>' : '') + (t.reportedAt ? '<div class="text-xs text-amber-300">Gemeldet: ' + new Date(t.reportedAt).toLocaleString('de-DE') + '</div>' : '') + (t.closureComment ? '<p class="text-xs text-amber-200">Kommentar zum Abschluss: ' + escapeHtml(t.closureComment) + '</p>' : '') + '<div class="flex flex-wrap gap-2 text-xs">' + buttons + reviewButtons + edit + (currentRole === 'Master' ? '<button onclick="openTaskClosure(\'' + t.id + '\')" class="px-3 py-1 rounded-lg bg-white/10"' + (['done','rejected'].includes(status) ? ' title="Abschluss korrigieren" aria-label="Abschluss korrigieren">✎' : '>Aufgabe abschließen') + '</button>' : '') + '</div></div>';
       }).join('') || '<p class="text-xs text-slate-400">Noch keine Aufgaben vorhanden.</p>';
     }
     // Selection is local and provisional until an RTDB ledger transaction commits.
@@ -5772,7 +6351,9 @@
 
     const REWARD_GALLERY = {
       belohnungen: [['film','🎬'],['geschenk','🎁'],['kerzen','🕯️'],['essen','🍰'],['musik','🎧'],['bad','🛁'],['reise','✈️'],['buch','📖'],['blumen','💐'],['sterne','🌟']],
-      strafen: [['hammer','🔨'],['uhr','⏳'],['blitz','⚡'],['kette','⛓️'],['schloss','🔒'],['glocke','🔔'],['schild','🛡️'],['ziel','🎯'],['karte','🃏'],['waage','⚖️']]
+      strafen: [['hammer','🔨'],['uhr','⏳'],['blitz','⚡'],['kette','⛓️'],['schloss','🔒'],['glocke','🔔'],['schild','🛡️'],['ziel','🎯'],['karte','🃏'],['waage','⚖️']],
+      kleidung: [['allgemein','👚'],['jacke','🧥'],['schuhe','👟'],['pullover','🧶'],['tshirt','👕'],['hose','👖'],['kleid','👗'],['hemd','👔'],['socken','🧦'],['muetze','🧢']],
+      toys: [['allgemein','🎲'],['puzzle','🧩'],['teddy','🧸'],['spiel','🎮'],['wuerfel','🎲'],['ball','⚽'],['roboter','🤖'],['auto','🚗'],['rakete','🚀'],['joystick','🕹️']]
     };
     function galleryImage(cat, id) {
       const options = REWARD_GALLERY[cat] || [];
@@ -5795,6 +6376,7 @@
       if (item.galleryImageId) return galleryImage(cat,item.galleryImageId);
       // Existing catalog entries get a stable visual fallback without migrating room data.
       if (REWARD_GALLERY[cat]) {
+        if (['kleidung','toys'].includes(cat)) return galleryImage(cat, 'allgemein');
         const key = String(item.id || item.title || '');
         let hash = 0;
         for (let i = 0; i < key.length; i++) hash = ((hash * 31) + key.charCodeAt(i)) >>> 0;
@@ -5803,7 +6385,7 @@
       return '';
     }
     function chooseRewardGallery(id) {
-      if (!['belohnungen','strafen'].includes(activeMgmtCategory)) return;
+      if (!REWARD_GALLERY[activeMgmtCategory]) return;
       if (!(REWARD_GALLERY[activeMgmtCategory] || []).some(entry=>entry[0]===id)) return;
       mgmtDraftImage = null; mgmtImageRemoved = false;
       mgmtDraftGalleryId = id;
@@ -5819,7 +6401,7 @@
       const options = REWARD_GALLERY[activeMgmtCategory];
       box.classList.toggle('hidden',!options);
       if (!options) return;
-      box.innerHTML = '<p class="text-xs text-amber-200 mb-2">Illustration auswählen (ohne Auswahl: Zufallsmotiv)</p>' +
+      box.innerHTML = '<p class="text-xs text-amber-200 mb-2">Illustration auswählen (ohne Auswahl: ' + (['kleidung','toys'].includes(activeMgmtCategory) ? 'allgemeines Kategorienmotiv' : 'Zufallsmotiv') + ')</p>' +
         '<div class="grid grid-cols-5 gap-2">' + options.map(([id]) =>
           '<button type="button" title="' + id + '" onclick="chooseRewardGallery(\'' + id +
           '\')" class="rounded-lg border p-1 ' +
@@ -5831,6 +6413,434 @@
       const entries = REWARD_GALLERY[cat] || [];
       return entries.length ? entries[Math.floor(Math.random()*entries.length)][0] : null;
     }
+    // Fest eingebaute, rollen- und namensneutrale Ideen. Kein Firebase-Zugriff.
+    const DOMINION_IDEAS = {
+      aufgaben: [
+        ['Morgenritual gestalten','Entwickle ein kleines, gemeinsames Morgenritual und halte die vereinbarten Schritte fest.'],
+        ['Eine Überraschung planen','Bereite eine kleine Überraschung für die andere Person vor.'],
+        ['Wochenziel festlegen','Wähle ein realistisches persönliches Ziel und dokumentiere den Fortschritt.'],
+        ['Achtsamkeitsmoment','Nimm dir zehn Minuten Zeit für eine bewusste Pause und beschreibe anschließend deine Eindrücke.'],
+        ['Wunschliste erstellen','Schreibe fünf Ideen für gemeinsame Erlebnisse auf.'],
+        ['Ein Ritual zuverlässig einhalten','Halte ein vorher gemeinsam vereinbartes Ritual für eine Woche ein.'],
+        ['Aufmerksamkeit zeigen','Überlege dir eine persönliche Geste der Wertschätzung und setze sie um.'],
+        ['Rollenspiel vorbereiten','Entwirf eine freiwillige Szene mit Rollen, Ablauf und klaren Grenzen.'],
+        ['Ein besonderes Outfit wählen','Stelle ein Outfit für einen gemeinsam vereinbarten Anlass zusammen.'],
+        ['Gemeinsamer Rückblick','Besprecht, was in der letzten Woche gut funktioniert hat und was ihr ändern möchtet.']
+      ],
+      belohnungen: [
+        ['Ein Abend nach Wunsch','Die belohnte Person darf das gemeinsame Abendprogramm auswählen.'],
+        ['Lieblingsessen','Ein selbst gekochtes oder bestelltes Lieblingsgericht nach Wahl.'],
+        ['Eine kleine Überraschung','Eine persönliche Aufmerksamkeit als Dankeschön.'],
+        ['Zeit zu zweit','Ein ungestörter gemeinsamer Abend ohne Ablenkung.'],
+        ['Wunschaktivität','Eine vorher vereinbarte Freizeitaktivität nach Wahl.'],
+        ['Ein Privileg für einen Tag','Ein zusätzliches, gemeinsam vereinbartes Privileg für einen Tag.'],
+        ['Ein Wunschritual','Ein besonderes, freiwilliges Ritual nach den Wünschen der belohnten Person.'],
+        ['Entspannungszeit','Ein ruhiger Abend mit Musik, Tee oder einem Wohlfühlprogramm.'],
+        ['Ein besonderer Ausflug','Ein kleiner Ausflug oder Spaziergang zu einem Wunschziel.'],
+        ['Freie Wahl','Die belohnte Person darf zwischen drei vorher vereinbarten Optionen wählen.']
+      ],
+      strafen: [
+        ['Zusätzliche Haushaltsaufgabe','Eine vorher vereinbarte, angemessene zusätzliche Aufgabe übernehmen.'],
+        ['Reflexion schreiben','Kurz notieren, was passiert ist und wie es künftig besser laufen kann.'],
+        ['Privileg aussetzen','Ein freiwillig vereinbartes, nicht wesentliches Privileg zeitweise pausieren.'],
+        ['Ordnung schaffen','Einen ausgewählten Bereich aufräumen und ordentlich hinterlassen.'],
+        ['Wiedergutmachung','Eine passende Geste vereinbaren, um einen Fehler auszugleichen.'],
+        ['Zusatzaufgabe erfüllen','Eine kleine, zumutbare Zusatzaufgabe innerhalb einer vereinbarten Frist erledigen.'],
+        ['Regel gemeinsam überprüfen','Eine bestehende Regel lesen und gemeinsam ihre Bedeutung besprechen.'],
+        ['Punkteabzug vereinbaren','Einen moderaten, vorher vereinbarten Punkteabzug festlegen.'],
+        ['Verantwortung übernehmen','Einen konkreten Plan zur Verbesserung formulieren und umsetzen.'],
+        ['Ritual wiederholen','Ein freiwillig vereinbartes Übungsritual noch einmal sorgfältig durchführen.']
+      ]
+    };
+    let dominionIdeaSession = null;
+    function openDominionIdeas(category) {
+      if (!DOMINION_IDEAS[category]) return;
+      if (category === 'aufgaben' && currentRole !== 'Master' && !hasPermission('aufgaben','add')) return;
+      if (category !== 'aufgaben' && !(hasPermission(category,'add') || (mgmtEditingItemId && hasPermission(category,'edit')))) return;
+      const order = DOMINION_IDEAS[category].map((_, i) => i);
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i],order[j]] = [order[j],order[i]];
+      }
+      dominionIdeaSession = {category, order, index:0};
+      document.getElementById('dominion-ideas-title').textContent = '💡 Ideen für ' + ({aufgaben:'Aufgaben',belohnungen:'Belohnungen',strafen:'Strafen'}[category]);
+      document.getElementById('dominion-ideas-dialog').classList.remove('hidden');
+      renderDominionIdea();
+    }
+    function renderDominionIdea() {
+      const session = dominionIdeaSession;
+      if (!session) return;
+      const idea = DOMINION_IDEAS[session.category][session.order[session.index]];
+      document.getElementById('dominion-ideas-progress').textContent = 'Vorschlag ' + (session.index+1) + ' von ' + session.order.length;
+      document.getElementById('dominion-ideas-name').textContent = idea[0];
+      document.getElementById('dominion-ideas-description').textContent = idea[1];
+    }
+    function nextDominionIdea() {
+      if (!dominionIdeaSession) return;
+      const session = dominionIdeaSession;
+      session.index++;
+      if (session.index >= session.order.length) {
+        session.index = 0;
+        for (let i = session.order.length-1; i>0; i--) {
+          const j = Math.floor(Math.random()*(i+1));
+          [session.order[i],session.order[j]]=[session.order[j],session.order[i]];
+        }
+      }
+      renderDominionIdea();
+    }
+    function closeDominionIdeas() {
+      document.getElementById('dominion-ideas-dialog').classList.add('hidden');
+      dominionIdeaSession = null;
+    }
+    function applyDominionIdea() {
+      const session = dominionIdeaSession;
+      if (!session) return;
+      const idea = DOMINION_IDEAS[session.category][session.order[session.index]];
+      if (session.category === 'aufgaben') {
+        if (document.getElementById('task-dialog').classList.contains('hidden')) return closeDominionIdeas();
+        document.getElementById('task-title').value = idea[0];
+        document.getElementById('task-desc').value = idea[1];
+      } else {
+        if (activeMgmtCategory !== session.category || document.getElementById('mgmt-add-box').classList.contains('hidden')) return closeDominionIdeas();
+        document.getElementById('mgmt-title').value = idea[0];
+        document.getElementById('mgmt-desc').value = idea[1];
+      }
+      closeDominionIdeas();
+    }
+
+
+    function renderMgmtApplications() {
+      let panel = document.getElementById('mgmt-applications-panel');
+      if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'mgmt-applications-panel';
+        panel.className = 'rounded-xl border border-amber-800/50 p-4 space-y-3';
+        document.getElementById('mgmt-items-list').before(panel);
+      }
+      // Completed requests remain in Firebase for audit/history, but not in the active queue.
+      const applications = (appState.mgmtApplications || []).filter(a =>
+        a.category === activeMgmtCategory &&
+        ['pending','revision'].includes(a.status) &&
+        (currentRole === 'Master' || a.item?.createdBy === currentRole));
+      const history = (appState.mgmtApplications || []).filter(a =>
+        a.category === activeMgmtCategory &&
+        ['approved','rejected'].includes(a.status) &&
+        (currentRole === 'Master' || a.item?.createdBy === currentRole));
+      const requestsOpen = panel.querySelector('[data-str-section="requests"]')?.open ?? true;
+      const historyOpen = panel.querySelector('details')?.open ?? false;
+      panel.classList.toggle('hidden', !MGMT_CATEGORIES.some(cat => cat.id === activeMgmtCategory && cat.id !== 'aufgaben' && (appState.permissions?.[cat.id]?.reviewRequired || applications.length || history.length)));
+      const labels = {pending:'Zur Prüfung',revision:'Nachbesserung erforderlich',rejected:'Abgelehnt',approved:'Freigegeben'};
+      panel.innerHTML = (applications.length ? '<h3 class="font-semibold text-amber-300">Anträge zur Bearbeitung</h3>' : '') + applications.map(a => {
+        const actions = currentRole === 'Master' && a.status === 'pending'
+          ? `<div class="flex flex-wrap gap-2 mt-2"><button class="text-xs px-3 py-2 rounded-lg bg-sky-900" onclick="openApplicationDialog('${a.id}','edit')">Bearbeiten</button><button class="text-xs px-3 py-2 rounded-lg bg-emerald-800" onclick="decideMgmtApplication('${a.id}','approved')">Freigeben</button><button class="text-xs px-3 py-2 rounded-lg bg-amber-800" onclick="decideMgmtApplication('${a.id}','revision')">Nachbesserung</button><button class="text-xs px-3 py-2 rounded-lg bg-rose-900" onclick="decideMgmtApplication('${a.id}','rejected')">Ablehnen</button></div>`
+          : currentRole === 'Daisy' && a.status === 'revision'
+          ? `<button class="text-xs px-3 py-2 rounded-lg bg-amber-800 mt-2" onclick="reviseMgmtApplication('${a.id}')">Überarbeiten und erneut einreichen</button>` : '';
+        return `<div class="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3 text-sm"><div class="${a.status !== 'approved' ? 'opacity-65 saturate-0' : ''}"><strong class="text-slate-300">${escapeHtml(a.item?.title || '')}</strong><span class="ml-2 text-xs text-slate-400">${labels[a.status] || a.status}</span><p class="text-xs text-slate-400 mt-1">${escapeHtml(a.item?.desc || '')}</p>${rewardImage(a.item || {}, a.category) ? `<img src="${escapeHtml(rewardImage(a.item || {}, a.category))}" alt="Bild zu ${escapeHtml(a.item?.title || 'Antrag')}" loading="lazy" class="rounded-xl max-h-48 w-auto mt-2 border border-slate-700 ${a.status !== 'approved' ? 'grayscale' : ''}" />` : ''}${a.comment ? `<p class="text-xs mt-2">Kommentar: ${escapeHtml(a.comment)}</p>` : ''}</div>${actions}</div>`;
+      }).join('') +
+        (history.length ? '<details class="rounded-lg border border-slate-700 p-3 mt-3"><summary class="cursor-pointer text-sm font-semibold text-amber-300">Antragsverlauf (' + history.length + ')</summary><div class="space-y-2 mt-3">' +
+          history.slice().sort((a,b) => (b.decidedAt || b.createdAt || 0) - (a.decidedAt || a.createdAt || 0)).map(a => {
+            const when = a.decidedAt ? new Date(a.decidedAt).toLocaleString('de-DE') : '';
+            return '<div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 text-sm">' +
+              (isMgmtDecisionUnread(a) ? '<button type="button" onclick="acknowledgeMgmtDecision(\'' + a.id + '\')" class="mb-2 rounded-lg border border-sky-500/50 bg-sky-900/30 px-3 py-1.5 text-xs text-sky-200">Neu – als gelesen markieren</button>' : '') +
+              '<div class="flex flex-wrap gap-2 items-center"><strong>' + escapeHtml(a.item?.title || '') + '</strong><span class="text-xs text-amber-300">' + escapeHtml(labels[a.status] || a.status) + '</span></div>' +
+              (when ? '<p class="text-xs text-slate-400 mt-1">Entscheidung: ' + escapeHtml(when) + '</p>' : '') +
+              (a.comment ? '<p class="mt-2 whitespace-pre-wrap break-words"><strong>Begründung:</strong> ' + escapeHtml(a.comment) + '</p>' : '<p class="text-xs text-slate-400 mt-2">Keine Begründung hinterlegt.</p>') +
+              '</div>';
+          }).join('') + '</div></details>' : '');
+      if (!panel.classList.contains('hidden')) {
+        // Keep the existing request cards and actions intact; group only their DOM nodes.
+        const requestSection = document.createElement('details');
+        requestSection.dataset.strSection = 'requests';
+        requestSection.className = 'rounded-xl border border-amber-800/50 p-3';
+        requestSection.open = requestsOpen;
+        const heading = document.createElement('summary');
+        heading.className = 'cursor-pointer font-semibold text-amber-300';
+        heading.textContent = 'Anträge zur Bearbeitung (' + applications.length + ')';
+        requestSection.appendChild(heading);
+        const requestContent = document.createElement('div');
+        requestContent.className = 'space-y-3 mt-3';
+        const historySection = panel.querySelector('details');
+        while (panel.firstChild && panel.firstChild !== historySection) {
+          const node = panel.firstChild;
+          if (node.nodeType === 1 && node.tagName === 'H3') { node.remove(); continue; }
+          requestContent.appendChild(node);
+        }
+        if (!applications.length) requestContent.innerHTML = '<p class="text-xs text-slate-400">Keine offenen Anträge.</p>';
+        requestSection.appendChild(requestContent);
+        panel.prepend(requestSection);
+        if (historySection) {
+          historySection.open = historyOpen;
+          historySection.className = 'rounded-xl border border-slate-700 p-3';
+        } else {
+          const emptyHistory = document.createElement('details');
+          emptyHistory.className = 'rounded-xl border border-slate-700 p-3';
+          const summary = document.createElement('summary');
+          summary.className = 'cursor-pointer font-semibold text-amber-300';
+          summary.textContent = 'Antragsverlauf (0)';
+          emptyHistory.append(summary);
+          const empty = document.createElement('p');
+          empty.className = 'text-xs text-slate-400 mt-3';
+          empty.textContent = 'Noch keine abgeschlossenen Anträge.';
+          emptyHistory.append(empty);
+          panel.append(emptyHistory);
+        }
+      }
+    }
+    function editMgmtApplication(id) {
+      if (currentRole !== 'Master') return;
+      const a = (appState.mgmtApplications || []).find(x => x.id === id);
+      if (!a || a.status !== 'pending' || !a.item || a.item.masterLocked) return;
+      const title = prompt('Antragsbezeichnung bearbeiten:', a.item.title || '');
+      if (title === null || !title.trim()) return;
+      const desc = prompt('Antragsbeschreibung bearbeiten:', a.item.desc || '');
+      if (desc === null) return;
+      let points = a.item.rewardPoints;
+      if (['belohnungen','strafen'].includes(a.category)) {
+        const entered = prompt('Punktwert des Eintrags:', String(rewardAmount(points)));
+        if (entered === null) return;
+        points = rewardAmount(entered);
+      }
+      a.item.title = title.trim(); a.item.desc = desc.trim();
+      if (['belohnungen','strafen'].includes(a.category)) a.item.rewardPoints = points;
+      a.history = [...(a.history || []), {action:'edited',role:currentRole,at:Date.now()}];
+      persistState(); refreshAllUI();
+    }
+    let mgmtDecisionPending = false;
+    async function decideMgmtApplication(id, decision) {
+      if (currentRole !== 'Master' || !['approved','revision','rejected'].includes(decision) || mgmtDecisionPending) return;
+      const application = (appState.mgmtApplications || []).find(x => x.id === id);
+      if (!application || application.status !== 'pending') return;
+      // Route comments through Dominion's own dialog, not browser prompts.
+      if (decision !== 'approved' && !(window.applicationDecisionConfirmed?.id === id && window.applicationDecisionConfirmed?.decision === decision)) {
+        openApplicationDialog(id,'decision');
+        const dialog = document.getElementById('application-edit-dialog');
+        dialog.dataset.decision = decision;
+        dialog.querySelector('#application-dialog-heading').textContent =
+          decision === 'revision' ? 'Zur Nachbesserung zurückgeben' : 'Antrag ablehnen';
+        dialog.querySelector('#application-dialog-submit').textContent =
+          decision === 'revision' ? 'Nachbesserung anfordern' : 'Endgültig ablehnen';
+        return;
+      }
+      const comment = window.applicationDecisionConfirmed?.id === id &&
+        window.applicationDecisionConfirmed?.decision === decision
+        ? window.applicationDecisionConfirmed.comment : '';
+      window.applicationDecisionConfirmed = null;
+      // No local fallback: application, catalog and reward ledger must commit together.
+      if (location.hostname !== 'jnilats33.github.io' ||
+          !location.pathname.startsWith('/Dominion/') ||
+          firebaseRoomPathPending !== DEFAULT_ROOM_CODE ||
+          !firebaseDbRef || !productionRoomLoaded || productionSyncConflict ||
+          isApplyingRemoteUpdate || recoveryPending || deadlineTransactionPending ||
+          taskCreationPending || pendingCollectionWrites.size ||
+          !lastRemoteState || !testAuthUser || testAuthRole !== 'Master' ||
+          !sameRemoteValue(appState.mgmtApplications,lastRemoteState.mgmtApplications) ||
+          !sameRemoteValue(appState.mgmt,lastRemoteState.mgmt) ||
+          !sameRemoteValue(appState.rewardLedger,lastRemoteState.rewardLedger)) {
+        showToast('Freigabe nicht ausgeführt: Synchronisation zuerst prüfen.', 'error');
+        return;
+      }
+      mgmtDecisionPending = true;
+      const roomRef = firebaseDbRef;
+      const timestamp = Date.now();
+      try {
+        const baseline = (await roomRef.once('value')).val();
+        // Compare server RAW data with the last server RAW snapshot.
+        // mergeWithDefaults() may add defaults and item numbering, so its
+        // normalized state is not a valid baseline for raw Firebase equality.
+        const checkedKeys = ['mgmtApplications','mgmt','rewardLedger'];
+        const mismatches = checkedKeys.filter(key =>
+          !sameRemoteValue(baseline?.[key],lastRemoteRawState?.[key]));
+        if (!baseline || roomRef !== firebaseDbRef || productionSyncConflict ||
+            !lastRemoteRawState || mismatches.length) {
+          console.warn('TEST approval raw baseline mismatch', {
+            missingBaseline: !baseline, roomChanged: roomRef !== firebaseDbRef,
+            conflict: productionSyncConflict, missingRawSnapshot: !lastRemoteRawState,
+            mismatches
+          });
+          throw new Error('Serverstand unterscheidet sich vom lokalen Stand' +
+            (mismatches.length ? ' (' + mismatches.join(', ') + ')' : '') + '.');
+        }
+        const result = await new Promise((resolve,reject) => {
+          roomRef.transaction(current => {
+            if (!current || !sameRemoteValue(current,baseline)) return;
+            const next = sanitizeForFirebase(current);
+            const request = (next.mgmtApplications || []).find(x => x.id === id);
+            if (!request || request.status !== 'pending' || !request.item ||
+                !Array.isArray(next.mgmt?.[request.category])) return;
+            if (decision === 'approved') {
+              if (next.mgmt[request.category].some(item => item.id === request.item.id)) return;
+              next.mgmt[request.category].unshift({...request.item});
+              const key = 'item:' + request.item.id;
+              const amount = rewardAmount(next.rewardRules?.[request.category]);
+              if (amount > 0 && !(next.rewardLedger || []).some(row => row.id === key) &&
+                  !(next.deletedRewardKeys || []).includes(key)) {
+                if (!Array.isArray(next.rewardLedger)) next.rewardLedger = [];
+                next.rewardLedger.push({id:key,amount,description:'Freigegebener Eintrag: ' + request.item.title,
+                  timestamp,actorRole:'Master'});
+              }
+            }
+            request.status = decision;
+            request.comment = comment;
+            request.decidedAt = timestamp;
+            request.history = [...(request.history || []),{action:decision,role:'Master',at:timestamp,comment}];
+            return next;
+          },(error,committed,snapshot) => error ? reject(error) : resolve({committed,snapshot}),false);
+        });
+        if (!result.committed) throw new Error('Serverstand hat sich geändert; keine Freigabe ausgeführt.');
+        showToast('Entscheidung atomar auf dem TEST-Server gespeichert.');
+      } catch (error) {
+        console.warn('Antragsentscheidung nicht gespeichert',error);
+        showToast('Entscheidung nicht ausgeführt: ' + (error.message || String(error)), 'error');
+      } finally {
+        mgmtDecisionPending = false;
+      }
+    }
+    let applicationImageDraft = null;
+    function openApplicationDialog(id, mode) {
+      const a = (appState.mgmtApplications || []).find(x => x.id === id);
+      if (!a || !a.item || a.item.masterLocked) return;
+      if (mode === 'revision' && (currentRole !== 'Daisy' || a.status !== 'revision' ||
+          a.item.createdBy !== 'Daisy' || !hasPermission(a.category,'add'))) return;
+      if (mode === 'edit' && (currentRole !== 'Master' || a.status !== 'pending')) return;
+      if (mode === 'decision' && (currentRole !== 'Master' || a.status !== 'pending')) return;
+      let dialog = document.getElementById('application-edit-dialog');
+      if (!dialog) {
+        dialog = document.createElement('div');
+        dialog.id = 'application-edit-dialog';
+        dialog.className = 'fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4';
+        dialog.innerHTML = `<div class="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-600 bg-slate-900 p-5 space-y-4 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="application-dialog-heading">
+          <h3 id="application-dialog-heading" class="font-semibold text-lg text-amber-300"></h3>
+          <label class="block text-sm">Bezeichnung<input id="application-dialog-title" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-600 p-2 text-white" maxlength="200"></label>
+          <label class="block text-sm">Beschreibung<textarea id="application-dialog-desc" rows="4" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-600 p-2 text-white"></textarea></label>
+          <label id="application-dialog-points-wrap" class="block text-sm">Punkte<input id="application-dialog-points" type="number" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-600 p-2 text-white"></label>
+          <div id="application-dialog-image-wrap" class="space-y-2"><img id="application-dialog-image" class="max-h-40 rounded-lg border border-slate-700" alt="Aktuelles Bild"><label class="block text-sm">Neues Bild auswählen<input id="application-dialog-file" type="file" accept="image/*" class="block w-full mt-1 text-xs"></label><button type="button" id="application-dialog-keep" class="text-xs px-3 py-2 bg-slate-700 rounded-lg">Bisheriges Bild behalten</button></div>
+          <label id="application-dialog-comment-wrap" class="block text-sm">Kommentar (optional)<textarea id="application-dialog-comment" rows="3" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-600 p-2 text-white"></textarea></label>
+          <div class="flex justify-end gap-2"><button type="button" onclick="closeApplicationDialog()" class="px-4 py-2 rounded-lg bg-slate-700">Abbrechen</button><button type="button" id="application-dialog-submit" class="px-4 py-2 rounded-lg bg-amber-700">Speichern</button></div>
+        </div>`;
+        document.body.appendChild(dialog);
+      }
+      dialog.dataset.id = id;
+      dialog.dataset.mode = mode;
+      applicationImageDraft = null;
+      dialog.querySelector('#application-dialog-heading').textContent = mode === 'revision' ? 'Vorschlag nachbessern' : mode === 'edit' ? 'Antrag bearbeiten' : 'Antrag entscheiden';
+      dialog.querySelector('#application-dialog-title').value = a.item.title || '';
+      dialog.querySelector('#application-dialog-desc').value = a.item.desc || '';
+      dialog.querySelector('#application-dialog-points').value = rewardAmount(a.item.rewardPoints);
+      dialog.querySelector('#application-dialog-comment').value = a.comment || '';
+      dialog.querySelector('#application-dialog-title').disabled = mode === 'decision';
+      dialog.querySelector('#application-dialog-desc').disabled = mode === 'decision';
+      dialog.querySelector('#application-dialog-points-wrap').classList.toggle('hidden',mode === 'decision' || !['strafen','belohnungen'].includes(a.category));
+      dialog.querySelector('#application-dialog-comment-wrap').classList.toggle('hidden',mode !== 'decision');
+      const img = rewardImage(a.item,a.category);
+      dialog.querySelector('#application-dialog-image-wrap').classList.toggle('hidden',mode === 'decision');
+      dialog.querySelector('#application-dialog-image').src = img || '';
+      dialog.querySelector('#application-dialog-image').classList.toggle('hidden',!img);
+      dialog.querySelector('#application-dialog-file').value = '';
+      dialog.querySelector('#application-dialog-file').onchange = async event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/') || file.size > 12*1024*1024) {
+          showToast('Bilddatei ungültig oder größer als 12 MB.', 'error'); return;
+        }
+        try {
+          const url = URL.createObjectURL(file);
+          const image = new Image();
+          await new Promise((resolve,reject) => { image.onload=resolve; image.onerror=reject; image.src=url; });
+          const scale = Math.min(1,1280/Math.max(image.naturalWidth,image.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
+          canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);
+          applicationImageDraft=canvas.toDataURL('image/jpeg',0.8);
+          URL.revokeObjectURL(url);
+          dialog.querySelector('#application-dialog-image').src=applicationImageDraft;
+          dialog.querySelector('#application-dialog-image').classList.remove('hidden');
+        } catch(e) { showToast('Bild konnte nicht verarbeitet werden.','error'); }
+      };
+      dialog.querySelector('#application-dialog-keep').onclick = () => {
+        applicationImageDraft=null;
+        dialog.querySelector('#application-dialog-file').value='';
+        dialog.querySelector('#application-dialog-image').src=img || '';
+        dialog.querySelector('#application-dialog-image').classList.toggle('hidden',!img);
+      };
+      dialog.querySelector('#application-dialog-submit').textContent=mode === 'revision' ? 'Erneut einreichen' : mode === 'edit' ? 'Änderungen speichern' : 'Weiter';
+      dialog.querySelector('#application-dialog-submit').onclick=()=>submitApplicationDialog();
+      dialog.classList.remove('hidden');
+      dialog.querySelector('#application-dialog-title').focus();
+    }
+    function closeApplicationDialog() {
+      document.getElementById('application-edit-dialog')?.classList.add('hidden');
+      applicationImageDraft=null;
+    }
+    function submitApplicationDialog() {
+      const dialog=document.getElementById('application-edit-dialog');
+      const id=dialog?.dataset.id,mode=dialog?.dataset.mode;
+      const a=(appState.mgmtApplications||[]).find(x=>x.id===id);
+      if (!a || !a.item || a.item.masterLocked) return closeApplicationDialog();
+      if (mode==='decision') {
+        if (currentRole!=='Master' || a.status!=='pending') return;
+        const decision=dialog.dataset.decision;
+        const comment=dialog.querySelector('#application-dialog-comment').value.trim().slice(0,2000);
+        closeApplicationDialog();
+        window.applicationDecisionConfirmed={id,decision,comment};
+        decideMgmtApplication(id,decision);
+        return;
+      }
+      if (mode==='revision' && (currentRole!=='Daisy' || a.status!=='revision' || a.item.createdBy!=='Daisy' || !hasPermission(a.category,'add'))) return;
+      if (mode==='edit' && (currentRole!=='Master' || a.status!=='pending')) return;
+      const title=dialog.querySelector('#application-dialog-title').value.trim();
+      if (!title) return showToast('Bezeichnung erforderlich.','error');
+      a.item.title=title;
+      a.item.desc=dialog.querySelector('#application-dialog-desc').value.trim();
+      if (mode==='edit' && ['strafen','belohnungen'].includes(a.category))
+        a.item.rewardPoints=rewardAmount(dialog.querySelector('#application-dialog-points').value);
+      if (applicationImageDraft) {
+        a.item.imgUrl=applicationImageDraft;
+        delete a.item.galleryImageId;
+      }
+      if (mode==='revision') {a.status='pending';a.comment='';}
+      a.history=[...(a.history||[]),{action:mode==='revision'?'resubmitted':'edited',role:currentRole,at:Date.now()}];
+      closeApplicationDialog();persistState();refreshAllUI();
+    }
+    function reviseMgmtApplication(id) { openApplicationDialog(id,'revision'); }
+
+    let mgmtPopupOpen = false;
+    function mgmtPopupCategory() { return ['kleidung','toys','strafen','belohnungen'].includes(activeMgmtCategory); }
+    function syncMgmtPopup() {
+      const box = document.getElementById('mgmt-add-box');
+      const launch = document.getElementById('mgmt-popup-launch');
+      const backdrop = document.getElementById('mgmt-popup-backdrop');
+      const header = document.getElementById('mgmt-popup-header');
+      const isPopup = mgmtPopupCategory();
+      const canOpen = hasPermission(activeMgmtCategory, 'add') || !!mgmtEditingItemId;
+      launch.classList.toggle('hidden', !isPopup || !canOpen || !!mgmtEditingItemId);
+      if (isPopup) launch.textContent = ({kleidung:'＋ Neues Kleidungsstück',toys:'＋ Neues Toy',strafen:'＋ Neue Strafe',belohnungen:'＋ Neue Belohnung'})[activeMgmtCategory];
+      const show = isPopup && mgmtPopupOpen && canOpen;
+      backdrop.classList.toggle('hidden', !show);
+      header.classList.toggle('hidden', !show);
+      for (const cls of ['fixed','z-[100]','left-1/2','top-1/2','-translate-x-1/2','-translate-y-1/2','w-[min(94vw,620px)]','max-h-[90vh]','overflow-y-auto']) box.classList.toggle(cls, show);
+      box.style.display = isPopup && !show ? 'none' : '';
+      if (show) document.getElementById('mgmt-popup-heading').textContent = (mgmtEditingItemId ? 'Bearbeiten: ' : 'Neu: ') + ({kleidung:'Kleidung',toys:'Toy',strafen:'Strafe',belohnungen:'Belohnung'})[activeMgmtCategory];
+    }
+    function openMgmtPopup() {
+      if (!mgmtPopupCategory() || !hasPermission(activeMgmtCategory, 'add')) return;
+      mgmtPopupOpen = true;
+      syncMgmtPopup();
+      document.getElementById('mgmt-title').focus();
+    }
+    function closeMgmtPopup() {
+      mgmtPopupOpen = false;
+      if (mgmtEditingItemId && mgmtPopupCategory()) {
+        cancelMgmtEdit();
+      } else {
+        document.getElementById('mgmt-title').value = '';
+        document.getElementById('mgmt-desc').value = '';
+        clearMgmtDraftImage();
+        syncMgmtPopup();
+      }
+    }
+
     function renderVerwaltung() {
       const visibleCats = MGMT_CATEGORIES.filter(cat => cat.id !== 'aufgaben' && hasPermission(cat.id, 'visible'));
       const subTabsEl = document.getElementById('verwaltung-subtabs');
@@ -5848,18 +6858,21 @@
       }
 
       subTabsEl.innerHTML = visibleCats.map(cat => `
-        <button onclick="selectMgmtCategory('${cat.id}')"
+        <button data-mgmt-category="${cat.id}" onclick="selectMgmtCategory('${cat.id}')"
                 class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
                   activeMgmtCategory === cat.id
                     ? 'gold-gradient shadow'
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }">
-          ${cat.label}
+          ${cat.label}<span class="dominion-mgmt-count ${mgmtAttentionCount(cat.id) ? '' : 'hidden'} ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold">${mgmtAttentionCount(cat.id)}</span>
         </button>
       `).join('');
+      updateMgmtNavigationBadges();
 
       const canAdd = hasPermission(activeMgmtCategory, 'add');
-      const canEdit = hasPermission(activeMgmtCategory, 'edit');
+      const ideasButton = document.getElementById('mgmt-ideas-button');
+      if (ideasButton) ideasButton.classList.toggle('hidden', !['belohnungen','strafen'].includes(activeMgmtCategory) || (!canAdd && !(mgmtEditingItemId && hasPermission(activeMgmtCategory,'edit'))));
+      const canEdit = currentRole === 'Master' || ['editOwn','editOthers'].some(key => !!(appState.permissions?.[activeMgmtCategory]?.[key] ?? appState.permissions?.[activeMgmtCategory]?.edit));
       const canDelete = hasPermission(activeMgmtCategory, 'delete');
       const isEditing = !!mgmtEditingItemId;
       document.getElementById('mgmt-add-box').classList.toggle('hidden', !canAdd && !(isEditing && canEdit));
@@ -5870,18 +6883,38 @@
       const showBonus = currentRole === 'Daisy' && !isEditing && canAdd && ['belohnungen','strafen','regeln','toys','kleidung'].includes(activeMgmtCategory) && bonus > 0;
       hint.classList.toggle('hidden', !showBonus);
       hint.textContent = showBonus ? '+' + bonus + ' Punkte' : '';
-      document.getElementById('mgmt-submit-button').textContent = isEditing ? 'Änderungen speichern' : 'Anlegen';
+      document.getElementById('mgmt-submit-button').textContent = isEditing ? 'Änderungen speichern' : (currentRole === 'Daisy' && appState.permissions?.[activeMgmtCategory]?.reviewRequired ? 'Vorschlag einreichen' : 'Anlegen');
       document.getElementById('mgmt-submit-button').onclick = isEditing ? saveMgmtEdit : addMgmtItem;
       document.getElementById('mgmt-cancel-edit').classList.toggle('hidden', !isEditing);
 
+      syncMgmtPopup();
       renderRewardGallery();
+      renderMgmtApplications();
       numberMgmtItems(appState);
       const items = appState.mgmt[activeMgmtCategory] || [];
       const listEl = document.getElementById('mgmt-items-list');
       const rewardCategory = ['belohnungen', 'strafen'].includes(activeMgmtCategory);
+      const catalogOpen = listEl.querySelector('[data-str-section="catalog"]')?.open ?? false;
+      const wrapCatalog = () => {
+        if (!MGMT_CATEGORIES.some(cat => cat.id === activeMgmtCategory && cat.id !== 'aufgaben' && (appState.permissions?.[cat.id]?.reviewRequired || (appState.mgmtApplications || []).some(a => a.category === cat.id)))) return;
+        const section = document.createElement('details');
+        section.dataset.strSection = 'catalog';
+        section.className = 'rounded-xl border border-slate-700 p-3';
+        section.open = catalogOpen;
+        const summary = document.createElement('summary');
+        summary.className = 'cursor-pointer font-semibold text-amber-300';
+        summary.textContent = (activeMgmtCategory === 'strafen' ? 'Strafenkatalog' : activeMgmtCategory === 'belohnungen' ? 'Belohnungskatalog' : activeMgmtCategory === 'kleidung' ? 'Kleidungskatalog' : activeMgmtCategory === 'toys' ? 'Toy-Katalog' : 'Regelkatalog') + ' (' + items.length + ')';
+        section.appendChild(summary);
+        const content = document.createElement('div');
+        content.className = 'space-y-2.5 mt-3';
+        while (listEl.firstChild) content.appendChild(listEl.firstChild);
+        section.appendChild(content);
+        listEl.appendChild(section);
+      };
 
       if (items.length === 0) {
         listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Noch keine Einträge in dieser Kategorie.</p>`;
+        wrapCatalog();
         return;
       }
 
@@ -5899,26 +6932,28 @@
             </div>
             ${rewardCategory ? `<p class="text-xs text-amber-300">Punktwert: ${activeMgmtCategory === 'strafen' ? '−' : '+'}${rewardAmount(item.rewardPoints)}</p>` : ''}
             ${item.desc ? `<p class="text-xs text-slate-400 mt-1 break-words">${escapeHtml(item.desc)}</p>` : ''}
-            ${rewardImage(item,activeMgmtCategory) ? `<img src="${escapeHtml(rewardImage(item,activeMgmtCategory))}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 w-auto mt-2 border border-slate-700" />` : ''}
+            ${rewardImage(item,activeMgmtCategory) ? `<img src="${escapeHtml(rewardImage(item,activeMgmtCategory))}" alt="${escapeHtml(item.title)}" class="rounded-xl max-h-56 max-w-full w-auto mt-2 border-2 border-[#e8b95c]" />` : ''}
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            ${canEdit ? `<button onclick="editMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 text-xs" title="Bearbeiten">✏️</button>` : ''}
-            ${canDelete ? `<button onclick="deleteMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs" title="Löschen">🗑️</button>` : ''}
+            ${currentRole === 'Master' ? `<button onclick="toggleMgmtMasterLock('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs" title="${item.masterLocked ? 'Eintrag entsperren' : 'Eintrag vor Änderungen und Löschen schützen'}">${item.masterLocked ? '🔒' : '🔓'}</button>` : (item.masterLocked ? '<span title="Durch Master gesperrt">🔒</span>' : '')}
+            ${canChangeEntry(activeMgmtCategory, 'edit', item) ? `<button onclick="editMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 text-xs" title="Bearbeiten">✏️</button>` : ''}
+            ${canChangeEntry(activeMgmtCategory, 'delete', item) ? `<button onclick="deleteMgmtItem('${activeMgmtCategory}', '${item.id}')" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 text-xs" title="Löschen">🗑️</button>` : ''}
           </div>
         </div>
       `).join('');
+      wrapCatalog();
     }
 
     function selectMgmtCategory(catId) {
-      if (activeMgmtCategory !== catId) { cancelMgmtEdit(); clearMgmtDraftImage(); }
+      if (activeMgmtCategory !== catId) { mgmtPopupOpen = false; cancelMgmtEdit(); clearMgmtDraftImage(); }
       activeMgmtCategory = catId;
       renderVerwaltung();
     }
 
     function editMgmtItem(catId, itemId) {
-      if (catId !== activeMgmtCategory || !hasPermission(catId, 'edit')) return;
+      if (catId !== activeMgmtCategory) return;
       const item = (appState.mgmt[catId] || []).find(entry => entry.id === itemId);
-      if (!item) return;
+      if (!item || !canChangeEntry(catId, 'edit', item)) return;
       mgmtEditingItemId = itemId; mgmtDraftImage = null; mgmtDraftGalleryId = item.galleryImageId || null; mgmtImageRemoved = false;
       document.getElementById('mgmt-title').value = item.title || '';
       document.getElementById('mgmt-desc').value = item.desc || '';
@@ -5927,8 +6962,9 @@
       const previewImg = document.getElementById('mgmt-image-preview-img');
       if (rewardImage(item,catId)) { previewImg.src = rewardImage(item,catId); preview.classList.remove('hidden'); }
       else { previewImg.src = ''; preview.classList.add('hidden'); }
+      if (mgmtPopupCategory()) mgmtPopupOpen = true;
       renderVerwaltung();
-      document.getElementById('mgmt-add-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (!mgmtPopupCategory()) document.getElementById('mgmt-add-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function removeMgmtImage() {
@@ -5944,14 +6980,16 @@
       mgmtEditingItemId = null;
       document.getElementById('mgmt-title').value = ''; document.getElementById('mgmt-desc').value = '';
       clearMgmtDraftImage();
+      mgmtPopupOpen = false;
       renderVerwaltung();
     }
 
     function saveMgmtEdit() {
       const catId = activeMgmtCategory;
-      if (!mgmtEditingItemId || !hasPermission(catId, 'edit')) return;
+      if (!mgmtEditingItemId) return;
       const item = (appState.mgmt[catId] || []).find(entry => entry.id === mgmtEditingItemId);
       if (!item) { cancelMgmtEdit(); return; }
+      if (!canChangeEntry(catId, 'edit', item)) { showToast('Keine Bearbeitungsberechtigung für diesen Eintrag.', 'error'); return; }
       const title = document.getElementById('mgmt-title').value.trim();
       const desc = document.getElementById('mgmt-desc').value.trim();
       if (!title) { showToast('Bitte eine Bezeichnung eingeben.', 'error'); return; }
@@ -5960,17 +6998,17 @@
       if (['kleidung','toys','belohnungen','strafen'].includes(catId)) {
         if (mgmtDraftImage) { item.imgUrl = mgmtDraftImage; delete item.galleryImageId; }
         else if (mgmtDraftGalleryId) { item.galleryImageId = mgmtDraftGalleryId; delete item.imgUrl; }
-        else if (mgmtImageRemoved && ['belohnungen','strafen'].includes(catId)) {
-          item.galleryImageId = randomRewardGalleryId(catId); delete item.imgUrl;
+        else if (mgmtImageRemoved && REWARD_GALLERY[catId]) {
+          item.galleryImageId = ['kleidung','toys'].includes(catId) ? 'allgemein' : randomRewardGalleryId(catId); delete item.imgUrl;
         } else if (mgmtImageRemoved) delete item.imgUrl;
-        if (['belohnungen','strafen'].includes(catId) && !rewardImage(item,catId))
-          item.galleryImageId = randomRewardGalleryId(catId);
+        if (REWARD_GALLERY[catId] && !rewardImage(item,catId))
+          item.galleryImageId = ['kleidung','toys'].includes(catId) ? 'allgemein' : randomRewardGalleryId(catId);
       }
       const catObj = MGMT_CATEGORIES.find(category => category.id === catId);
       logActivity('hat ' + (catObj ? catObj.singular : 'Eintrag') + ' bearbeitet: „' + oldTitle + '“ → „' + title + '“', 'verwaltung', catId, item.id);
       mgmtEditingItemId = null;
       document.getElementById('mgmt-title').value = ''; document.getElementById('mgmt-desc').value = '';
-      clearMgmtDraftImage(); document.getElementById('mgmt-points').value = '0'; persistState(); refreshAllUI(); showToast('Änderungen gespeichert.');
+      clearMgmtDraftImage(); document.getElementById('mgmt-points').value = '0'; mgmtPopupOpen = false; persistState(); refreshAllUI(); showToast('Änderungen gespeichert.');
     }
 
     function addMgmtItem() {
@@ -5985,16 +7023,20 @@
       const prefix = MGMT_NUMBER_PREFIXES[activeMgmtCategory];
       const next = (appState.mgmtCounters[activeMgmtCategory] || 0) + 1;
       appState.mgmtCounters[activeMgmtCategory] = next;
-      const newItem = { id: 'mgmt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), itemNumber: prefix + '-' + String(next).padStart(4, '0'), title, desc, done: false };
+      const newItem = { id: 'mgmt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), itemNumber: prefix + '-' + String(next).padStart(4, '0'), title, desc, done: false, createdBy: currentRole };
       if (['belohnungen','strafen'].includes(activeMgmtCategory)) newItem.rewardPoints = rewardAmount(document.getElementById('mgmt-points').value);
       if (['kleidung','toys','belohnungen','strafen'].includes(activeMgmtCategory) && mgmtDraftImage) newItem.imgUrl = mgmtDraftImage;
-      if (['belohnungen','strafen'].includes(activeMgmtCategory) && !mgmtDraftImage)
-        newItem.galleryImageId = mgmtDraftGalleryId || randomRewardGalleryId(activeMgmtCategory);
+      if (REWARD_GALLERY[activeMgmtCategory] && !mgmtDraftImage)
+        newItem.galleryImageId = mgmtDraftGalleryId || (['kleidung','toys'].includes(activeMgmtCategory) ? 'allgemein' : randomRewardGalleryId(activeMgmtCategory));
       if (!Array.isArray(appState.mgmt[activeMgmtCategory])) {
         appState.mgmt[activeMgmtCategory] = [];
       }
-      appState.mgmt[activeMgmtCategory].unshift(newItem);
-      if (currentRole === 'Daisy' && ['kleidung','toys','belohnungen','strafen','regeln'].includes(activeMgmtCategory)) bookReward('item:' + newItem.id, rewardAmount(appState.rewardRules[activeMgmtCategory]), 'Neuer Eintrag: ' + title);
+      const needsReview = currentRole === 'Daisy' && !!appState.permissions?.[activeMgmtCategory]?.reviewRequired;
+      if (needsReview) {
+        if (!Array.isArray(appState.mgmtApplications)) appState.mgmtApplications = [];
+        appState.mgmtApplications.unshift({id:'application-' + newItem.id,category:activeMgmtCategory,item:newItem,status:'pending',createdAt:Date.now(),history:[{action:'submitted',role:currentRole,at:Date.now()}]});
+      } else appState.mgmt[activeMgmtCategory].unshift(newItem);
+      if (!needsReview && currentRole === 'Daisy' && ['kleidung','toys','belohnungen','strafen','regeln'].includes(activeMgmtCategory)) bookReward('item:' + newItem.id, rewardAmount(appState.rewardRules[activeMgmtCategory]), 'Neuer Eintrag: ' + title);
 
       logActivity(`hat ${catObj ? catObj.singular : 'Eintrag'} hinzugefügt: „${title}“`, 'verwaltung', activeMgmtCategory, newItem.id);
 
@@ -6002,25 +7044,34 @@
       document.getElementById('mgmt-desc').value = '';
       clearMgmtDraftImage();
       document.getElementById('mgmt-points').value = '0';
+      mgmtPopupOpen = false;
       persistState();
       refreshAllUI();
-      showToast('Eintrag angelegt.');
+      showToast(needsReview ? 'Antrag zur Prüfung eingereicht.' : 'Eintrag angelegt.');
     }
 
     function toggleMgmtDone(catId, itemId) {
-      if (!hasPermission(catId, 'edit')) return;
       const item = (appState.mgmt[catId] || []).find(i => i.id === itemId);
-      if (!item) return;
+      if (!item || !canChangeEntry('einkauf', 'edit', item)) return;
       item.done = !item.done;
       logActivity(`hat Aufgabe ${item.done ? 'erledigt' : 'geöffnet'}: „${item.title}“`, 'verwaltung', catId, item.id);
       persistState();
       refreshAllUI();
     }
 
+    function toggleMgmtMasterLock(catId, itemId) {
+      if (currentRole !== 'Master' || !MGMT_CATEGORIES.some(c => c.id === catId)) return;
+      const item = (appState.mgmt?.[catId] || []).find(x => x.id === itemId);
+      if (!item) return;
+      item.masterLocked = !item.masterLocked;
+      logActivity('hat Eintrag ' + (item.masterLocked ? 'gesperrt' : 'entsperrt') + ': „' + (item.title || '') + '“', 'verwaltung', catId, item.id);
+      persistState(); refreshAllUI();
+    }
+
     function deleteMgmtItem(catId, itemId) {
-      if (!hasPermission(catId, 'delete')) return;
       const catObj = MGMT_CATEGORIES.find(c => c.id === catId);
       const item = (appState.mgmt[catId] || []).find(i => i.id === itemId);
+      if (!canChangeEntry(catId, 'delete', item)) return;
       appState.mgmt[catId] = (appState.mgmt[catId] || []).filter(i => i.id !== itemId);
       if (item) {
         logActivity(`hat ${catObj ? catObj.singular : 'Eintrag'} gelöscht: „${item.title}“`, 'verwaltung', catId);
@@ -6073,6 +7124,7 @@
       document.getElementById('settings-panel-ansicht').classList.toggle('hidden', activeSettingsSubTab !== 'ansicht');
       renderDashboardVisibilitySettings();
       renderDashboardMetricVisibilitySettings();
+      renderActivityStreamFilterSettings();
       document.getElementById('settings-panel-basics').classList.toggle('hidden', activeSettingsSubTab !== 'basics');
       document.getElementById('settings-panel-berechtigungen').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'berechtigungen');
       document.getElementById('settings-panel-sicherheit').classList.toggle('hidden', !isMaster || activeSettingsSubTab !== 'sicherheit');
@@ -6249,6 +7301,13 @@
         renderDevelopmentPanel();
       }
     }
+    function openActivityStreamSettings() {
+      activeSettingsSubTab = 'ansicht';
+      switchTab('einstellungen');
+      renderEinstellungen();
+      const box = document.getElementById('activity-stream-filter-settings');
+      if (box) box.scrollIntoView({behavior:'smooth',block:'start'});
+    }
     function selectSettingsSubTab(subTab) {
       if (currentRole !== 'Master' && !['basics', 'ansicht', 'benachrichtigungen', 'daisy-security'].includes(subTab)) return;
       activeSettingsSubTab = subTab;
@@ -6306,21 +7365,48 @@
       document.getElementById('perm-username-toggle').checked = !!appState.permissions.username;
 
       const tbody = document.getElementById('permissions-matrix-body');
+      // Die Matrix konfiguriert die Rechte der zweiten Rolle; Beschriftungen
+      // beziehen sich immer auf die unter Einstellungen hinterlegten Rollennamen.
+      const roleLabels = [
+        ['editOwn', getDisplayName('Daisy') + ' bearbeiten'],
+        ['editOthers', getDisplayName('Master') + ' bearbeiten'],
+        ['deleteOwn', getDisplayName('Daisy') + ' löschen'],
+        ['deleteOthers', getDisplayName('Master') + ' löschen']
+      ];
+      const headings = tbody.closest('table')?.querySelectorAll('thead th');
+      if (headings && headings.length >= 7) {
+        roleLabels.forEach(([key, label], index) => {
+          headings[index + 3].textContent = label;
+          headings[index + 3].title = key.endsWith('Others')
+            ? 'Einträge der anderen Rolle sowie Altbestand ohne bekannten Ersteller'
+            : 'Einträge, die diese Rolle selbst erstellt hat';
+        });
+      }
       const table = tbody.closest('table');
       const header = table?.querySelector('thead tr');
+      if (header && !header.querySelector('[data-review-heading]')) {
+        const pointsHeading = header.querySelector('[data-points-heading]');
+        const th = document.createElement('th');
+        th.dataset.reviewHeading = 'true';
+        th.className = 'p-2 text-center text-xs';
+        th.textContent = 'Prüfung';
+        th.title = 'Freigabe vor Übernahme in den Bestand (wird in einem nächsten Schritt aktiviert)';
+        header.insertBefore(th, pointsHeading || null);
+      }
       if (header && !header.querySelector('[data-points-heading]')) header.insertAdjacentHTML('beforeend', '<th data-points-heading class="p-2 text-center text-xs" title="Punkte je neuem Eintrag von Daisy">🎯 Punkte</th>');
       tbody.innerHTML = PERMISSION_CATEGORIES.map(cat => {
         const p = appState.permissions[cat.id] || { visible: true, add: false, edit: false, delete: false };
         return `
           <tr class="hover:bg-white/[0.02]">
             <td class="p-3.5 font-medium text-slate-200">${cat.label}</td>
-            ${['visible', 'add', 'edit', 'delete'].map(action => `
+            ${['visible', 'add', 'editOwn', 'editOthers', 'deleteOwn', 'deleteOthers'].map(action => `
               <td class="p-3.5 text-center">
-                <input type="checkbox" ${p[action] ? 'checked' : ''}
+                <input type="checkbox" ${(typeof p[action] === 'boolean' ? p[action] : p[action.startsWith('edit') ? 'edit' : action.startsWith('delete') ? 'delete' : action]) ? 'checked' : ''}
                        onchange="updateCategoryPermission('${cat.id}', '${action}', this.checked)"
                        class="w-4 h-4 accent-[#c9973e] rounded cursor-pointer" />
               </td>
             `).join('')}
+            <td class="p-2 text-center"><input type="checkbox" ${p.reviewRequired ? 'checked' : ''} ${MGMT_CATEGORIES.some(c => c.id === cat.id && cat.id !== 'aufgaben') ? `onchange="updateCategoryPermission('${cat.id}', 'reviewRequired', this.checked)"` : 'disabled title="Für diese Kategorie noch nicht verfügbar"'} class="w-4 h-4 accent-[#c9973e]" /></td>
             ${['kleidung', 'toys', 'belohnungen', 'strafen', 'regeln'].includes(cat.id) ? `<td class="p-2 text-center"><input aria-label="Punkte für ${cat.label}" title="Punkte pro neuem Eintrag durch Daisy" type="number" min="0" step="1" value="${rewardAmount(appState.rewardRules?.[cat.id])}" onchange="saveRewardRule('${cat.id}',this.value)" class="w-16 max-w-full px-2 py-1.5 text-xs rounded-lg" /></td>` : '<td class="p-2 text-center text-slate-600">–</td>'}
           </tr>
         `;
@@ -6340,7 +7426,12 @@
       if (!appState.permissions[catId]) {
         appState.permissions[catId] = { visible: true, add: false, edit: false, delete: false };
       }
-      appState.permissions[catId][action] = value;
+      if (!['visible','add','editOwn','editOthers','deleteOwn','deleteOthers','reviewRequired'].includes(action)) return;
+      const p = appState.permissions[catId];
+      for (const key of ['editOwn','editOthers','deleteOwn','deleteOthers']) {
+        if (typeof p[key] !== 'boolean') p[key] = !!p[key.startsWith('edit') ? 'edit' : 'delete'];
+      }
+      p[action] = value;
       persistState();
       refreshAllUI();
       showToast('Berechtigung aktualisiert.');
